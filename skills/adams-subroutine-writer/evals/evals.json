@@ -1,0 +1,156 @@
+{
+  "skill": "adams-subroutine-writer",
+  "version": "1.0.0",
+  "evals": [
+    {
+      "id": "cbksub-c-skeleton",
+      "description": "Generate a minimal C CBKSUB that caches a DISP result at ev_ITERATION_BEG",
+      "prompt": "Write a C CBKSUB subroutine for Adams that caches the Y-displacement of marker 5 relative to marker 1 at each iteration begin event. The cached value should be accessible by other subroutines. Include the correct Adams SDK headers and use the enum constants for events.",
+      "assertions": [
+        {
+          "type": "contains",
+          "value": "#include \"slv_cbksub.h\"",
+          "description": "Must include the CBKSUB header"
+        },
+        {
+          "type": "contains",
+          "value": "ev_ITERATION_BEG",
+          "description": "Must use symbolic constant, not raw integer 4"
+        },
+        {
+          "type": "contains",
+          "value": "ev_PRIVATE_EVENT1",
+          "description": "Must handle private events"
+        },
+        {
+          "type": "contains",
+          "value": "ev_PRIVATE_EVENT2",
+          "description": "Must handle private events"
+        },
+        {
+          "type": "contains",
+          "value": "c_sysary",
+          "description": "Must call c_sysary to retrieve displacement"
+        },
+        {
+          "type": "contains_one_of",
+          "value": ["DISP", "\"DISP\""],
+          "description": "Must use DISP function name in SYSARY call"
+        },
+        {
+          "type": "not_contains",
+          "value": "event == 4",
+          "description": "Must not use raw integer for ITERATION_BEG"
+        },
+        {
+          "type": "not_contains",
+          "value": "event == 43",
+          "description": "Must not compare against raw private event integer"
+        }
+      ]
+    },
+    {
+      "id": "cbksub-forbidden-calls",
+      "description": "Agent must warn that VFOSUB cannot be called from CBKSUB",
+      "prompt": "I want to call my VFOSUB subroutine from inside CBKSUB to pre-compute forces at ev_ITERATION_BEG. How do I do that in C?",
+      "assertions": [
+        {
+          "type": "contains_one_of",
+          "value": ["cannot", "not allowed", "forbidden", "not permitted", "not possible"],
+          "description": "Must explain that calling VFOSUB from CBKSUB is not allowed"
+        },
+        {
+          "type": "contains_one_of",
+          "value": ["cache", "global", "shared", "common block"],
+          "description": "Must suggest the correct alternative pattern (caching)"
+        }
+      ]
+    },
+    {
+      "id": "vfosub-iflag-guard",
+      "description": "VFOSUB must include the correct iflag guard",
+      "prompt": "Write a C VFOSUB for Adams that applies a spring force Fx = -k*(x - x0) where k=500 N/mm and x0=100mm. Marker 10 moves, marker 1 is ground. Include everything needed to compile.",
+      "assertions": [
+        {
+          "type": "contains",
+          "value": "#include",
+          "description": "Must include an Adams utility header"
+        },
+        {
+          "type": "contains_one_of",
+          "value": ["iflag == 5", "*iflag == 5", "iflag.EQ.5", "IFLAG.EQ.5"],
+          "description": "Must guard against iflag=5 (expression destruction)"
+        },
+        {
+          "type": "contains_one_of",
+          "value": ["iflag == 7", "*iflag == 7", "iflag.EQ.7", "IFLAG.EQ.7"],
+          "description": "Must guard against iflag=7 (serialization)"
+        },
+        {
+          "type": "contains_one_of",
+          "value": ["iflag == 9", "*iflag == 9", "iflag.EQ.9", "IFLAG.EQ.9"],
+          "description": "Must guard against iflag=9 (unserialization)"
+        },
+        {
+          "type": "contains_one_of",
+          "value": ["c_sysary", "c_sysfnc", "SYSARY", "SYSFNC"],
+          "description": "Must use SYSARY or SYSFNC to get displacement"
+        },
+        {
+          "type": "contains",
+          "value": "DISP",
+          "description": "Must retrieve displacement using DISP fncnam"
+        }
+      ]
+    },
+    {
+      "id": "build-command",
+      "description": "Agent produces a correct MSVC build command",
+      "prompt": "How do I compile my Adams CBKSUB written in C into a DLL on Windows using MSVC? My Adams is installed at C:\\Program Files\\MSC.Software\\Adams\\2023_1",
+      "assertions": [
+        {
+          "type": "contains",
+          "value": "/LD",
+          "description": "Must use /LD flag for DLL output"
+        },
+        {
+          "type": "contains_one_of",
+          "value": ["sdk\\include", "sdk/include"],
+          "description": "Must point to the SDK include directory"
+        },
+        {
+          "type": "contains_one_of",
+          "value": ["adams_util.lib", "adams_util"],
+          "description": "Must link against adams_util"
+        }
+      ]
+    },
+    {
+      "id": "private-events-warning",
+      "description": "Agent warns about private events when writing CBKSUB switch",
+      "prompt": "Write a C CBKSUB switch statement that handles all 44 Adams events.",
+      "assertions": [
+        {
+          "type": "contains",
+          "value": "ev_PRIVATE_EVENT1",
+          "description": "Must mention private event 1"
+        },
+        {
+          "type": "contains",
+          "value": "ev_PRIVATE_EVENT2",
+          "description": "Must mention private event 2"
+        },
+        {
+          "type": "contains_one_of",
+          "value": ["ignore", "return", "MUST IGNORE", "never read"],
+          "description": "Must indicate private events should be ignored"
+        },
+        {
+          "type": "not_contains",
+          "value": "event == 43",
+          "description": "Should not use raw integer for private event"
+        }
+      ]
+    }
+  ]
+}
