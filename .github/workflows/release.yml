@@ -16,6 +16,9 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install dependencies
+        run: pip install pyyaml
+
       - name: Package adams-subroutine-writer
         working-directory: .agents/skills/skill-creator
         run: python -m scripts.package_skill ../../../skills/adams-subroutine-writer ../../../dist
