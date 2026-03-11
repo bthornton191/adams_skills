@@ -83,7 +83,7 @@ void Cbksub( const struct sAdamsCbksub *cbk, double time, int event, int *data )
 Model file:
 ```
 CBKSUB/1
-, USER(1.0, 2.0)
+, FUNCTION=USER(1.0, 2.0)\
 , ROUTINE=my_dll:Cbksub
 ```
 
@@ -179,6 +179,8 @@ See [references/build.md](references/build.md) for more detail and troubleshooti
 | Complete C template (annotated starter) | [assets/c_subroutines/cbksub_template.c](assets/c_subroutines/cbksub_template.c) |
 
 ### SDK Headers (canonical — use these for correct signatures and enum values)
+
+If the user's project does not already contain `slv_c_utils.h`, `slv_cbksub.h`, or `slv_cbksub_util.h`, copy the needed headers from this skill's [references/sdk_headers/](references/sdk_headers/) folder into the user's source directory before compiling.
 
 | File | Contents |
 |------|----------|

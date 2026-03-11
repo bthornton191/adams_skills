@@ -337,7 +337,7 @@ END
 
 ```
 CBKSUB/1
-, USER(param1, param2)
+, FUNCTION=USER(param1, param2)\
 , ROUTINE=user_sub:Cbksub
 ```
 

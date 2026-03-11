@@ -91,7 +91,7 @@ The `mdi` tool handles Fortran source files (`.f`) identically — just pass the
 
 ```
 CBKSUB/1
-, USER(1.0, 2.0)
+, FUNCTION=USER(1.0, 2.0)\
 , ROUTINE=my_subroutines:Cbksub
 ```
 
