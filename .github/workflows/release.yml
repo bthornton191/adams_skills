@@ -26,6 +26,6 @@ jobs:
         run: python -m scripts.package_skill ../../../skills/adams-subroutine-writer ../../../dist
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.5.0
         with:
           files: dist/adams-subroutine-writer.zip
