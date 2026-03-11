@@ -43,7 +43,7 @@ SUBROUTINE CBKSUB ( time, event, data )
 
 ```c
 struct sAdamsCbksub {
-    int ID;            /* CBKSUB element ID from the .adm model file     */
+    int ID;            /* CBKSUB element ID from the Adams dataset file  */
     int NPAR;          /* number of USER() parameters                    */
     const double* PAR; /* array of USER() parameter values               */
     void *reserved;    /* internal — do not use                          */
@@ -333,7 +333,7 @@ END
 
 ---
 
-## `.adm` Model File Syntax
+## Adams Dataset File (`.adm`) Syntax
 
 ```
 CBKSUB/1

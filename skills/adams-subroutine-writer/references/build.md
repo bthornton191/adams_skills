@@ -1,79 +1,93 @@
 # Build Reference — Adams User Subroutine DLLs
 
-## Directory Layout Convention
+## Building with the `mdi` Tool
 
-```
-my_subroutine/
-├── cbksub.c          (or .f, .cpp)
-├── vfosub.c
-└── build/
-    └── my_subroutine.dll
-```
+Adams provides the `mdi` (Model Development Interface) tool to compile and link user subroutines into a shared library (DLL on Windows, `.so` on Linux). This is the standard and correct way to build — it handles SDK paths, compiler flags, and linking automatically.
 
----
+On Windows the command is `mdi.bat`; on Linux it is `mdi` (with `-c` flag).
 
-## Required SDK Environment Variable
+### Prerequisite: Set Up the Compiler Environment (Windows)
 
-The Adams SDK root must be set. On a default Adams 2023.1 Windows install:
+Before calling `mdi.bat`, the Adams build environment must be initialized (PATH, Visual Studio, Intel Fortran).
 
-```powershell
-$env:ADAMS_SDK = "C:\Program Files\MSC.Software\Adams\2023_1"
-```
+#### Agent workflow (default)
 
-Or set permanently via System Properties → Environment Variables.
-
----
-
-## C — Compile to DLL (Windows, MSVC)
+After presenting generated code for the user to review, **the agent should offer to compile it** — not merely show build instructions. Adams ships `AdamsSetup.bat` for environment setup, but it spawns an interactive `cmd.exe /K` shell, making it unusable from automated workflows. Use the bundled script to generate a `call`-able version:
 
 ```cmd
-cl /LD /I"%ADAMS_SDK%\sdk\include" cbksub.c /link "%ADAMS_SDK%\sdk\lib\adams_util.lib"
+python scripts/generate_adams_env.py
 ```
 
-This produces `cbksub.dll` in the current directory.
-
-### Multiple source files
+This finds the latest Adams installation, patches `AdamsSetup.bat` to hardcode the install path and remove the interactive shell, and writes the result to `%LOCALAPPDATA%\adams_env_init.bat`. You can also specify the Adams path explicitly:
 
 ```cmd
-cl /LD /I"%ADAMS_SDK%\sdk\include" cbksub.c vfosub.c /link "%ADAMS_SDK%\sdk\lib\adams_util.lib" /OUT:my_subroutines.dll
+python scripts/generate_adams_env.py --adams-dir "C:\Program Files\MSC.Software\Adams\2024_2"
 ```
 
-### Key compiler flags
+If `%LOCALAPPDATA%\adams_env_init.bat` already exists, skip the `python` step. Then initialize the environment and build:
 
-| Flag | Purpose |
-|------|---------|
-| `/LD` | Build a DLL |
-| `/I"%ADAMS_SDK%\sdk\include"` | Find `slv_cbksub.h`, `slv_cbksub_util.h`, etc. |
-| `/O2` | Optimize (recommended for release) |
-| `/Zi` | Debug info (use during development) |
+```cmd
+call "%LOCALAPPDATA%\adams_env_init.bat"
+mdi.bat cr-u n <source files> -n <output>.dll ex
+```
 
----
+#### Fallback: manual user build (only if agent compilation fails)
 
-## C — Compile to Shared Object (Linux, GCC)
+If the agent compilation step fails, tell the user to build manually:
+1. Open **Start Menu → Adams \<version\> → Command Prompt** (runs `AdamsSetup.bat` automatically)
+2. `cd` to the directory containing the source files
+3. Run `mdi.bat cr-u n <source files> -n <output>.dll ex`
+
+On Linux, source the Adams environment script before calling `mdi`.
+
+### Basic Usage
+
+```
+mdi[.bat] cr-u <options> <source files> -n <output library> ex
+```
+
+Arguments for `cr-u` (create user library):
+
+| Argument | Meaning |
+|----------|--------|
+| `y` or `n` | Yes/no option to link in debug mode |
+| `.c`, `.cxx`, `.f` | Source files to compile |
+| `.o` | Pre-compiled object files |
+| `.lst` | List file containing source/object file paths |
+| `-n` | Marks end of source list; followed by output library name |
+| `ex` | Exit the mdi tool |
+
+### Windows
+
+```cmd
+mdi.bat cr-u n cbksub.c vfosub.c -n my_sub.dll ex
+```
+
+### Linux
 
 ```bash
-gcc -shared -fPIC -o my_subroutines.so \
-    -I"$ADAMS_SDK/sdk/include" \
-    cbksub.c vfosub.c \
-    -L"$ADAMS_SDK/sdk/lib" -ladams_util
+mdi -c cr-u n cbksub.c vfosub.c -n my_sub.so ex
 ```
 
----
-
-## Fortran — Compile to DLL (Windows, Intel Fortran)
+### With debug symbols
 
 ```cmd
-ifort /dll /I"%ADAMS_SDK%\sdk\include" cbksub.f vfosub.f ^
-      /link "%ADAMS_SDK%\sdk\lib\adams_util.lib"
+mdi.bat cr-u y cbksub.c vfosub.c -n my_sub.dll ex
 ```
 
-### Fortran include file placement
+Use `y` instead of `n` to enable debug mode.
 
-The include files (`slv_cbksub.inc`, `slv_cbksub_util.inc`) must be findable by the compiler. Either use `/include:"%ADAMS_SDK%\sdk\include"` or copy them next to your source files.
+### Fortran source files
+
+```cmd
+mdi.bat cr-u n cbksub.f vfosub.f -n my_sub.dll ex
+```
+
+The `mdi` tool handles Fortran source files (`.f`) identically — just pass them instead of `.c` files.
 
 ---
 
-## Referencing the DLL in the Adams Model (`.adm`)
+## Referencing the Library in the Adams Dataset File (`.adm`)
 
 ```
 CBKSUB/1
@@ -85,36 +99,19 @@ CBKSUB/1
 - `Cbksub` is the exported function name (case-sensitive on Linux)
 - `USER(...)` parameters are accessible via `cbk->PAR[]` (0-indexed in C) or `PAR(*)` in Fortran
 
-The DLL must be on the `PATH` (Windows) or `LD_LIBRARY_PATH` (Linux), or placed in the same directory as the `.adm` file.
-
----
-
-## Exporting Functions (Windows)
-
-On Windows, MSVC exports all functions from a `/LD` DLL by default. To be explicit, add a `.def` file:
-
-```def
-EXPORTS
-    Cbksub
-    Vfosub
-```
-
-Or use `__declspec(dllexport)` in the source:
-
-```c
-__declspec(dllexport) void Cbksub( const struct sAdamsCbksub *cbk,
-                                    double time, int event, int *data );
-```
+The DLL must be on the `PATH` (Windows) or `LD_LIBRARY_PATH` (Linux), or placed in the same directory as the Adams dataset file (`.adm`).
 
 ---
 
 ## Verifying Exports
 
+After building with `mdi`, verify the exported symbols:
+
 ```cmd
-dumpbin /exports my_subroutines.dll
+dumpbin /exports my_sub.dll
 ```
 
-Confirm the exported name matches exactly what the `.adm` `ROUTINE=` line specifies.
+Confirm the exported name matches exactly what the `ROUTINE=` line in the Adams dataset file (`.adm`) specifies (case-sensitive on Linux).
 
 ---
 
@@ -122,22 +119,7 @@ Confirm the exported name matches exactly what the `.adm` `ROUTINE=` line specif
 
 | Error | Likely Cause |
 |-------|-------------|
-| `LNK2019: unresolved external symbol c_sysary` | Missing `adams_util.lib` in link step |
-| `fatal error C1083: Cannot open include file: 'slv_cbksub.h'` | `/I` path wrong or `ADAMS_SDK` not set |
+| `mdi.bat` not found / not recognized | Adams environment not initialized — run `scripts/generate_adams_env.py` then `call "%LOCALAPPDATA%\adams_env_init.bat"` |
 | Adams reports "cannot find routine Cbksub" | DLL not on PATH, or function name case mismatch |
 | Crash at startup | C++ CBKSUB not declared `extern "C"` |
-
----
-
-## CMake (optional, cross-platform)
-
-```cmake
-cmake_minimum_required(VERSION 3.20)
-project(adams_user_sub C)
-
-set(ADAMS_SDK "C:/Program Files/MSC.Software/Adams/2023_1" CACHE PATH "Adams SDK root")
-
-add_library(my_subroutines SHARED cbksub.c vfosub.c)
-target_include_directories(my_subroutines PRIVATE "${ADAMS_SDK}/sdk/include")
-target_link_libraries(my_subroutines PRIVATE "${ADAMS_SDK}/sdk/lib/adams_util.lib")
-```
+| Linker errors for `c_sysary` etc. | Unusual — `mdi` handles linking automatically; check source file paths |

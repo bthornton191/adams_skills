@@ -1,155 +1,53 @@
 {
-  "skill": "adams-subroutine-writer",
-  "version": "1.0.0",
+  "skill_name": "adams-subroutine-writer",
   "evals": [
     {
-      "id": "cbksub-c-skeleton",
-      "description": "Generate a minimal C CBKSUB that caches a DISP result at ev_ITERATION_BEG",
-      "prompt": "Write a C CBKSUB subroutine for Adams that caches the Y-displacement of marker 5 relative to marker 1 at each iteration begin event. The cached value should be accessible by other subroutines. Include the correct Adams SDK headers and use the enum constants for events.",
-      "assertions": [
-        {
-          "type": "contains",
-          "value": "#include \"slv_cbksub.h\"",
-          "description": "Must include the CBKSUB header"
-        },
-        {
-          "type": "contains",
-          "value": "ev_ITERATION_BEG",
-          "description": "Must use symbolic constant, not raw integer 4"
-        },
-        {
-          "type": "contains",
-          "value": "ev_PRIVATE_EVENT1",
-          "description": "Must handle private events"
-        },
-        {
-          "type": "contains",
-          "value": "ev_PRIVATE_EVENT2",
-          "description": "Must handle private events"
-        },
-        {
-          "type": "contains",
-          "value": "c_sysary",
-          "description": "Must call c_sysary to retrieve displacement"
-        },
-        {
-          "type": "contains_one_of",
-          "value": ["DISP", "\"DISP\""],
-          "description": "Must use DISP function name in SYSARY call"
-        },
-        {
-          "type": "not_contains",
-          "value": "event == 4",
-          "description": "Must not use raw integer for ITERATION_BEG"
-        },
-        {
-          "type": "not_contains",
-          "value": "event == 43",
-          "description": "Must not compare against raw private event integer"
-        }
+      "id": "cache-and-reuse",
+      "prompt": "I have an Adams model with a slider (marker 5 on part 2, ground marker is 1). I need to write a user subroutine in C that grabs the Y displacement once per iteration and makes it available to my VFOSUB so I don't recompute it every time the force is evaluated. Can you write the CBKSUB and show me how the VFOSUB would read the cached value?",
+      "expected_output": "A C CBKSUB that caches Y-displacement via c_sysary at ev_ITERATION_BEG using a file-scope global, plus a companion VFOSUB that reads the cache when valid and falls back to a direct SYSARY call otherwise. Both use correct SDK headers and enum constants.",
+      "expectations": [
+        "CBKSUB uses struct-based C signature (sAdamsCbksub* parameter), not Fortran-style flat params",
+        "CBKSUB includes adams_c_Callback forward declaration typedef",
+        "CBKSUB uses ev_ITERATION_BEG enum constant, not a raw integer like case 4",
+        "CBKSUB handles ev_PRIVATE_EVENT1/2 (ignores them without reading data[])",
+        "CBKSUB includes slv_c_utils.h as the primary SDK header",
+        "VFOSUB uses struct-based C signature (sAdamsVforce* parameter) or correct pointer-based signature",
+        "VFOSUB includes iflag guard that skips iflag 5, 7, 9",
+        "VFOSUB is dflag-aware: uses cache when dflag==0, falls back to direct SYSARY when dflag==1",
+        "Both files use c_errmes for error handling",
+        "Build command uses mdi.bat (Windows) or mdi -c (Linux), not raw cl/gcc/ifort",
+        "Agent offers to compile the code (or runs the build) rather than only providing manual build instructions",
+        "Manual Start Menu / Adams Command Prompt instructions are presented as a fallback for when agent compilation fails, not as the primary workflow"
       ]
     },
     {
-      "id": "cbksub-forbidden-calls",
-      "description": "Agent must warn that VFOSUB cannot be called from CBKSUB",
-      "prompt": "I want to call my VFOSUB subroutine from inside CBKSUB to pre-compute forces at ev_ITERATION_BEG. How do I do that in C?",
-      "assertions": [
-        {
-          "type": "contains_one_of",
-          "value": ["cannot", "not allowed", "forbidden", "not permitted", "not possible"],
-          "description": "Must explain that calling VFOSUB from CBKSUB is not allowed"
-        },
-        {
-          "type": "contains_one_of",
-          "value": ["cache", "global", "shared", "common block"],
-          "description": "Must suggest the correct alternative pattern (caching)"
-        }
+      "id": "forbidden-call-trap",
+      "prompt": "In my Adams CBKSUB, I want to call my VFOSUB at the start of each iteration to pre-calculate the forces. What's the best way to do that in C?",
+      "expected_output": "The agent should warn that calling VFOSUB from CBKSUB is forbidden and suggest the correct alternative: cache values in CBKSUB via globals/shared state, then read them from VFOSUB.",
+      "expectations": [
+        "Explicitly warns that VFOSUB cannot be called from within CBKSUB",
+        "Does NOT present calling VFOSUB directly from CBKSUB as a valid primary approach",
+        "Suggests caching pattern: compute in CBKSUB via utility functions, read from VFOSUB via shared state",
+        "Uses ev_ITERATION_BEG enum constant (not raw integer) when showing the caching alternative",
+        "Uses c_sysary or c_sysfnc (allowed utility routines) for computation inside CBKSUB"
       ]
     },
     {
-      "id": "vfosub-iflag-guard",
-      "description": "VFOSUB must include the correct iflag guard",
-      "prompt": "Write a C VFOSUB for Adams that applies a spring force Fx = -k*(x - x0) where k=500 N/mm and x0=100mm. Marker 10 moves, marker 1 is ground. Include everything needed to compile.",
-      "assertions": [
-        {
-          "type": "contains",
-          "value": "#include",
-          "description": "Must include an Adams utility header"
-        },
-        {
-          "type": "contains_one_of",
-          "value": ["iflag == 5", "*iflag == 5", "iflag.EQ.5", "IFLAG.EQ.5"],
-          "description": "Must guard against iflag=5 (expression destruction)"
-        },
-        {
-          "type": "contains_one_of",
-          "value": ["iflag == 7", "*iflag == 7", "iflag.EQ.7", "IFLAG.EQ.7"],
-          "description": "Must guard against iflag=7 (serialization)"
-        },
-        {
-          "type": "contains_one_of",
-          "value": ["iflag == 9", "*iflag == 9", "iflag.EQ.9", "IFLAG.EQ.9"],
-          "description": "Must guard against iflag=9 (unserialization)"
-        },
-        {
-          "type": "contains_one_of",
-          "value": ["c_sysary", "c_sysfnc", "SYSARY", "SYSFNC"],
-          "description": "Must use SYSARY or SYSFNC to get displacement"
-        },
-        {
-          "type": "contains",
-          "value": "DISP",
-          "description": "Must retrieve displacement using DISP fncnam"
-        }
-      ]
-    },
-    {
-      "id": "build-command",
-      "description": "Agent produces a correct MSVC build command",
-      "prompt": "How do I compile my Adams CBKSUB written in C into a DLL on Windows using MSVC? My Adams is installed at C:\\Program Files\\MSC.Software\\Adams\\2023_1",
-      "assertions": [
-        {
-          "type": "contains",
-          "value": "/LD",
-          "description": "Must use /LD flag for DLL output"
-        },
-        {
-          "type": "contains_one_of",
-          "value": ["sdk\\include", "sdk/include"],
-          "description": "Must point to the SDK include directory"
-        },
-        {
-          "type": "contains_one_of",
-          "value": ["adams_util.lib", "adams_util"],
-          "description": "Must link against adams_util"
-        }
-      ]
-    },
-    {
-      "id": "private-events-warning",
-      "description": "Agent warns about private events when writing CBKSUB switch",
-      "prompt": "Write a C CBKSUB switch statement that handles all 44 Adams events.",
-      "assertions": [
-        {
-          "type": "contains",
-          "value": "ev_PRIVATE_EVENT1",
-          "description": "Must mention private event 1"
-        },
-        {
-          "type": "contains",
-          "value": "ev_PRIVATE_EVENT2",
-          "description": "Must mention private event 2"
-        },
-        {
-          "type": "contains_one_of",
-          "value": ["ignore", "return", "MUST IGNORE", "never read"],
-          "description": "Must indicate private events should be ignored"
-        },
-        {
-          "type": "not_contains",
-          "value": "event == 43",
-          "description": "Should not use raw integer for private event"
-        }
+      "id": "vfosub-spring-force",
+      "prompt": "I need a C user subroutine for an Adams VFORCE that applies a linear spring: Fx = -500*(DX - 100). The moving marker is 10, ground is marker 1. I need the whole thing - headers, the function, everything so I can compile it into a DLL.",
+      "expected_output": "A complete, compilable C VFOSUB with correct Adams SDK includes, the adams_c_Vfosub typedef forward declaration, iflag guard pattern (skip 5/7/9), c_sysary DISP call, spring force computation, error handling via c_errmes, and a build command.",
+      "expectations": [
+        "Uses struct-based C signature (sAdamsVforce* parameter), not Fortran-style flat params with trailing underscore",
+        "Includes adams_c_Vfosub forward declaration typedef",
+        "Includes slv_c_utils.h as the primary SDK header",
+        "Includes iflag guard that skips iflag 5, 7, 9",
+        "Uses c_sysary or c_sysfnc to query displacement (not a raw function call)",
+        "Uses c_errmes for error handling after utility function calls",
+        "Parameterizes markers or constants via PAR[] instead of hardcoding marker IDs in the function body",
+        "Build command uses correct library name adams_util.lib (not adams_utils.lib)",
+        "Build command uses mdi.bat (Windows) or mdi -c (Linux), not raw cl/gcc/ifort",
+        "Agent offers to compile the code (or runs the build) rather than only providing manual build instructions",
+        "Manual Start Menu / Adams Command Prompt instructions are presented as a fallback for when agent compilation fails, not as the primary workflow"
       ]
     }
   ]

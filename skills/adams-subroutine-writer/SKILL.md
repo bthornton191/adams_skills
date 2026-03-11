@@ -7,7 +7,7 @@ description: >
   REQSUB output requests, and all other Adams user-defined subroutines. Covers correct
   include files, function signatures, ev_* event handling, am_* analysis mode constants,
   SYSARY/SYSFNC state access, ERRMES error handling, RCNVRT rotation conversion,
-  DLL build commands, and .adm ROUTINE= syntax.
+  DLL build commands, and Adams dataset file (.adm) ROUTINE= syntax.
 compatibility:
   - github-copilot
   - claude-code
@@ -139,20 +139,37 @@ void Vfosub( int *id, double *time, double *par, int *npar,
 
 ## Build Commands
 
-### Windows (MSVC)
-```cmd
-cl /LD /I"%ADAMS_SDK%\sdk\include" cbksub.c vfosub.c ^
-   /link "%ADAMS_SDK%\sdk\lib\adams_util.lib" /OUT:my_sub.dll
-```
+Adams provides the `mdi` tool to compile and link user subroutines. Do NOT use raw `cl` or `gcc` commands.
 
-### Linux (GCC)
+### Agent compilation (default behaviour)
+
+After presenting code for the user to review, **offer to compile it**. Do not just show build instructions — run the build. On Windows:
+
+1. If `%LOCALAPPDATA%\adams_env_init.bat` does not exist, generate it first:
+   ```cmd
+   python scripts/generate_adams_env.py
+   ```
+2. Initialize the environment and compile:
+   ```cmd
+   call "%LOCALAPPDATA%\adams_env_init.bat"
+   mdi.bat cr-u n <source files> -n <output>.dll ex
+   ```
+
+### If agent compilation fails
+
+Only if the above fails, tell the user to build manually:
+1. Open **Start Menu → Adams \<version\> → Command Prompt** (runs `AdamsSetup.bat` automatically)
+2. `cd` to the directory containing the source files
+3. Run `mdi.bat cr-u n <source files> -n <output>.dll ex`
+
+### Linux
 ```bash
-gcc -shared -fPIC -I"$ADAMS_SDK/sdk/include" \
-    cbksub.c vfosub.c \
-    -L"$ADAMS_SDK/sdk/lib" -ladams_util -o my_sub.so
+mdi -c cr-u n cbksub.c vfosub.c -n my_sub.so ex
 ```
 
-See [references/build.md](references/build.md) for Fortran, CMake, and troubleshooting.
+The flags mean: `cr-u` = create user library, `n` = no debug, `-n` = output name, `ex` = exit.
+
+See [references/build.md](references/build.md) for more detail and troubleshooting.
 
 ---
 

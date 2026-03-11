@@ -1,13 +1,15 @@
 /*
  * cbksub_template.c — Adams Solver CBKSUB skeleton (C)
  *
- * Build (Windows MSVC):
- *   cl /LD /I"%ADAMS_SDK%\sdk\include" /I"C:\Program Files\MSC.Software\Adams\2023_1\solver\c_usersubs" cbksub_template.c
- *       /link "%ADAMS_SDK%\sdk\lib\adams_util.lib"
+ * Build (using Adams mdi tool):
+ *   First set up the build environment (once per session):
+ *     python scripts/generate_adams_env.py
+ *     call "%LOCALAPPDATA%\adams_env_init.bat"
+ *   Then:
+ *     Windows: mdi.bat cr-u n cbksub_template.c -n cbksub_template.dll ex
+ *     Linux:   mdi -c cr-u n cbksub_template.c -n cbksub_template.so ex
  *
- * Or, copy slv_cbksub.h, slv_cbksub_util.h, slv_c_utils.h next to this file and omit the extra /I.
- *
- * Model file (.adm):
+ * Adams dataset file (.adm):
  *   CBKSUB/1
  *   , USER(1.0)
  *   , ROUTINE=cbksub_template:Cbksub
@@ -32,14 +34,54 @@ static struct {
     int    valid;           /* 1 = cache contains fresh data, 0 = stale */
 } g_cache;
 
-/*
- * Cbksub — called by Adams at each simulation lifecycle event.
+/**
+ * @brief Called by Adams at each simulation lifecycle event.
  *
- * Parameters:
- *   cbk   – element metadata (ID, NPAR, PAR[]); NULL on ev_INITIALIZE/ev_TERMINATE
- *   time  – current simulation time (seconds); undefined on ev_INITIALIZE
- *   event – event identifier (use ev_* constants — never raw integers)
- *   data  – event payload [3]; semantics depend on event (see cbksub.md)
+ * @param cbk   Pointer to element metadata (ID, NPAR, PAR[]); NULL on
+ *              ev_INITIALIZE and ev_TERMINATE.
+ *
+ *      - cbk->ID      = CBKSUB element ID in the Adams model
+ *      - cbk->NPAR    = number of USER() parameters
+ *      - cbk->PAR[i]  = USER() parameter i (0-indexed)
+ *
+ * @param time  Current simulation time (seconds); undefined on ev_INITIALIZE.
+ *
+ * @param event Event identifier — always use ev_* named constants, never raw
+ *              integers. Common values:
+ *
+ *      - ev_INITIALIZE      = one-time startup (cbk and time are undefined)
+ *      - ev_TERMINATE       = one-time shutdown
+ *      - ev_ITERATION_BEG   = start of each Newton iteration (primary cache point)
+ *      - ev_ITERATION_END   = end of each Newton iteration
+ *      - ev_STATICS_END     = after each static equilibrium solve
+ *      - ev_SENSOR          = an Adams SENSOR element fired
+ *      - ev_COMMAND         = an Adams command was issued
+ *      - ev_PRIVATE_EVENT1  = internal solver event — MUST be ignored
+ *      - ev_PRIVATE_EVENT2  = internal solver event — MUST be ignored
+ *
+ * @param data  Event payload array [3]; semantics depend on @p event:
+ *
+ *      ev_INITIALIZE / ev_TERMINATE:
+ *      - data[0] = solver exit status (TERMINATE only)
+ *
+ *      ev_ITERATION_BEG / ev_ITERATION_END:
+ *      - data[0] = simulation mode  (am_DYNAMICS, am_STATICS, am_KINEMATICS, ...)
+ *      - data[1] = analysis mode    (am_*)
+ *      - data[2] = 1 if a Jacobian/partial-derivative pass is required
+ *
+ *      ev_STATICS_END:
+ *      - data[2] = 0 if converged, 1 if failed
+ *
+ *      ev_SENSOR:
+ *      - data[0] = sensor element ID
+ *      - data[1] = sensor action type (sn_HALT, sn_PRINT, ...)
+ *
+ *      ev_COMMAND:
+ *      - data[0] = command identifier (cm_SIMULATE, cm_STOP, ...)
+ *      - data[1] = 1 if issued from CONSUB, 0 otherwise
+ *
+ *      ev_PRIVATE_EVENT1 / ev_PRIVATE_EVENT2:
+ *      - data[] MUST NOT be read — content is undefined
  */
 void Cbksub( const struct sAdamsCbksub *cbk, double time, int event, int *data )
 {
@@ -48,33 +90,15 @@ void Cbksub( const struct sAdamsCbksub *cbk, double time, int event, int *data )
 
     switch ( event )
     {
-        /* -------------------------------------------------------
-         * ev_INITIALIZE — called once before simulation begins.
-         * time and cbk are undefined here.
-         * Use for one-time allocations or external connections.
-         * ------------------------------------------------------- */
-        case ev_INITIALIZE:
+        case ev_INITIALIZE:  /* once before simulation; cbk and time are undefined */
             /* TODO: one-time initialization */
             break;
 
-        /* -------------------------------------------------------
-         * ev_TERMINATE — called once after simulation ends.
-         * data[0] = solver exit status.
-         * Use for cleanup, file flush, etc.
-         * ------------------------------------------------------- */
-        case ev_TERMINATE:
+        case ev_TERMINATE:  /* once after simulation; data[0] = exit status */
             /* TODO: cleanup */
             break;
 
-        /* -------------------------------------------------------
-         * ev_ITERATION_BEG — called at the start of each Newton
-         * iteration.  This is the primary caching point.
-         *
-         * data[0] = simulation mode  (am_DYNAMICS, am_STATICS, ...)
-         * data[1] = analysis mode    (am_*)
-         * data[2] = 1 if Jacobian/partial derivative is needed
-         * ------------------------------------------------------- */
-        case ev_ITERATION_BEG:
+        case ev_ITERATION_BEG:  /* start of each Newton iteration — primary cache point */
         {
             int    ipar[3], nv, errflg;
             double states[6];
@@ -101,43 +125,25 @@ void Cbksub( const struct sAdamsCbksub *cbk, double time, int event, int *data )
             break;
         }
 
-        /* -------------------------------------------------------
-         * ev_STATICS_END — called after each static analysis.
-         * data[2] = 0 if converged, 1 if failed.
-         * ------------------------------------------------------- */
-        case ev_STATICS_END:
+        case ev_STATICS_END:  /* after each static solve; data[2]=0 converged, 1 failed */
             if ( data[2] == 1 )
             {
                 /* statics failed to converge — log or handle */
             }
             break;
 
-        /* -------------------------------------------------------
-         * ev_SENSOR — triggered when an Adams SENSOR fires.
-         * data[0] = sensor element ID
-         * data[1] = sensor action type (sn_HALT, sn_PRINT, ...)
-         * ------------------------------------------------------- */
-        case ev_SENSOR:
+        case ev_SENSOR:  /* data[0]=sensor ID, data[1]=action (sn_HALT, sn_PRINT, ...) */
             /* TODO: respond to sensor event if needed */
             break;
 
-        /* -------------------------------------------------------
-         * ev_COMMAND — triggered when an Adams command is issued.
-         * data[0] = command identifier (cm_SIMULATE, cm_STOP, ...)
-         * data[1] = 1 if issued from CONSUB, 0 otherwise
-         * ------------------------------------------------------- */
-        case ev_COMMAND:
+        case ev_COMMAND:  /* data[0]=command (cm_SIMULATE, cm_STOP, ...), data[1]=from CONSUB */
             if ( data[0] == cm_SIMULATE )
             {
                 /* about to run a simulation */
             }
             break;
 
-        /* -------------------------------------------------------
-         * PRIVATE EVENTS — must always be ignored.
-         * Never read data[] for these events.
-         * ------------------------------------------------------- */
-        case ev_PRIVATE_EVENT1:
+        case ev_PRIVATE_EVENT1:  /* internal solver events — MUST be ignored; never read data[] */
         case ev_PRIVATE_EVENT2:
             return;
 
