@@ -9,6 +9,8 @@ description: >
   SYSARY/SYSFNC state access, ERRMES error handling, RCNVRT rotation conversion,
   DLL build commands, and Adams dataset file (.adm) ROUTINE= syntax.
 compatibility: github-copilot, claude-code, cursor, windsurf
+metadata:
+  version: 1.0.0
 ---
 
 # Adams Subroutine Writer
@@ -156,7 +158,7 @@ After presenting code for the user to review, **offer to compile it**. Do not ju
 Only if the above fails, tell the user to build manually:
 1. Open **Start Menu → Adams \<version\> → Command Prompt** (runs `AdamsSetup.bat` automatically)
 2. `cd` to the directory containing the source files
-3. Run `mdi.bat cr-u n <source files> -n <output>.dll ex`
+3. Run `adamsXXXX cr-u n <source files> -n <output>.dll ex`
 
 ### Linux
 ```bash
@@ -215,6 +217,29 @@ All located in [assets/c_subroutines/examples/](assets/c_subroutines/examples/).
 | `gse_deriv.c` / `gse_output.c` / `gse_samp.c` / `gse_update.c` | GSE state equations | `sAdamsGSE` |
 | `spline_read.c` | SPLINE data reader | `sAdamsSpline` |
 | `vtosub.c` | VTORQUE vector torque | `sAdamsVtorque` |
+
+---
+
+## Version Check
+
+Before starting work, check whether this skill is up to date:
+
+1. Read `metadata.version` from this file's YAML frontmatter — that is the **installed version**.
+2. Fetch `https://api.github.com/repos/bthornton191/adams_skills/releases/latest` and read the `tag_name` field (strip the leading `v` to get the **latest version**).
+3. If the latest version is newer than the installed version, show this notice:
+
+> **Update available:** adams-subroutine-writer **{latest version}** is available (you have **{installed version}**).
+> Upgrade with:
+> ```powershell
+> [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+> $url = "https://github.com/bthornton191/adams_skills/releases/latest/download/adams-subroutine-writer.zip"
+> $zip = "$env:TEMP\adams-subroutine-writer.zip"
+> Invoke-WebRequest $url -OutFile $zip
+> Expand-Archive $zip "$env:USERPROFILE\.vscode\skills" -Force
+> Remove-Item $zip
+> ```
+
+4. If the fetch fails (network error, timeout, etc.), **silently continue** — do not warn the user.
 
 ---
 

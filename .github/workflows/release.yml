@@ -21,6 +21,11 @@ jobs:
       - name: Install dependencies
         run: pip install pyyaml
 
+      - name: Stamp version from tag
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          sed -i "/^---$/,/^---$/s/^  version: .*/  version: $VERSION/" skills/adams-subroutine-writer/SKILL.md
+
       - name: Package adams-subroutine-writer
         working-directory: .agents/skills/skill-creator
         run: python -m scripts.package_skill ../../../skills/adams-subroutine-writer ../../../dist
