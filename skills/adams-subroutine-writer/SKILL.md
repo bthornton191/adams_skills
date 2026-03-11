@@ -8,11 +8,7 @@ description: >
   include files, function signatures, ev_* event handling, am_* analysis mode constants,
   SYSARY/SYSFNC state access, ERRMES error handling, RCNVRT rotation conversion,
   DLL build commands, and Adams dataset file (.adm) ROUTINE= syntax.
-compatibility:
-  - github-copilot
-  - claude-code
-  - cursor
-  - windsurf
+compatibility: github-copilot, claude-code, cursor, windsurf
 ---
 
 # Adams Subroutine Writer

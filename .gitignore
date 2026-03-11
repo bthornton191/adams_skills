@@ -1,2 +1,4 @@
 /.vscode
 /adams-subroutine-writer-workspace
+/dist
+__pycache__
