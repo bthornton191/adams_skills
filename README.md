@@ -4,8 +4,8 @@ A collection of [GitHub Copilot skills](https://docs.github.com/en/copilot/custo
 
 ## Skills
 
-| Skill | Description | Install |**
-**|-------|-------------|---------|
+| Skill | Description | Install |
+|-------|-------------|---------|
 | [adams-subroutine-writer](skills/adams-subroutine-writer/) | Write, explain, and debug Adams/Solver user subroutines in C, C++, and Fortran | [latest release](https://github.com/bthornton191/adams_skills/releases/latest/download/adams-subroutine-writer.skill) |
 
 ## Quick install
