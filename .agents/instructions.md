@@ -1,6 +1,6 @@
 # Development Instructions
 
-This repo contains AI coding skills for MSC Adams. Each skill lives in `skills/<skill-name>/` and is packaged as a `.skill` file for distribution.
+This repo contains AI coding skills for MSC Adams. Each skill lives in `skills/<skill-name>/` and is packaged as a `.zip` file for distribution.
 
 ## Project structure
 
@@ -11,12 +11,12 @@ skills/
     references/       # Domain knowledge files the skill reads
     assets/           # Templates, example code
     scripts/          # Helper scripts (e.g. generate_adams_env.py)
-    evals/            # Test prompts and grading (dev-only, excluded from .skill package)
-    README.md         # Skill-specific docs (excluded from .skill package)
+    evals/            # Test prompts and grading (dev-only, excluded from .zip package)
+    README.md         # Skill-specific docs (excluded from .zip package)
 .agents/
   skills/
     skill-creator/    # Tooling for creating, testing, and packaging skills
-dist/                 # Build output (.skill files) — gitignored
+dist/                 # Build output (.zip files) — gitignored
 ```
 
 ## Adams terminology
@@ -33,7 +33,7 @@ cd .agents\skills\skill-creator
 python -m scripts.package_skill ..\..\..\skills\<skill-name> ..\..\..\dist
 ```
 
-This creates `dist/<skill-name>.skill` (a ZIP archive). The packager automatically excludes `evals/`, `README.md`, `__pycache__/`, and `*.pyc`.
+This creates `dist/<skill-name>.zip` (a ZIP archive). The packager automatically excludes `evals/`, `README.md`, `__pycache__/`, and `*.pyc`.
 
 ## Running evals
 
