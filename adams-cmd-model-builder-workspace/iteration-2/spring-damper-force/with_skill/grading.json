@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Uses force create element_like spring_damper (not single_component_force or bushing)",
+      "passed": true,
+      "evidence": "Found: 'force create element_like spring_damper  spring_damper_name = .my_model.SPR_MAIN'"
+    },
+    {
+      "text": "Includes stiffness = 5000",
+      "passed": true,
+      "evidence": "Found: 'stiffness = 5000.0'"
+    },
+    {
+      "text": "Includes damping = 100",
+      "passed": true,
+      "evidence": "Found: 'damping = 100.0'"
+    },
+    {
+      "text": "Includes length = 250 (free length)",
+      "passed": true,
+      "evidence": "Found: 'length = 250.0' — correct parameter name for free length"
+    },
+    {
+      "text": "References both i_marker_name and j_marker_name",
+      "passed": true,
+      "evidence": "Found: 'i_marker_name = .my_model.part_a.M_SPR_I  j_marker_name = .my_model.part_b.M_SPR_J'"
+    },
+    {
+      "text": "Explains that spring_damper is for 1-DOF along a line of action",
+      "passed": true,
+      "evidence": "Response states: 'The element connects an I marker on one part to a J marker on another. Adams resolves the instantaneous distance between the markers and applies the force along the line connecting the I and J markers' describing the 1-DOF line-of-action nature."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  }
+}

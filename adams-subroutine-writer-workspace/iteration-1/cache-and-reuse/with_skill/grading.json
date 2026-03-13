@@ -1,0 +1,55 @@
+{
+  "expectations": [
+    {
+      "text": "CBKSUB uses struct-based C signature (sAdamsCbksub* parameter), not Fortran-style flat params",
+      "passed": true,
+      "evidence": "cbksub.c line 29: void Cbksub( const struct sAdamsCbksub *cbk, double time, int event, int *data )"
+    },
+    {
+      "text": "CBKSUB includes adams_c_Callback forward declaration typedef",
+      "passed": true,
+      "evidence": "cbksub.c line 22: adams_c_Callback  Cbksub;"
+    },
+    {
+      "text": "CBKSUB uses ev_ITERATION_BEG enum constant, not a raw integer like case 4",
+      "passed": true,
+      "evidence": "cbksub.c line 40: case ev_ITERATION_BEG:"
+    },
+    {
+      "text": "CBKSUB handles ev_PRIVATE_EVENT1/2 (ignores them without reading data[])",
+      "passed": true,
+      "evidence": "cbksub.c lines 66-68: case ev_PRIVATE_EVENT1: case ev_PRIVATE_EVENT2: return;"
+    },
+    {
+      "text": "CBKSUB includes slv_c_utils.h as the primary SDK header",
+      "passed": true,
+      "evidence": "cbksub.c line 18: #include \"slv_c_utils.h\""
+    },
+    {
+      "text": "VFOSUB uses struct-based C signature (sAdamsVforce* parameter) or correct pointer-based signature",
+      "passed": true,
+      "evidence": "vfosub.c line 30: void Vfosub( const struct sAdamsVforce *vfo, double time, int dflag, int iflag, double *result )"
+    },
+    {
+      "text": "VFOSUB includes iflag guard that skips iflag 5, 7, 9",
+      "passed": true,
+      "evidence": "vfosub.c line 36: if ( iflag == 5 || iflag == 7 || iflag == 9 ) return;"
+    },
+    {
+      "text": "VFOSUB is dflag-aware: uses cache when dflag==0, falls back to direct SYSARY when dflag==1",
+      "passed": true,
+      "evidence": "vfosub.c line 47: if ( dflag == 0 && g_cache_valid ) uses cache; lines 55-67 fallback: c_sysary( \"DISP\", ... ) for differencing or cache miss"
+    },
+    {
+      "text": "Both files use c_errmes for error handling",
+      "passed": true,
+      "evidence": "cbksub.c line 56: c_errmes( errflg, ... ); vfosub.c line 64: c_errmes( errflg, ... )"
+    }
+  ],
+  "summary": {
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "pass_rate": 1.0
+  }
+}

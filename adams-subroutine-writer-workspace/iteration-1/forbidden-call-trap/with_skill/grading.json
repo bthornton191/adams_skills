@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Explicitly warns that VFOSUB cannot be called from within CBKSUB",
+      "passed": true,
+      "evidence": "response.md opens with: 'VFOSUB is on the forbidden call list for CBKSUB. Calling it will cause undefined behavior or a crash.'"
+    },
+    {
+      "text": "Does NOT present calling VFOSUB directly from CBKSUB as a valid primary approach",
+      "passed": true,
+      "evidence": "The response rejects the direct call immediately and presents only the caching alternative. No code shows calling VFOSUB from CBKSUB."
+    },
+    {
+      "text": "Suggests caching pattern: compute in CBKSUB via utility functions, read from VFOSUB via shared state",
+      "passed": true,
+      "evidence": "Shows full caching pattern: CBKSUB computes via c_sysary at ev_ITERATION_BEG, stores in g_cache struct; VFOSUB reads from g_cache via extern declaration."
+    },
+    {
+      "text": "Uses ev_ITERATION_BEG enum constant (not raw integer) when showing the caching alternative",
+      "passed": true,
+      "evidence": "response.md CBKSUB code: case ev_ITERATION_BEG:"
+    },
+    {
+      "text": "Uses c_sysary or c_sysfnc (allowed utility routines) for computation inside CBKSUB",
+      "passed": true,
+      "evidence": "CBKSUB code: c_sysary( \"DISP\", ipar, 3, states, &nv, &errflg );"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Explicitly warns that VFOSUB cannot be called from within CBKSUB",
+      "passed": false,
+      "evidence": "Response does NOT warn that calling VFOSUB from CBKSUB is forbidden. Opens with 'To call your VFOSUB from within your CBKSUB... you can invoke it as a regular C function call.' The alternative section mentions a different approach but never states the direct call is forbidden."
+    },
+    {
+      "text": "Does NOT present calling VFOSUB directly from CBKSUB as a valid primary approach",
+      "passed": false,
+      "evidence": "The entire main section presents calling vfosub_() directly from CBKSUB as the recommended approach, with full code example showing vfosub_(&vfo_id, &t, par, &npar, &dflag, &iflag, result) inside the CBKSUB function."
+    },
+    {
+      "text": "Suggests caching pattern: compute in CBKSUB via utility functions, read from VFOSUB via shared state",
+      "passed": true,
+      "evidence": "The 'Alternative: Shared Computation via Utility Functions' section suggests using c_sysary/c_sysfnc in CBKSUB and storing in globals for VFOSUB to read."
+    },
+    {
+      "text": "Uses ev_ITERATION_BEG enum constant (not raw integer) when showing the caching alternative",
+      "passed": false,
+      "evidence": "Uses raw integer: 'case 4:  /* Iteration begin */' — not the ev_ITERATION_BEG enum constant."
+    },
+    {
+      "text": "Uses c_sysary or c_sysfnc (allowed utility routines) for computation inside CBKSUB",
+      "passed": true,
+      "evidence": "Alternative section shows c_sysary(\"DISP\", marker_id, ground_id, disp, &nstates, &errflg) inside CBKSUB."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 3,
+    "total": 5,
+    "pass_rate": 0.4
+  }
+}

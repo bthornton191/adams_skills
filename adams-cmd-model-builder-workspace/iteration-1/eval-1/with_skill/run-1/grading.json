@@ -1,0 +1,40 @@
+{
+    "expectations":  [
+                         {
+                             "text":  "Uses force create element_like spring_damper (not single_component_force, bushing, or beam)",
+                             "passed":  true,
+                             "evidence":  "Script contains: `force create element_like spring_damper \u0026` with spring_damper_name = .SPRING_MODEL.SPR_MAIN"
+                         },
+                         {
+                             "text":  "The stiffness parameter is set to 5000",
+                             "passed":  true,
+                             "evidence":  "`stiffness = 5000.0` in the force create command; also confirmed in the parameters table: \u00275000.0 — Spring rate — 5000 N per mm of deformation\u0027"
+                         },
+                         {
+                             "text":  "The damping parameter is set to 100",
+                             "passed":  true,
+                             "evidence":  "`damping = 100.0` in the force create command; also confirmed in the parameters table: \u0027100.0 — Damping coefficient — 100 N·s/mm of velocity\u0027"
+                         },
+                         {
+                             "text":  "The length parameter (free length) is set to 250",
+                             "passed":  true,
+                             "evidence":  "`length = 250.0` in the force create command; table confirms: \u0027250.0 — Free (natural) length — no force when the markers are 250 mm apart\u0027"
+                         },
+                         {
+                             "text":  "References both i_marker_name and j_marker_name",
+                             "passed":  true,
+                             "evidence":  "`i_marker_name = .SPRING_MODEL.PART_A.M_SPR_I` and `j_marker_name = .SPRING_MODEL.PART_B.M_SPR_J` both appear in the force create command"
+                         },
+                         {
+                             "text":  "Explains or implies that spring_damper acts along the line joining the two markers",
+                             "passed":  true,
+                             "evidence":  "Two explicit statements: \u0027The force acts along the line joining the I and J markers.\u0027 (in How It Works) and \u0027The spring force is always along the line joining the two markers\u0027 (in Important Notes #3)"
+                         }
+                     ],
+    "summary":  {
+                    "pass_rate":  1,
+                    "passed":  6,
+                    "failed":  0,
+                    "total":  6
+                }
+}

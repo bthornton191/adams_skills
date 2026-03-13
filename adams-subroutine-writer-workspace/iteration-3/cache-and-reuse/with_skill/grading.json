@@ -1,0 +1,70 @@
+{
+  "expectations": [
+    {
+      "text": "CBKSUB uses struct-based C signature (sAdamsCbksub* parameter), not Fortran-style flat params",
+      "passed": true,
+      "evidence": "cbksub.c: void Cbksub( const struct sAdamsCbksub *cbk, double time, int event, int *data )"
+    },
+    {
+      "text": "CBKSUB includes adams_c_Callback forward declaration typedef",
+      "passed": true,
+      "evidence": "cbksub.c: adams_c_Callback  Cbksub;"
+    },
+    {
+      "text": "CBKSUB uses ev_ITERATION_BEG enum constant, not a raw integer like case 4",
+      "passed": true,
+      "evidence": "cbksub.c: case ev_ITERATION_BEG:"
+    },
+    {
+      "text": "CBKSUB handles ev_PRIVATE_EVENT1/2 (ignores them without reading data[])",
+      "passed": true,
+      "evidence": "cbksub.c: case ev_PRIVATE_EVENT1: case ev_PRIVATE_EVENT2: return;"
+    },
+    {
+      "text": "CBKSUB includes slv_c_utils.h as the primary SDK header",
+      "passed": true,
+      "evidence": "cbksub.c: #include \"slv_c_utils.h\""
+    },
+    {
+      "text": "VFOSUB uses struct-based C signature (sAdamsVforce* parameter) or correct pointer-based signature",
+      "passed": true,
+      "evidence": "vfosub.c: void Vfosub( const struct sAdamsVforce *vfo, double time, int dflag, int iflag, double *result )"
+    },
+    {
+      "text": "VFOSUB includes iflag guard that skips iflag 5, 7, 9",
+      "passed": true,
+      "evidence": "vfosub.c: if ( iflag == 5 || iflag == 7 || iflag == 9 ) return;"
+    },
+    {
+      "text": "VFOSUB is dflag-aware: uses cache when dflag==0, falls back to direct SYSARY when dflag==1",
+      "passed": true,
+      "evidence": "vfosub.c: if ( iflag == 0 && dflag == 0 && g_cache_valid ) uses cache; fallback c_sysary for differencing"
+    },
+    {
+      "text": "Both files use c_errmes for error handling",
+      "passed": true,
+      "evidence": "cbksub.c: c_errmes( &errflg, ... ); vfosub.c: c_errmes( &errflg, ... )"
+    },
+    {
+      "text": "Build command uses mdi.bat (Windows) or mdi -c (Linux), not raw cl/gcc/ifort",
+      "passed": true,
+      "evidence": "response.md: mdi.bat cr-u n cbksub.c vfosub.c -n slider_sub.dll ex"
+    },
+    {
+      "text": "Agent offers to compile the code (or runs the build) rather than only providing manual build instructions",
+      "passed": true,
+      "evidence": "response.md: \"Would you like me to compile these now? I'll run:\" followed by generate_adams_env.py and mdi.bat steps"
+    },
+    {
+      "text": "Manual Start Menu / Adams Command Prompt instructions are presented as a fallback for when agent compilation fails, not as the primary workflow",
+      "passed": true,
+      "evidence": "response.md: manual Start Menu instructions not shown at all; agent compilation offer is the only build path presented"
+    }
+  ],
+  "summary": {
+    "passed": 12,
+    "failed": 0,
+    "total": 12,
+    "pass_rate": 1.0
+  }
+}

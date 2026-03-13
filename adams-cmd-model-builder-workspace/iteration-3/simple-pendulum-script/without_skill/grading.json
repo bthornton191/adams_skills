@@ -1,0 +1,60 @@
+{
+  "expectations": [
+    {
+      "text": "Script contains a model create command",
+      "passed": true,
+      "evidence": "Found: 'model create model_name = pendulum' (with line continuation '&')"
+    },
+    {
+      "text": "A rigid body part is created with part create rigid_body name_and_position",
+      "passed": true,
+      "evidence": "Found: 'part create rigid_body name_and_position part_name = .pendulum.link'"
+    },
+    {
+      "text": "At least one marker is created on the link and at least one on ground",
+      "passed": true,
+      "evidence": "Ground marker: '.pendulum.ground.pivot_ground'. Link markers: '.pendulum.link.cm_marker', '.pendulum.link.pivot_link', '.pendulum.link.bottom'"
+    },
+    {
+      "text": "A revolute joint is created using constraint create joint revolute with i_marker_name and j_marker_name",
+      "passed": true,
+      "evidence": "Found: 'constraint create joint revolute joint_name = .pendulum.pin_joint i_marker_name = .pendulum.link.pivot_link j_marker_name = .pendulum.ground.pivot_ground'"
+    },
+    {
+      "text": "Gravity is created with force create body gravitational (not force create body_force or any other variant)",
+      "passed": false,
+      "evidence": "Used 'environment set gravity gravity_x = 0.0 gravity_y = -9806.65 gravity_z = 0.0' — this is the WRONG command. The correct command is 'force create body gravitational'"
+    },
+    {
+      "text": "Initial orientation set to 45 degrees for the release angle",
+      "passed": true,
+      "evidence": "Part created with location = 70.711, -70.711, 0.0 which is the CM position at 45 degrees (100 mm from pivot at 45°). However, orientation = 0.0, 0.0, 45.0 lacks the 'D' degree suffix."
+    },
+    {
+      "text": "All keywords spelled out fully (no abbreviations)",
+      "passed": true,
+      "evidence": "Keywords appear spelled out fully; 'environment set gravity' is wrong command but not an abbreviation issue"
+    },
+    {
+      "text": "No adams_id specified anywhere in the script",
+      "passed": false,
+      "evidence": "Found: 'adams_id = 2' on the part create command — manually specified ID violates Core Rule #8"
+    },
+    {
+      "text": "Mass properties are set with part modify rigid_body mass_properties (not part create rigid_body mass_properties)",
+      "passed": false,
+      "evidence": "Found: 'part create rigid_body mass_properties part_name = .pendulum.link' — incorrectly uses 'part create' instead of 'part modify' for mass properties"
+    },
+    {
+      "text": "CMD script runs in Adams View without any ERROR: lines in aview.log (validated by scripts/run_adams_cmd.py)",
+      "passed": false,
+      "evidence": "Not validated — without_skill script uses 'environment set gravity' (non-existent command), 'part create rigid_body mass_properties' (wrong), and 'adams_id = 2' (forbidden). Multiple errors expected in Adams View."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 4,
+    "total": 10,
+    "pass_rate": 0.6
+  }
+}

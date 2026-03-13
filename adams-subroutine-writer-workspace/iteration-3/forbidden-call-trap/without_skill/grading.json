@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Explicitly warns that VFOSUB cannot be called from within CBKSUB",
+      "passed": false,
+      "evidence": "response.md says \"The most straightforward approach is to call your VFOSUB function directly\" — no warning given"
+    },
+    {
+      "text": "Does NOT present calling VFOSUB directly from CBKSUB as a valid primary approach",
+      "passed": false,
+      "evidence": "response.md section heading: direct Vfosub(...) call from CBKSUB is presented as the primary 'Simple' recommended approach"
+    },
+    {
+      "text": "Suggests caching pattern: compute in CBKSUB via utility functions, read from VFOSUB via shared state",
+      "passed": false,
+      "evidence": "The 'caching' shown still calls VFOSUB directly from CBKSUB, which is the forbidden pattern; no correct cache-via-utility approach shown"
+    },
+    {
+      "text": "Uses ev_ITERATION_BEG enum constant (not raw integer) when showing the caching alternative",
+      "passed": false,
+      "evidence": "Uses raw integer case 4: /* ev_ITERATION_BEG */ and if (event == 4) — no enum constant"
+    },
+    {
+      "text": "Uses c_sysary or c_sysfnc (allowed utility routines) for computation inside CBKSUB",
+      "passed": false,
+      "evidence": "No c_sysary or c_sysfnc calls anywhere in the response; force computed as par[0] * 100.0 with no SDK utility calls"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 5,
+    "total": 5,
+    "pass_rate": 0.0
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Uses struct-based C signature (sAdamsVforce* parameter), not Fortran-style flat params with trailing underscore",
+      "passed": true,
+      "evidence": "vfosub.c: void Vfosub( const struct sAdamsVforce *vfo, double time, int dflag, int iflag, double *result )"
+    },
+    {
+      "text": "Includes adams_c_Vfosub forward declaration typedef",
+      "passed": true,
+      "evidence": "vfosub.c line 3: adams_c_Vfosub  Vfosub;"
+    },
+    {
+      "text": "Includes slv_c_utils.h as the primary SDK header",
+      "passed": true,
+      "evidence": "vfosub.c line 1: #include \"slv_c_utils.h\""
+    },
+    {
+      "text": "Includes iflag guard that skips iflag 5, 7, 9",
+      "passed": true,
+      "evidence": "vfosub.c: if ( iflag == 5 || iflag == 7 || iflag == 9 ) return;"
+    },
+    {
+      "text": "Uses c_sysary or c_sysfnc to query displacement (not a raw function call)",
+      "passed": true,
+      "evidence": "vfosub.c: c_sysary( \"TDISP\", ipar, 3, disp, &nstates, &errflg );"
+    },
+    {
+      "text": "Uses c_errmes for error handling after utility function calls",
+      "passed": true,
+      "evidence": "vfosub.c: c_errmes( errflg, \"SYSARY TDISP failed in Vfosub\", vfo->ID, \"STOP\" );"
+    },
+    {
+      "text": "Parameterizes markers or constants via PAR[] instead of hardcoding marker IDs in the function body",
+      "passed": true,
+      "evidence": "vfosub.c reads stiffness from vfo->PAR[0], free_length from vfo->PAR[1], marker_i from vfo->PAR[2], marker_j from vfo->PAR[3]"
+    },
+    {
+      "text": "Build command uses correct library name adams_util.lib (not adams_utils.lib)",
+      "passed": true,
+      "evidence": "response.md build command: /link \"%ADAMS_SDK%\\sdk\\lib\\adams_util.lib\""
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "pass_rate": 1.0
+  }
+}

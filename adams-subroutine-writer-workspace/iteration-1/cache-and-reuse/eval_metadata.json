@@ -1,0 +1,16 @@
+{
+  "eval_id": "cache-and-reuse",
+  "eval_name": "cache-and-reuse",
+  "prompt": "I have an Adams model with a slider (marker 5 on part 2, ground marker is 1). I need to write a user subroutine in C that grabs the Y displacement once per iteration and makes it available to my VFOSUB so I don't recompute it every time the force is evaluated. Can you write the CBKSUB and show me how the VFOSUB would read the cached value?",
+  "assertions": [
+    "CBKSUB uses struct-based C signature (sAdamsCbksub* parameter), not Fortran-style flat params",
+    "CBKSUB includes adams_c_Callback forward declaration typedef",
+    "CBKSUB uses ev_ITERATION_BEG enum constant, not a raw integer like case 4",
+    "CBKSUB handles ev_PRIVATE_EVENT1/2 (ignores them without reading data[])",
+    "CBKSUB includes slv_c_utils.h as the primary SDK header",
+    "VFOSUB uses struct-based C signature (sAdamsVforce* parameter) or correct pointer-based signature",
+    "VFOSUB includes iflag guard that skips iflag 5, 7, 9",
+    "VFOSUB is dflag-aware: uses cache when dflag==0, falls back to direct SYSARY when dflag==1",
+    "Both files use c_errmes for error handling"
+  ]
+}

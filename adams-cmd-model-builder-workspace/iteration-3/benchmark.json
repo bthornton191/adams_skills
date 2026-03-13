@@ -1,0 +1,185 @@
+{
+  "metadata": {
+    "skill_name": "adams-cmd-model-builder",
+    "skill_path": "skills/adams-cmd-model-builder",
+    "timestamp": "2026-03-13T00:00:00Z",
+    "evals_run": ["simple-pendulum-script", "spring-damper-force", "contact-force-expression"],
+    "runs_per_configuration": 1
+  },
+
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "simple-pendulum-script",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Script contains a model create command", "passed": true, "evidence": "Found: 'model create model_name = pendulum'"},
+        {"text": "A rigid body part is created with part create rigid_body name_and_position", "passed": true, "evidence": "Found: 'part create rigid_body name_and_position part_name = .pendulum.link'"},
+        {"text": "At least one marker is created on the link and at least one on ground", "passed": true, "evidence": "Ground marker: '.pendulum.ground.pivot_mkr'. Link markers: '.pendulum.link.cm', '.pendulum.link.pin_mkr', '.pendulum.link.tip_mkr'"},
+        {"text": "A revolute joint is created using constraint create joint revolute with i_marker_name and j_marker_name", "passed": true, "evidence": "Found: 'constraint create joint revolute joint_name = .pendulum.rev_pivot i_marker_name = .pendulum.link.pin_mkr j_marker_name = .pendulum.ground.pivot_mkr'"},
+        {"text": "Gravity is created with force create body gravitational (not force create body_force or any other variant)", "passed": true, "evidence": "Found: 'force create body gravitational gravity_field_name = .pendulum.gravity y_component_gravity = -9806.65'"},
+        {"text": "Initial orientation set to 45 degrees for the release angle", "passed": true, "evidence": "Found: 'part modify rigid_body name_and_position part_name = .pendulum.link orientation = 0.0D, 0.0D, 45.0D'"},
+        {"text": "All keywords spelled out fully (no abbreviations)", "passed": true, "evidence": "All commands use fully-spelled keywords throughout"},
+        {"text": "No adams_id specified anywhere in the script", "passed": true, "evidence": "Searched entire script for 'adams_id' — not found"},
+        {"text": "Mass properties are set with part modify rigid_body mass_properties (not part create rigid_body mass_properties)", "passed": true, "evidence": "Found: 'part modify rigid_body mass_properties' — correctly uses part modify"},
+        {"text": "CMD script runs in Adams View without any ERROR: lines in aview.log (validated by scripts/run_adams_cmd.py)", "passed": true, "evidence": "run_adams_cmd.py exit code 0 — no ERROR: lines in aview.log after fixing cm marker creation order"}
+      ],
+      "notes": ["Initial LLM output failed Adams View with 'cm does not exist beneath .pendulum.link' — root cause: skill example did not show explicit cm marker creation. Skill updated with Core Rule #10. Output patched and re-validated."]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "simple-pendulum-script",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6,
+        "passed": 6,
+        "failed": 4,
+        "total": 10,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Script contains a model create command", "passed": true, "evidence": "Found: 'model create model_name = pendulum'"},
+        {"text": "A rigid body part is created with part create rigid_body name_and_position", "passed": true, "evidence": "Found: 'part create rigid_body name_and_position part_name = .pendulum.link'"},
+        {"text": "At least one marker is created on the link and at least one on ground", "passed": true, "evidence": "Ground: '.pendulum.ground.pivot_ground'. Link: '.pendulum.link.cm_marker', '.pendulum.link.pivot_link', '.pendulum.link.bottom'"},
+        {"text": "A revolute joint is created using constraint create joint revolute with i_marker_name and j_marker_name", "passed": true, "evidence": "Found: 'constraint create joint revolute joint_name = .pendulum.pin_joint i_marker_name = .pendulum.link.pivot_link j_marker_name = .pendulum.ground.pivot_ground'"},
+        {"text": "Gravity is created with force create body gravitational (not force create body_force or any other variant)", "passed": false, "evidence": "Used 'environment set gravity' — wrong command. Correct is 'force create body gravitational'"},
+        {"text": "Initial orientation set to 45 degrees for the release angle", "passed": true, "evidence": "CM placed at 70.711, -70.711, 0.0 (correct 45° position). Orientation 0.0, 0.0, 45.0 lacks 'D' suffix."},
+        {"text": "All keywords spelled out fully (no abbreviations)", "passed": true, "evidence": "Other keywords appear fully spelled"},
+        {"text": "No adams_id specified anywhere in the script", "passed": false, "evidence": "Found: 'adams_id = 2' on the part create command — violates Core Rule #8"},
+        {"text": "Mass properties are set with part modify rigid_body mass_properties (not part create rigid_body mass_properties)", "passed": false, "evidence": "Found: 'part create rigid_body mass_properties' — incorrectly uses part create"},
+        {"text": "CMD script runs in Adams View without any ERROR: lines in aview.log (validated by scripts/run_adams_cmd.py)", "passed": false, "evidence": "Not validated — multiple expected errors: wrong gravity command, forbidden adams_id, part create instead of part modify"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "spring-damper-force",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Uses force create element_like spring_damper (not single_component_force or bushing)", "passed": true, "evidence": "Found: 'force create element_like spring_damper spring_damper_name = .model.spring_main'"},
+        {"text": "Includes stiffness = 5000", "passed": true, "evidence": "Found: 'stiffness = 5000.0'"},
+        {"text": "Includes damping = 100", "passed": true, "evidence": "Found: 'damping = 100.0'"},
+        {"text": "Includes length = 250 (free length)", "passed": true, "evidence": "Found: 'length = 250.0'"},
+        {"text": "References both i_marker_name and j_marker_name", "passed": true, "evidence": "Found: 'i_marker_name = .model.body_1.spring_i_mkr' and 'j_marker_name = .model.body_2.spring_j_mkr'"},
+        {"text": "Explains that spring_damper is for 1-DOF along a line of action", "passed": true, "evidence": "Response explicitly explains 1-DOF spring + damper along a single line of action vs bushing for 6-DOF"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "spring-damper-force",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 3,
+        "failed": 3,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Uses force create element_like spring_damper (not single_component_force or bushing)", "passed": false, "evidence": "Used 'force create element translational_spring_damper' — wrong command. Correct is 'force create element_like spring_damper'"},
+        {"text": "Includes stiffness = 5000", "passed": true, "evidence": "Found: 'stiffness = 5000.0'"},
+        {"text": "Includes damping = 100", "passed": true, "evidence": "Found: 'damping = 100.0'"},
+        {"text": "Includes length = 250 (free length)", "passed": false, "evidence": "Used 'free_length = 250.0' — wrong parameter name. Correct is 'length = 250.0'"},
+        {"text": "References both i_marker_name and j_marker_name", "passed": true, "evidence": "Found: 'i_marker_name' and 'j_marker_name'"},
+        {"text": "Explains that spring_damper is for 1-DOF along a line of action", "passed": false, "evidence": "Response mentions spring acts along a line between markers but does not explicitly explain 1-DOF concept or when to choose spring_damper vs bushing"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "contact-force-expression",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Uses the IMPACT() function (not BISTOP or a manual IF expression)", "passed": true, "evidence": "Uses IMPACT() and explicitly contrasts with BISTOP and IF()"},
+        {"text": "First arg uses DZ or similar displacement measuring penetration below floor", "passed": true, "evidence": "Found: 'DZ(.model.body.cm, .model.ground.ref, .model.ground.ref)'"},
+        {"text": "Second arg uses VZ or matching velocity measure", "passed": true, "evidence": "Found: 'VZ(.model.body.cm, .model.ground.ref, .model.ground.ref, .model.ground.ref)'"},
+        {"text": "Threshold value is 0.0 (or equivalent contact point)", "passed": true, "evidence": "Found: '0.0' as x1"},
+        {"text": "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present", "passed": true, "evidence": "Found: '1.0E5, 1.5, 50.0, 0.1'"},
+        {"text": "Expression wrapped in double quotes as required for FUNCTION= parameter", "passed": true, "evidence": "Found: 'function = \"IMPACT(...)\"' — correctly wrapped in double quotes"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "contact-force-expression",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.833,
+        "passed": 5,
+        "failed": 1,
+        "total": 6,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Uses the IMPACT() function (not BISTOP or a manual IF expression)", "passed": true, "evidence": "Uses IMPACT() and gives correct parameter table"},
+        {"text": "First arg uses DZ or similar displacement measuring penetration below floor", "passed": true, "evidence": "Found: 'DZ(CM_MARKER, GROUND_MARKER)'"},
+        {"text": "Second arg uses VZ or matching velocity measure", "passed": true, "evidence": "Found: 'VZ(CM_MARKER, GROUND_MARKER)'"},
+        {"text": "Threshold value is 0.0 (or equivalent contact point)", "passed": true, "evidence": "Found: '0.0' as x1"},
+        {"text": "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present", "passed": true, "evidence": "Found: '1.0E5, 1.5, 50.0, 0.1'"},
+        {"text": "Expression wrapped in double quotes as required for FUNCTION= parameter", "passed": false, "evidence": "Main example uses 'FUNCTION = IMPACT(...)' without double quotes around the expression"}
+      ],
+      "notes": []
+    }
+  ],
+
+  "summary": {
+    "with_skill": {
+      "total_assertions": 22,
+      "passed": 22,
+      "failed": 0,
+      "pass_rate": 1.0
+    },
+    "without_skill": {
+      "total_assertions": 22,
+      "passed": 14,
+      "failed": 8,
+      "pass_rate": 0.636
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+    "expectations":  [
+                         {
+                             "text":  "Uses the IMPACT() function (not BISTOP, STEP, or a manual IF expression)",
+                             "passed":  true,
+                             "evidence":  "Response explicitly uses IMPACT() throughout: \u0027FUNCTION = IMPACT(DZ(cm_marker_id, 0, 0), VZ(cm_marker_id, 0, 0), 0.0, 1.0E+05, 1.5, 50.0, 0.1, 0)\u0027"
+                         },
+                         {
+                             "text":  "The first argument measures displacement using DZ or equivalent (e.g. DZ(.MODEL.BODY.CM))",
+                             "passed":  true,
+                             "evidence":  "First argument is \u0027DZ(cm_marker_id, 0, 0)\u0027 — Z-displacement of the CM marker relative to the global origin"
+                         },
+                         {
+                             "text":  "The second argument measures velocity using VZ or equivalent",
+                             "passed":  true,
+                             "evidence":  "Second argument is \u0027VZ(cm_marker_id, 0, 0)\u0027 — Z-velocity of the CM marker in the global frame"
+                         },
+                         {
+                             "text":  "The contact threshold value is 0.0",
+                             "passed":  true,
+                             "evidence":  "Third argument is \u00270.0\u0027: \u0027IMPACT(DZ(...), VZ(...), 0.0, 1.0E+05, 1.5, 50.0, 0.1, 0)\u0027"
+                         },
+                         {
+                             "text":  "The stiffness value 1e5 (or 100000) is present",
+                             "passed":  true,
+                             "evidence":  "Stiffness is listed in the parameters table as \u00271.0E+05\u0027 and used in the expression as the fourth argument"
+                         },
+                         {
+                             "text":  "The exponent 1.5 is present",
+                             "passed":  true,
+                             "evidence":  "Exponent is listed as \u00271.5\u0027 in the parameters table and appears as the fifth argument in the IMPACT() call"
+                         },
+                         {
+                             "text":  "The damping value 50 is present",
+                             "passed":  true,
+                             "evidence":  "Max damping is listed as \u002750.0\u0027 in the parameters table and appears as the sixth argument: \u0027...1.5, 50.0, 0.1, 0)\u0027"
+                         },
+                         {
+                             "text":  "The penetration depth 0.1 is present",
+                             "passed":  true,
+                             "evidence":  "Penetration depth is listed as \u00270.1\u0027 in the parameters table and appears as the seventh argument: \u0027...50.0, 0.1, 0)\u0027"
+                         },
+                         {
+                             "text":  "The expression is wrapped in double quotes as a FUNCTION= parameter value",
+                             "passed":  false,
+                             "evidence":  "The SFORCE definition shows \u0027FUNCTION = IMPACT(DZ(cm_marker_id, 0, 0), ...)\u0027 with no double quotes wrapping the expression"
+                         }
+                     ],
+    "summary":  {
+                    "pass_rate":  0.8889,
+                    "passed":  8,
+                    "failed":  1,
+                    "total":  9
+                }
+}

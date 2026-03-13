@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Uses the IMPACT() function (not BISTOP or a manual IF expression)",
+      "passed": true,
+      "evidence": "Main expression uses IMPACT(). An IF/STEP alternative is also provided as a secondary example, but IMPACT is the primary recommendation."
+    },
+    {
+      "text": "First arg uses DZ or similar displacement measuring penetration below floor",
+      "passed": true,
+      "evidence": "First arg is 'DZ(cm_marker, floor_marker, floor_marker)'"
+    },
+    {
+      "text": "Second arg uses VZ or matching velocity measure",
+      "passed": true,
+      "evidence": "Second arg is 'VZ(cm_marker, floor_marker, floor_marker)'"
+    },
+    {
+      "text": "Threshold value is 0.0 (or equivalent contact point)",
+      "passed": true,
+      "evidence": "Third argument is '0.0'"
+    },
+    {
+      "text": "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present",
+      "passed": true,
+      "evidence": "Found: '1.0E5, 1.5, 50.0, 0.1' in IMPACT expression"
+    },
+    {
+      "text": "Expression wrapped in double quotes as required for FUNCTION= parameter",
+      "passed": false,
+      "evidence": "Main 'FUNCTION= Expression' section shows the expression without double quotes: 'FUNCTION = IMPACT(DZ(cm_marker, floor_marker, floor_marker), ...)'. The CMD block also uses Adams solver (.adm) SFORCE notation with integer marker IDs rather than Adams View CMD syntax with quoted FUNCTION= strings."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 1,
+    "total": 6,
+    "pass_rate": 0.833
+  }
+}

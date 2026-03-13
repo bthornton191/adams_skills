@@ -1,0 +1,198 @@
+{
+  "metadata": {
+    "skill_name": "adams-subroutine-writer",
+    "skill_path": "skills/adams-subroutine-writer",
+    "timestamp": "2025-01-01T00:00:00Z",
+    "evals_run": ["cache-and-reuse", "forbidden-call-trap", "vfosub-spring-force"],
+    "runs_per_configuration": 1
+  },
+
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "cache-and-reuse",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 9,
+        "failed": 0,
+        "total": 9,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "CBKSUB uses struct-based C signature (sAdamsCbksub* parameter), not Fortran-style flat params", "passed": true, "evidence": "cbksub.c: void Cbksub( const struct sAdamsCbksub *cbk, double time, int event, int *data )"},
+        {"text": "CBKSUB includes adams_c_Callback forward declaration typedef", "passed": true, "evidence": "cbksub.c: adams_c_Callback  Cbksub;"},
+        {"text": "CBKSUB uses ev_ITERATION_BEG enum constant, not a raw integer like case 4", "passed": true, "evidence": "cbksub.c: case ev_ITERATION_BEG:"},
+        {"text": "CBKSUB handles ev_PRIVATE_EVENT1/2 (ignores them without reading data[])", "passed": true, "evidence": "cbksub.c: case ev_PRIVATE_EVENT1: case ev_PRIVATE_EVENT2: return;"},
+        {"text": "CBKSUB includes slv_c_utils.h as the primary SDK header", "passed": true, "evidence": "cbksub.c: #include \"slv_c_utils.h\""},
+        {"text": "VFOSUB uses struct-based C signature (sAdamsVforce* parameter) or correct pointer-based signature", "passed": true, "evidence": "vfosub.c: void Vfosub( const struct sAdamsVforce *vfo, double time, int dflag, int iflag, double *result )"},
+        {"text": "VFOSUB includes iflag guard that skips iflag 5, 7, 9", "passed": true, "evidence": "vfosub.c: if ( iflag == 5 || iflag == 7 || iflag == 9 ) return;"},
+        {"text": "VFOSUB is dflag-aware: uses cache when dflag==0, falls back to direct SYSARY when dflag==1", "passed": true, "evidence": "vfosub.c: if ( dflag == 0 && g_cache_valid ) uses cache; fallback c_sysary block for differencing"},
+        {"text": "Both files use c_errmes for error handling", "passed": true, "evidence": "cbksub.c: c_errmes(...); vfosub.c: c_errmes(...)"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "cache-and-reuse",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.11,
+        "passed": 1,
+        "failed": 8,
+        "total": 9,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "CBKSUB uses struct-based C signature (sAdamsCbksub* parameter), not Fortran-style flat params", "passed": false, "evidence": "Uses Fortran-style flat params: void cbksub(int *id, double *time, double *par, int *npar, int *flag, int *iflag)"},
+        {"text": "CBKSUB includes adams_c_Callback forward declaration typedef", "passed": false, "evidence": "No forward declaration typedef present."},
+        {"text": "CBKSUB uses ev_ITERATION_BEG enum constant, not a raw integer like case 4", "passed": false, "evidence": "No event-based switch; no ev_* constants."},
+        {"text": "CBKSUB handles ev_PRIVATE_EVENT1/2 (ignores them without reading data[])", "passed": false, "evidence": "No event handling of any kind."},
+        {"text": "CBKSUB includes slv_c_utils.h as the primary SDK header", "passed": true, "evidence": "cbksub.c: #include \"slv_c_utils.h\""},
+        {"text": "VFOSUB uses struct-based C signature (sAdamsVforce* parameter) or correct pointer-based signature", "passed": false, "evidence": "Uses Fortran-style flat params: void vfosub(int *id, double *time, ...)"},
+        {"text": "VFOSUB includes iflag guard that skips iflag 5, 7, 9", "passed": false, "evidence": "No iflag guard present."},
+        {"text": "VFOSUB is dflag-aware: uses cache when dflag==0, falls back to direct SYSARY when dflag==1", "passed": false, "evidence": "Always uses cache without any dflag awareness."},
+        {"text": "Both files use c_errmes for error handling", "passed": false, "evidence": "Neither file uses c_errmes."}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "forbidden-call-trap",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Explicitly warns that VFOSUB cannot be called from within CBKSUB", "passed": true, "evidence": "Opens with: 'VFOSUB is on the forbidden call list for CBKSUB. Calling it will cause undefined behavior or a crash.'"},
+        {"text": "Does NOT present calling VFOSUB directly from CBKSUB as a valid primary approach", "passed": true, "evidence": "Rejects the direct call immediately; only shows caching alternative."},
+        {"text": "Suggests caching pattern: compute in CBKSUB via utility functions, read from VFOSUB via shared state", "passed": true, "evidence": "Full CBKSUB + VFOSUB caching pattern with g_cache struct and extern declaration."},
+        {"text": "Uses ev_ITERATION_BEG enum constant (not raw integer) when showing the caching alternative", "passed": true, "evidence": "CBKSUB code: case ev_ITERATION_BEG:"},
+        {"text": "Uses c_sysary or c_sysfnc (allowed utility routines) for computation inside CBKSUB", "passed": true, "evidence": "CBKSUB code: c_sysary( \"DISP\", ipar, 3, states, &nv, &errflg );"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "forbidden-call-trap",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4,
+        "passed": 2,
+        "failed": 3,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Explicitly warns that VFOSUB cannot be called from within CBKSUB", "passed": false, "evidence": "Does not warn. Opens with 'you can invoke it as a regular C function call' presenting it as valid."},
+        {"text": "Does NOT present calling VFOSUB directly from CBKSUB as a valid primary approach", "passed": false, "evidence": "Main section presents calling vfosub_() directly from CBKSUB with full code example."},
+        {"text": "Suggests caching pattern: compute in CBKSUB via utility functions, read from VFOSUB via shared state", "passed": true, "evidence": "Alternative section suggests c_sysary/c_sysfnc in CBKSUB with globals for VFOSUB."},
+        {"text": "Uses ev_ITERATION_BEG enum constant (not raw integer) when showing the caching alternative", "passed": false, "evidence": "Uses raw integer: case 4:  /* Iteration begin */"},
+        {"text": "Uses c_sysary or c_sysfnc (allowed utility routines) for computation inside CBKSUB", "passed": true, "evidence": "Alternative section shows c_sysary(\"DISP\", ...) inside CBKSUB."}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "vfosub-spring-force",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Uses struct-based C signature (sAdamsVforce* parameter), not Fortran-style flat params with trailing underscore", "passed": true, "evidence": "vfosub.c: void Vfosub( const struct sAdamsVforce *vfo, double time, int dflag, int iflag, double *result )"},
+        {"text": "Includes adams_c_Vfosub forward declaration typedef", "passed": true, "evidence": "vfosub.c: adams_c_Vfosub  Vfosub;"},
+        {"text": "Includes slv_c_utils.h as the primary SDK header", "passed": true, "evidence": "vfosub.c: #include \"slv_c_utils.h\""},
+        {"text": "Includes iflag guard that skips iflag 5, 7, 9", "passed": true, "evidence": "vfosub.c: if ( iflag == 5 || iflag == 7 || iflag == 9 ) return;"},
+        {"text": "Uses c_sysary or c_sysfnc to query displacement (not a raw function call)", "passed": true, "evidence": "vfosub.c: c_sysary( \"TDISP\", ipar, 3, disp, &nstates, &errflg );"},
+        {"text": "Uses c_errmes for error handling after utility function calls", "passed": true, "evidence": "vfosub.c: c_errmes( errflg, \"SYSARY TDISP failed in Vfosub\", vfo->ID, \"STOP\" );"},
+        {"text": "Parameterizes markers or constants via PAR[] instead of hardcoding marker IDs in the function body", "passed": true, "evidence": "Reads stiffness from vfo->PAR[0], free_length from vfo->PAR[1], markers from vfo->PAR[2] and vfo->PAR[3]"},
+        {"text": "Build command uses correct library name adams_util.lib (not adams_utils.lib)", "passed": true, "evidence": "Build command: /link \"%ADAMS_SDK%\\sdk\\lib\\adams_util.lib\""}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "vfosub-spring-force",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.375,
+        "passed": 3,
+        "failed": 5,
+        "total": 8,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Uses struct-based C signature (sAdamsVforce* parameter), not Fortran-style flat params with trailing underscore", "passed": false, "evidence": "Uses Fortran-style: void vfosub_(int *id, double *time, double *par, int *npar, int *dflag, int *iflag, double *result)"},
+        {"text": "Includes adams_c_Vfosub forward declaration typedef", "passed": false, "evidence": "No typedef. Uses DLLFUNC __declspec(dllexport) macro instead."},
+        {"text": "Includes slv_c_utils.h as the primary SDK header", "passed": true, "evidence": "vfosub.c: #include \"slv_c_utils.h\""},
+        {"text": "Includes iflag guard that skips iflag 5, 7, 9", "passed": false, "evidence": "No iflag guard present."},
+        {"text": "Uses c_sysary or c_sysfnc to query displacement (not a raw function call)", "passed": true, "evidence": "vfosub.c: c_sysfnc(\"DX\", ipar, nipar, &dx, &errflg);"},
+        {"text": "Uses c_errmes for error handling after utility function calls", "passed": true, "evidence": "vfosub.c: c_errmes(1, \"VFOSUB: failed to evaluate DX(10,1)\", *id, \"VFORCE\");"},
+        {"text": "Parameterizes markers or constants via PAR[] instead of hardcoding marker IDs in the function body", "passed": false, "evidence": "Hardcoded: ipar[0] = 10; ipar[1] = 1; Response notes acknowledge this."},
+        {"text": "Build command uses correct library name adams_util.lib (not adams_utils.lib)", "passed": false, "evidence": "Uses wrong library name: adams_utils.lib (with extra 's')"}
+      ],
+      "notes": []
+    }
+  ],
+
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0},
+      "time_seconds": {"mean": 0, "stddev": 0, "min": 0, "max": 0},
+      "tokens": {"mean": 0, "stddev": 0, "min": 0, "max": 0}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 0.295, "stddev": 0.155, "min": 0.11, "max": 0.4},
+      "time_seconds": {"mean": 0, "stddev": 0, "min": 0, "max": 0},
+      "tokens": {"mean": 0, "stddev": 0, "min": 0, "max": 0}
+    },
+    "delta": {
+      "pass_rate": "+0.705",
+      "time_seconds": "N/A",
+      "tokens": "N/A"
+    }
+  },
+
+  "notes": [
+    "With-skill achieved 100% pass rate across all 22 assertions (9+5+8). Without-skill passed only 6/22 (27.3%).",
+    "Assertion 'Includes slv_c_utils.h as the primary SDK header' passes in both configurations (3/3 each) — non-discriminating, consider removing.",
+    "Assertions 'Uses c_sysary or c_sysfnc' and 'Uses c_errmes' partially pass without-skill (2/3 and 1/3 respectively) — the baseline model knows these function names exist but uses them incorrectly or inconsistently.",
+    "The most discriminating assertions are: struct-based C signature (0% without skill), iflag guard (0% without skill), ev_PRIVATE_EVENT handling (0% without skill), dflag awareness (0% without skill), and PAR[] parameterization (0% without skill).",
+    "Without-skill consistently falls back to a Fortran-style flat parameter signature with trailing underscore — this is the single biggest correctness issue the skill fixes.",
+    "The forbidden-call-trap eval shows partial baseline knowledge: the model knows c_sysary exists and mentions the caching alternative, but still presents the forbidden approach as the primary recommendation.",
+    "Timing/token data was not captured for these runs (subagent notifications were not processed). Consider re-running with timing capture for a complete benchmark."
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Explicitly warns that VFOSUB cannot be called from within CBKSUB",
+      "passed": true,
+      "evidence": "response.md: \"VFOSUB is on CBKSUB's forbidden call list\" — direct call from CBKSUB is clearly prohibited"
+    },
+    {
+      "text": "Does NOT present calling VFOSUB directly from CBKSUB as a valid primary approach",
+      "passed": true,
+      "evidence": "response.md never presents direct call as valid; immediately redirects to caching alternative"
+    },
+    {
+      "text": "Suggests caching pattern: compute in CBKSUB via utility functions, read from VFOSUB via shared state",
+      "passed": true,
+      "evidence": "cbksub.c implements full caching pattern with file-scope global struct holding precomputed values; vfosub.c reads the cache"
+    },
+    {
+      "text": "Uses ev_ITERATION_BEG enum constant (not raw integer) when showing the caching alternative",
+      "passed": true,
+      "evidence": "cbksub.c: case ev_ITERATION_BEG: — enum constant used in the switch statement"
+    },
+    {
+      "text": "Uses c_sysary or c_sysfnc (allowed utility routines) for computation inside CBKSUB",
+      "passed": true,
+      "evidence": "cbksub.c: c_sysary( \"TDISP\", ... ) used to compute displacement at ev_ITERATION_BEG"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  }
+}

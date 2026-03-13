@@ -1,0 +1,65 @@
+{
+  "expectations": [
+    {
+      "text": "Uses struct-based C signature (sAdamsVforce* parameter), not Fortran-style flat params with trailing underscore",
+      "passed": false,
+      "evidence": "vfosub.c: ADAMS_EXPORT void vfosub(int *id, double *time, double *par, int *npar, int *dflag, int *iflag, double *result) — Fortran-style flat params"
+    },
+    {
+      "text": "Includes adams_c_Vfosub forward declaration typedef",
+      "passed": false,
+      "evidence": "No adams_c_Vfosub typedef or forward declaration present"
+    },
+    {
+      "text": "Includes slv_c_utils.h as the primary SDK header",
+      "passed": false,
+      "evidence": "Does not include slv_c_utils.h; manually declares extern void c_sysfnc(...) and extern void c_errmes(...)"
+    },
+    {
+      "text": "Includes iflag guard that skips iflag 5, 7, 9",
+      "passed": false,
+      "evidence": "Only checks if (*iflag == 1) for initialization; no guard for iflag 5, 7, or 9"
+    },
+    {
+      "text": "Uses c_sysary or c_sysfnc to query displacement (not a raw function call)",
+      "passed": true,
+      "evidence": "vfosub.c: c_sysfnc(\"DX\", ipar, 2, &dx, &istat) used to query X-displacement"
+    },
+    {
+      "text": "Uses c_errmes for error handling after utility function calls",
+      "passed": true,
+      "evidence": "vfosub.c: c_errmes(&nerr, msg, id, \"STOP\") called after checking istat"
+    },
+    {
+      "text": "Parameterizes markers or constants via PAR[] instead of hardcoding marker IDs in the function body",
+      "passed": false,
+      "evidence": "vfosub.c: hardcodes int ipar[2] = { 10, 1 } as marker IDs inside the function body"
+    },
+    {
+      "text": "Build command uses correct library name adams_util.lib (not adams_utils.lib)",
+      "passed": false,
+      "evidence": "response.md uses raw MSVC cl /LD /MD /O2 ... /link /DLL /OUT:vfosub.dll — no mdi.bat, no adams_util.lib reference"
+    },
+    {
+      "text": "Build command uses mdi.bat (Windows) or mdi -c (Linux), not raw cl/gcc/ifort",
+      "passed": false,
+      "evidence": "response.md: cl /LD /MD /O2 ... vfosub.c /link /DLL /OUT:vfosub.dll — raw MSVC, no mdi.bat"
+    },
+    {
+      "text": "Agent offers to compile the code (or runs the build) rather than only providing manual build instructions",
+      "passed": false,
+      "evidence": "response.md only provides manual compiler commands; no offer to compile via agent workflow"
+    },
+    {
+      "text": "Manual Start Menu / Adams Command Prompt instructions are presented as a fallback for when agent compilation fails, not as the primary workflow",
+      "passed": false,
+      "evidence": "Manual compiler commands are the primary and only build path; no agent compilation offer or Start Menu fallback distinction"
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 9,
+    "total": 11,
+    "pass_rate": 0.182
+  }
+}

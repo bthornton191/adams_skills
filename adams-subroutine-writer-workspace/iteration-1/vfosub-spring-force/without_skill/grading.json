@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Uses struct-based C signature (sAdamsVforce* parameter), not Fortran-style flat params with trailing underscore",
+      "passed": false,
+      "evidence": "vfosub.c uses Fortran-style signature with trailing underscore: void vfosub_(int *id, double *time, double *par, int *npar, int *dflag, int *iflag, double *result)"
+    },
+    {
+      "text": "Includes adams_c_Vfosub forward declaration typedef",
+      "passed": false,
+      "evidence": "No forward declaration typedef. Uses DLLFUNC __declspec(dllexport) macro instead."
+    },
+    {
+      "text": "Includes slv_c_utils.h as the primary SDK header",
+      "passed": true,
+      "evidence": "vfosub.c: #include \"slv_c_utils.h\""
+    },
+    {
+      "text": "Includes iflag guard that skips iflag 5, 7, 9",
+      "passed": false,
+      "evidence": "No iflag guard present. The function always proceeds to compute the force regardless of iflag value."
+    },
+    {
+      "text": "Uses c_sysary or c_sysfnc to query displacement (not a raw function call)",
+      "passed": true,
+      "evidence": "vfosub.c: c_sysfnc(\"DX\", ipar, nipar, &dx, &errflg);"
+    },
+    {
+      "text": "Uses c_errmes for error handling after utility function calls",
+      "passed": true,
+      "evidence": "vfosub.c: c_errmes(1, \"VFOSUB: failed to evaluate DX(10,1)\", *id, \"VFORCE\");"
+    },
+    {
+      "text": "Parameterizes markers or constants via PAR[] instead of hardcoding marker IDs in the function body",
+      "passed": false,
+      "evidence": "Markers are hardcoded: ipar[0] = 10; ipar[1] = 1; Response Notes section acknowledges: 'The marker IDs (10 and 1) are hard-coded in the subroutine.'"
+    },
+    {
+      "text": "Build command uses correct library name adams_util.lib (not adams_utils.lib)",
+      "passed": false,
+      "evidence": "response.md build command uses wrong library name: adams_utils.lib (with incorrect 's' suffix)"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 5,
+    "total": 8,
+    "pass_rate": 0.375
+  }
+}

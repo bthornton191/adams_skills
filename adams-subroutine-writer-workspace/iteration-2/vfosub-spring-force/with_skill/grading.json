@@ -1,0 +1,60 @@
+{
+  "expectations": [
+    {
+      "text": "Uses struct-based C signature (sAdamsVforce* parameter), not Fortran-style flat params with trailing underscore",
+      "passed": true,
+      "evidence": "vfosub.c: void Vfosub(const struct sAdamsVforce *vfo, double time, int dflag, int iflag, double *result)"
+    },
+    {
+      "text": "Includes adams_c_Vfosub forward declaration typedef",
+      "passed": true,
+      "evidence": "vfosub.c: adams_c_Vfosub    Vfosub;"
+    },
+    {
+      "text": "Includes slv_c_utils.h as the primary SDK header",
+      "passed": true,
+      "evidence": "vfosub.c: #include \"slv_c_utils.h\""
+    },
+    {
+      "text": "Includes iflag guard that skips iflag 5, 7, 9",
+      "passed": true,
+      "evidence": "vfosub.c: if (iflag == 5 || iflag == 7 || iflag == 9) return;"
+    },
+    {
+      "text": "Uses c_sysary or c_sysfnc to query displacement (not a raw function call)",
+      "passed": true,
+      "evidence": "vfosub.c: c_sysary(\"TDISP\", ipar, 3, disp, &nstates, &errflg);"
+    },
+    {
+      "text": "Uses c_errmes for error handling after utility function calls",
+      "passed": true,
+      "evidence": "vfosub.c: c_errmes(errflg, \"c_sysary TDISP failed in Vfosub\", vfo->ID, \"STOP\");"
+    },
+    {
+      "text": "Parameterizes markers or constants via PAR[] instead of hardcoding marker IDs in the function body",
+      "passed": true,
+      "evidence": "vfosub.c: K from vfo->PAR[0], free_len from vfo->PAR[1]; markers from vfo->I and vfo->JFLOAT (struct fields, not hardcoded)"
+    },
+    {
+      "text": "Build command uses correct library name adams_util.lib (not adams_utils.lib)",
+      "passed": true,
+      "evidence": "Uses mdi.bat cr-u which handles linking automatically; no incorrect library name mentioned."
+    },
+    {
+      "text": "Build command uses mdi.bat (Windows) or mdi -c (Linux), not raw cl/gcc/ifort",
+      "passed": true,
+      "evidence": "response.md Build Instructions: 'mdi.bat cr-u n vfosub.c -n my_sub.dll ex' (Windows) and 'mdi -c cr-u n vfosub.c -n my_sub.so ex' (Linux)"
+    },
+    {
+      "text": "Build instructions mention setting up the Adams environment before running mdi.bat",
+      "passed": true,
+      "evidence": "response.md shows both automated workflow (python scripts/generate_adams_env.py + call adams_env_init.bat before mdi.bat) and manual workflow (Start Menu → Adams → Command Prompt)"
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 0,
+    "total": 10,
+    "pass_rate": 1.0
+  }
+}

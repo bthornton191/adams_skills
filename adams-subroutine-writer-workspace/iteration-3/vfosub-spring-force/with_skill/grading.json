@@ -1,0 +1,65 @@
+{
+  "expectations": [
+    {
+      "text": "Uses struct-based C signature (sAdamsVforce* parameter), not Fortran-style flat params with trailing underscore",
+      "passed": true,
+      "evidence": "vfosub.c: void Vfosub(const struct sAdamsVforce *vfo, double time, int dflag, int iflag, double *result)"
+    },
+    {
+      "text": "Includes adams_c_Vfosub forward declaration typedef",
+      "passed": true,
+      "evidence": "vfosub.c: adams_c_Vfosub    Vfosub;"
+    },
+    {
+      "text": "Includes slv_c_utils.h as the primary SDK header",
+      "passed": true,
+      "evidence": "vfosub.c: #include \"slv_c_utils.h\""
+    },
+    {
+      "text": "Includes iflag guard that skips iflag 5, 7, 9",
+      "passed": true,
+      "evidence": "vfosub.c: if ( iflag == 5 || iflag == 7 || iflag == 9 ) return;"
+    },
+    {
+      "text": "Uses c_sysary or c_sysfnc to query displacement (not a raw function call)",
+      "passed": true,
+      "evidence": "vfosub.c: c_sysary( \"TDISP\", ipar, 2, disp, 6, &errflg ) to retrieve displacement"
+    },
+    {
+      "text": "Uses c_errmes for error handling after utility function calls",
+      "passed": true,
+      "evidence": "vfosub.c: c_errmes( &errflg, \"c_sysary TDISP failed\", &vfo->ID, \"STOP\" )"
+    },
+    {
+      "text": "Parameterizes markers or constants via PAR[] instead of hardcoding marker IDs in the function body",
+      "passed": true,
+      "evidence": "vfosub.c: spring constant K = vfo->PAR[0], free_len from vfo->PAR[1], markers from vfo->I and vfo->JFLOAT"
+    },
+    {
+      "text": "Build command uses correct library name adams_util.lib (not adams_utils.lib)",
+      "passed": true,
+      "evidence": "response.md: mdi.bat handles adams_util.lib automatically via cr-u flag — no explicit lib name needed"
+    },
+    {
+      "text": "Build command uses mdi.bat (Windows) or mdi -c (Linux), not raw cl/gcc/ifort",
+      "passed": true,
+      "evidence": "response.md: mdi.bat cr-u n vfosub.c -n my_sub.dll ex"
+    },
+    {
+      "text": "Agent offers to compile the code (or runs the build) rather than only providing manual build instructions",
+      "passed": true,
+      "evidence": "response.md: \"I can run the build now using the agent workflow:\" followed by generate_adams_env.py and call + mdi.bat steps"
+    },
+    {
+      "text": "Manual Start Menu / Adams Command Prompt instructions are presented as a fallback for when agent compilation fails, not as the primary workflow",
+      "passed": true,
+      "evidence": "response.md: \"> Fallback (only if agent compilation fails): Open Start Menu → Adams <version> → Command Prompt\""
+    }
+  ],
+  "summary": {
+    "passed": 11,
+    "failed": 0,
+    "total": 11,
+    "pass_rate": 1.0
+  }
+}

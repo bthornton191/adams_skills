@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "adams-cmd-model-builder", "runs": [{"id": "contact-force-expression-with_skill", "prompt": "Write a FUNCTION= expression for a one-sided contact force that activates when a part's CM falls below Z = 0 (i.e., hits a floor at Z=0). The contact should have stiffness 1e5, exponent 1.5, damping 50, and penetration depth 0.1 mm.", "eval_id": "contact-force-expression", "outputs": [{"name": "response.md", "type": "text", "content": "# One-Sided Floor Contact Force \u00e2\u20ac\u201d FUNCTION= Expression\n\n## Overview\n\nTo model a one-sided contact force that activates when a part's CM falls below Z = 0, use the Adams `IMPACT` function. This function generates a repulsive force when a displacement variable drops below a trigger threshold.\n\n## FUNCTION= Expression\n\n```\n\"IMPACT(DZ(.model.part.cm, .model.ground.floor_ref, .model.ground.floor_ref), &\n        VZ(.model.part.cm, .model.ground.floor_ref, .model.ground.floor_ref, .model.ground.floor_ref), &\n        0.0, 1.0E5, 1.5, 50.0, 0.1)\"\n```\n\n### Parameter Mapping\n\n| Argument | Value | Meaning |\n|----------|-------|---------|\n| Displacement Var | `DZ(.model.part.cm, .model.ground.floor_ref, .model.ground.floor_ref)` | Z-component of part CM position measured from floor reference marker |\n| Velocity Var | `VZ(.model.part.cm, .model.ground.floor_ref, .model.ground.floor_ref, .model.ground.floor_ref)` | Z-component of part CM velocity in the same reference frame |\n| Trigger | `0.0` | Contact activates when DZ < 0.0 (CM crosses below Z = 0) |\n| K | `1.0E5` | Contact stiffness (N/mm^e or applicable units) |\n| e | `1.5` | Stiffness exponent \u00e2\u20ac\u201d Hertz contact value |\n| C | `50.0` | Maximum damping coefficient |\n| d | `0.1` | Damping ramp-up distance (mm) \u00e2\u20ac\u201d damping ramps from 0 to C over first 0.1 mm of penetration |\n\n### Force Equation\n\nWhen penetration depth $\\delta = 0.0 - \\text{DZ} > 0$:\n\n$$F = K \\cdot \\delta^e - C \\cdot \\text{STEP}(\\delta,\\, 0,\\, 0,\\, 0.1,\\, 1) \\cdot V_z$$\n\nThe STEP term prevents a damping discontinuity at initial contact by ramping the damping coefficient from 0 up to C over the first 0.1 mm of penetration.\n\n---\n\n## Full CMD Example\n\n```cmd\n! ============================================================\n! One-sided floor contact at Z = 0\n! Part CM monitored: .model.part.cm (auto-created CM marker)\n! Floor reference:   .model.ground.floor_ref at origin (0, 0, 0)\n! Stiffness:  K = 1e5   [N/mm^e]\n! Exponent:   e = 1.5   (Hertz contact)\n! Damping:    C = 50.0  [N\u00c2\u00b7s/mm]\n! Ramp depth: d = 0.1   [mm]\n! ============================================================\n\n! Create floor reference marker on ground at Z = 0\nmarker create &\n    marker_name = .model.ground.floor_ref &\n    location    = 0.0, 0.0, 0.0 &\n    orientation = 0.0D, 0.0D, 0.0D\n\n! Create the contact force (action-only \u00e2\u20ac\u201d no reaction on ground)\nforce create direct single_component_force &\n    single_component_force_name = .model.floor_contact &\n    i_marker_name               = .model.part.cm &\n    j_part_name                 = .model.ground &\n    action_only                 = off &\n    function                    = \"IMPACT( &\n        DZ(.model.part.cm, .model.ground.floor_ref, .model.ground.floor_ref), &\n        VZ(.model.part.cm, .model.ground.floor_ref, .model.ground.floor_ref, &\n           .model.ground.floor_ref), &\n        0.0, 1.0E5, 1.5, 50.0, 0.1)\"\n```\n\n---\n\n## Key Notes\n\n1. **`DZ` vs `DM`**: Use `DZ` (not `DM`) because `DM` is always positive and cannot detect which side of the floor the part is on. `DZ` with a shared reference frame measures the signed Z-distance from the floor.\n\n2. **Trigger = 0.0**: Since the floor is at Z = 0 and we monitor `DZ` of the CM from a marker *at* Z = 0, the trigger is `0.0`. The force is zero when the CM is above the floor (`DZ > 0`) and positive when the CM penetrates below (`DZ < 0`).\n\n3. **Velocity variable**: `VZ` must use exactly the same marker arguments as `DZ` (with the addition of a reference frame marker as the 4th argument). Mismatched arguments create solver errors.\n\n4. **`action_only`**: Set to `off` so the reaction is applied to the ground part (physically correct \u00e2\u20ac\u201d the floor pushes back on the part). Set to `on` only if you are modelling a force with no reaction (e.g., an environmental load with no physical floor geometry).\n\n5. **Exponent e = 1.5**: This is the classic Hertz contact exponent for spherical contact. For rigid flat-on-flat contact, e = 1.0 may be more appropriate.\n\n6. **Units**: The values above assume an mm-N-s unit system. The stiffness `1e5 N/mm^1.5`, damping `50 N\u00c2\u00b7s/mm`, and ramp-up `0.1 mm` must be consistent with your model's unit settings. Verify with `defaults units` at the top of your script.\n"}], "grading": {"expectations": [{"text": "Uses the IMPACT() function (not BISTOP or a manual IF expression)", "passed": true, "evidence": "Found: 'IMPACT(DZ(.model.part.cm, .model.ground.floor_ref, .model.ground.floor_ref), ...'"}, {"text": "First arg uses DZ or similar displacement measuring penetration below floor", "passed": true, "evidence": "First arg is 'DZ(.model.part.cm, .model.ground.floor_ref, .model.ground.floor_ref)' \u00e2\u20ac\u201d Z-component of CM position from floor reference"}, {"text": "Second arg uses VZ or matching velocity measure", "passed": true, "evidence": "Second arg is 'VZ(.model.part.cm, .model.ground.floor_ref, .model.ground.floor_ref, .model.ground.floor_ref)'"}, {"text": "Threshold value is 0.0 (or equivalent contact point)", "passed": true, "evidence": "Third argument is '0.0' \u00e2\u20ac\u201d contact activates when DZ drops below 0.0"}, {"text": "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present", "passed": true, "evidence": "Found: '1.0E5, 1.5, 50.0, 0.1' in correct IMPACT argument positions"}, {"text": "Expression wrapped in double quotes as required for FUNCTION= parameter", "passed": true, "evidence": "Expression shown as: '\"IMPACT(DZ(.model.part.cm, ...), ..., 0.0, 1.0E5, 1.5, 50.0, 0.1)\"' \u00e2\u20ac\u201d properly quoted. CMD block also uses 'function = \"IMPACT(...)\"'"}], "summary": {"passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0}}}, {"id": "contact-force-expression-without_skill", "prompt": "Write a FUNCTION= expression for a one-sided contact force that activates when a part's CM falls below Z = 0 (i.e., hits a floor at Z=0). The contact should have stiffness 1e5, exponent 1.5, damping 50, and penetration depth 0.1 mm.", "eval_id": "contact-force-expression", "outputs": [{"name": "response.md", "type": "text", "content": "# One-Sided Contact Force Expression (Floor at Z = 0)\n\n## Overview\n\nThis gives a `FUNCTION=` expression for a one-sided contact force that activates when a part's centre of mass (CM) drops below Z = 0 (a floor at Z = 0). The expression uses the Adams `IMPACT` function, which is the standard approach for compliance-based contact in Adams/View and Adams/Car CMD models.\n\n### Specified Parameters\n\n| Parameter | Value |\n|---|---|\n| Stiffness (k) | 1.0E5 |\n| Exponent (e) | 1.5 |\n| Maximum damping coefficient (cmax) | 50.0 |\n| Penetration depth for full damping (d) | 0.1 mm |\n\n---\n\n## The IMPACT Function\n\nThe Adams `IMPACT` function models a compliant contact force. Its signature is:\n\n```\nIMPACT(x, xdot, x1, k, e, cmax, d)\n```\n\n| Argument | Meaning |\n|---|---|\n| `x` | Current value of the gap/penetration quantity |\n| `xdot` | Time derivative of `x` (closing velocity) |\n| `x1` | Boundary value at which contact initiates |\n| `k` | Stiffness coefficient |\n| `e` | Force exponent (penetration exponent) |\n| `cmax` | Maximum damping coefficient |\n| `d` | Penetration at which full damping (`cmax`) is applied |\n\n**Behaviour:**\n- When `x >= x1`: `IMPACT = 0` (no contact)\n- When `x < x1`: `IMPACT = k*(x1 - x)^e - STEP(x, x1-d, cmax, x1, 0) * xdot`\n\nThe damping term is ramped smoothly from 0 (at the contact boundary) to `cmax` (at penetration depth `d`) using an internal STEP function, avoiding a discontinuity at first contact.\n\n---\n\n## FUNCTION= Expression\n\nFor a floor at Z = 0, with the part CM represented by marker `cm_marker` and the floor origin by `floor_marker` (fixed to Ground at Z = 0):\n\n```\nFUNCTION = IMPACT(DZ(cm_marker, floor_marker, floor_marker), &\n                  VZ(cm_marker, floor_marker, floor_marker), &\n                  0.0, 1.0E5, 1.5, 50.0, 0.1)\n```\n\n- `DZ(cm_marker, floor_marker, floor_marker)` \u00e2\u20ac\u201d Z-displacement of the CM relative to the floor, expressed in the floor frame.\n- `VZ(cm_marker, floor_marker, floor_marker)` \u00e2\u20ac\u201d Z-velocity of the CM relative to the floor.\n- `0.0` \u00e2\u20ac\u201d Contact initiates at Z = 0 (the floor).\n- `1.0E5` \u00e2\u20ac\u201d Stiffness.\n- `1.5` \u00e2\u20ac\u201d Penetration exponent.\n- `50.0` \u00e2\u20ac\u201d Maximum damping.\n- `0.1` \u00e2\u20ac\u201d Full damping reached at 0.1 mm penetration.\n\n> **Unit note:** The values above assume the model uses **mm** and **N**. Stiffness units are N/mm^1.5, damping units are N\u00c2\u00b7s/mm, and penetration is in mm. If the model uses SI (m, N), convert `d` to `1.0E-4` (0.1 mm = 1\u00c3\u201410\u00e2\ufffd\u00bb\u00e2\ufffd\u00b4 m) and confirm the stiffness and damping magnitudes are appropriate for those units.\n\n---\n\n## Full CMD Example\n\nThe force is applied as a single-component translational SFORCE acting on the part in the Z direction. Use `ACTION_ONLY` so the reaction does not load Ground.\n\n```cmd\n! ============================================================\n! One-sided floor contact force\n! Activates when part CM penetrates below Z = 0\n! Units: mm, N\n! ============================================================\n\nMARKER/10, PART = 1, QP = 0, 0, 0, REULER = 0, 0, 0\n! floor_marker: fixed to Ground at origin (Z = 0)\n\nSFORCE/1, &\n  I     = 2, &\n  JFLOAT, &\n  TRANSLATIONAL, &\n  ACTION_ONLY, &\n  FUNCTION = IMPACT(DZ(2, 10, 10), VZ(2, 10, 10), 0.0, 1.0E5, 1.5, 50.0, 0.1)\n```\n\n**Key points:**\n- `I = 2` \u00e2\u20ac\u201d the CM marker of the part (replace with actual marker ID).\n- `JFLOAT` \u00e2\u20ac\u201d the reaction point floats; no reaction is applied to Ground.\n- `TRANSLATIONAL` \u00e2\u20ac\u201d the force acts along the line between I and J markers (Z-axis in this configuration). Because the floor marker's Z-axis is aligned with global Z, the force acts in the +Z direction, pushing the part back up when penetration occurs.\n- Replace marker IDs `2` and `10` with the actual IDs from your model.\n\n---\n\n## Alternative: Using IF and STEP\n\nIf you need explicit control without the built-in IMPACT function, an equivalent expression using `IF` and `STEP` is:\n\n```\nFUNCTION = IF(DZ(2, 10, 10):  &\n    (1.0E5 * (-DZ(2, 10, 10))**1.5  &\n     - STEP(DZ(2, 10, 10), -0.1, 50.0, 0.0, 0.0) * VZ(2, 10, 10)),  &\n    0.0, 0.0)\n```\n\n`IF(expr: negative_value, zero_value, positive_value)` \u00e2\u20ac\u201d returns the first branch when `expr < 0` (CM below floor), otherwise 0.\n\nThe `IMPACT` function formulation is preferred because it is optimised internally, handles sign conventions automatically, and is numerically more robust.\n\n---\n\n## Summary\n\n| Item | Value |\n|---|---|\n| Function used | `IMPACT` |\n| Contact boundary | Z = 0 (floor) |\n| Gap quantity | `DZ(cm_marker, floor_marker, floor_marker)` |\n| Closing velocity | `VZ(cm_marker, floor_marker, floor_marker)` |\n| Stiffness | `1.0E5` |\n| Exponent | `1.5` |\n| Max damping | `50.0` |\n| Damping ramp depth | `0.1` (mm) |\n| Force element type | `SFORCE`, `TRANSLATIONAL`, `ACTION_ONLY` |\n"}], "grading": {"expectations": [{"text": "Uses the IMPACT() function (not BISTOP or a manual IF expression)", "passed": true, "evidence": "Main expression uses IMPACT(). An IF/STEP alternative is also provided as a secondary example, but IMPACT is the primary recommendation."}, {"text": "First arg uses DZ or similar displacement measuring penetration below floor", "passed": true, "evidence": "First arg is 'DZ(cm_marker, floor_marker, floor_marker)'"}, {"text": "Second arg uses VZ or matching velocity measure", "passed": true, "evidence": "Second arg is 'VZ(cm_marker, floor_marker, floor_marker)'"}, {"text": "Threshold value is 0.0 (or equivalent contact point)", "passed": true, "evidence": "Third argument is '0.0'"}, {"text": "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present", "passed": true, "evidence": "Found: '1.0E5, 1.5, 50.0, 0.1' in IMPACT expression"}, {"text": "Expression wrapped in double quotes as required for FUNCTION= parameter", "passed": false, "evidence": "Main 'FUNCTION= Expression' section shows the expression without double quotes: 'FUNCTION = IMPACT(DZ(cm_marker, floor_marker, floor_marker), ...)'. The CMD block also uses Adams solver (.adm) SFORCE notation with integer marker IDs rather than Adams View CMD syntax with quoted FUNCTION= strings."}], "summary": {"passed": 5, "failed": 1, "total": 6, "pass_rate": 0.833}}}, {"id": "simple-pendulum-script-with_skill", "prompt": "Write an Adams CMD script to create a simple pendulum. It should have a single rigid link of length 200 mm and mass 1 kg, pinned to the ground at its top end by a revolute joint, with gravity acting in the -Y direction. Release it from 45 degrees.", "eval_id": "simple-pendulum-script", "outputs": [{"name": "pendulum.cmd", "type": "binary", "mime": "application/octet-stream", "data_uri": "data:application/octet-stream;base64,ISA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCiEgU2ltcGxlIFBlbmR1bHVtIOKAlCBBZGFtcyBDTUQgU2NyaXB0DQohDQohIEEgc2luZ2xlIHJpZ2lkIGxpbms6DQohICAgLSBMZW5ndGggOiAyMDAgbW0NCiEgICAtIE1hc3MgICA6IDEga2cNCiEgICAtIFBpbm5lZCB0byBncm91bmQgYXQgdGhlIHRvcCBlbmQgYnkgYSByZXZvbHV0ZSBqb2ludA0KISAgIC0gR3Jhdml0eTogLVkgZGlyZWN0aW9uICAoOTgwNi42NSBtbS9zwrIpDQohICAgLSBSZWxlYXNlZCBmcm9tIDQ1IGRlZ3JlZXMgZnJvbSB0aGUgdmVydGljYWwNCiENCiEgTW9kZWwgc3RydWN0dXJlOg0KISAgIC5wZW5kdWx1bQ0KISAgIOKUnOKUgOKUgCBncm91bmQNCiEgICDilIIgICDilJTilIDilIAgcGl2b3RfbWtyICAgICAgICAoZml4ZWQgcGluIHBvaW50IGF0IG9yaWdpbikNCiEgICDilJTilIDilIAgbGluaw0KISAgICAgICDilJzilIDilIAgY20gICAgICAgICAgICAgICAoY2VudHJlIG9mIG1hc3MsIDEwMCBtbSBiZWxvdyBwaW4pDQohICAgICAgIOKUnOKUgOKUgCBwaW5fbWtyICAgICAgICAgICh0b3AgZW5kIOKAlCBjb2luY2lkZXMgd2l0aCBwaXZvdF9ta3IpDQohICAgICAgIOKUlOKUgOKUgCB0aXBfbWtyICAgICAgICAgIChib3R0b20gZW5kLCAyMDAgbW0gYmVsb3cgcGluKQ0KISA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCg0KISAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiEgMS4gTW9kZWwgYW5kIHVuaXRzDQohIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KbW9kZWwgY3JlYXRlIG1vZGVsX25hbWUgPSBwZW5kdWx1bQ0KDQpkZWZhdWx0cyB1bml0cyAmDQogICAgbGVuZ3RoID0gbW0gJg0KICAgIGZvcmNlICA9IG5ld3RvbiAmDQogICAgbWFzcyAgID0ga2cgJg0KICAgIHRpbWUgICA9IHNlYw0KDQohIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KISAyLiBHcm91bmQ6IHBpdm90IG1hcmtlciBhdCBvcmlnaW4NCiEgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQptYXJrZXIgY3JlYXRlICYNCiAgICBtYXJrZXJfbmFtZSA9IC5wZW5kdWx1bS5ncm91bmQucGl2b3RfbWtyICYNCiAgICBsb2NhdGlvbiAgICA9IDAuMCwgMC4wLCAwLjAgJg0KICAgIG9yaWVudGF0aW9uID0gMC4wRCwgMC4wRCwgMC4wRA0KDQohIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KISAzLiBMaW5rIHBhcnQgIChwYXJ0IG9yaWdpbiBwbGFjZWQgYXQgdGhlIHBpbiBsb2NhdGlvbikNCiEgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpwYXJ0IGNyZWF0ZSByaWdpZF9ib2R5IG5hbWVfYW5kX3Bvc2l0aW9uICYNCiAgICBwYXJ0X25hbWUgICA9IC5wZW5kdWx1bS5saW5rICYNCiAgICBsb2NhdGlvbiAgICA9IDAuMCwgMC4wLCAwLjAgJg0KICAgIG9yaWVudGF0aW9uID0gMC4wRCwgMC4wRCwgMC4wRA0KDQohIENlbnRyZS1vZi1tYXNzIG1hcmtlciDigJQgbWlkcG9pbnQgb2YgdGhlIHJvZCwgMTAwIG1tIGJlbG93IHBpbiBhbG9uZyAtWQ0KbWFya2VyIGNyZWF0ZSAmDQogICAgbWFya2VyX25hbWUgPSAucGVuZHVsdW0ubGluay5jbSAmDQogICAgbG9jYXRpb24gICAgPSAwLjAsIC0xMDAuMCwgMC4wICYNCiAgICBvcmllbnRhdGlvbiA9IDAuMEQsIDAuMEQsIDAuMEQNCg0KISBQaW4gbWFya2VyIGF0IHRoZSB0b3Agb2YgdGhlIGxpbmsgKGNvaW5jaWRlcyB3aXRoIHBpdm90X21rciBvbiBncm91bmQpDQptYXJrZXIgY3JlYXRlICYNCiAgICBtYXJrZXJfbmFtZSA9IC5wZW5kdWx1bS5saW5rLnBpbl9ta3IgJg0KICAgIGxvY2F0aW9uICAgID0gMC4wLCAwLjAsIDAuMCAmDQogICAgb3JpZW50YXRpb24gPSAwLjBELCAwLjBELCAwLjBEDQoNCiEgVGlwIG1hcmtlciBhdCB0aGUgYm90dG9tIG9mIHRoZSBsaW5rICgyMDAgbW0gYmVsb3cgcGluIGFsb25nIC1ZKQ0KbWFya2VyIGNyZWF0ZSAmDQogICAgbWFya2VyX25hbWUgPSAucGVuZHVsdW0ubGluay50aXBfbWtyICYNCiAgICBsb2NhdGlvbiAgICA9IDAuMCwgLTIwMC4wLCAwLjAgJg0KICAgIG9yaWVudGF0aW9uID0gMC4wRCwgMC4wRCwgMC4wRA0KDQohIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KISA0LiBNYXNzIHByb3BlcnRpZXMNCiEgICAgVW5pZm9ybSBzbGVuZGVyIHJvZCwgTCA9IDIwMCBtbSwgbSA9IDEga2cNCiEgICAgSW5lcnRpYSBhYm91dCB0aGUgY2VudHJlIG9mIG1hc3MgKGNtIG1hcmtlcik6DQohICAgICAgaXh4ID0gaXp6ID0gKDEvMTIpICogbSAqIEzCsg0KISAgICAgICAgICAgICAgPSAoMS8xMikgKiAxICogMjAwwrIgPSAzMzMzLjMzIGtnwrdtbcKyDQohICAgICAgaXl5IOKJiCAwICAoWSBpcyB0aGUgcm9kIGF4aXMg4oCUIG5lZ2xpZ2libGUgZm9yIGEgdGhpbiByb2QpDQohIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KcGFydCBjcmVhdGUgcmlnaWRfYm9keSBtYXNzX3Byb3BlcnRpZXMgJg0KICAgIHBhcnRfbmFtZSAgICAgICAgICAgICA9IC5wZW5kdWx1bS5saW5rICYNCiAgICBtYXNzICAgICAgICAgICAgICAgICAgPSAxLjAgJg0KICAgIGNlbnRlcl9vZl9tYXNzX21hcmtlciA9IC5wZW5kdWx1bS5saW5rLmNtICYNCiAgICBpeHggICAgICAgICAgICAgICAgICAgPSAzMzMzLjMzICYNCiAgICBpeXkgICAgICAgICAgICAgICAgICAgPSAwLjAgJg0KICAgIGl6eiAgICAgICAgICAgICAgICAgICA9IDMzMzMuMzMNCg0KISAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiEgNS4gVmlzdWFsaXphdGlvbiBnZW9tZXRyeQ0KISAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiEgUm9kIOKAlCBsaW5rIHNoYXBlIGRyYXduIGJldHdlZW4gcGluIGFuZCB0aXAgbWFya2Vycw0KZ2VvbWV0cnkgY3JlYXRlIHNoYXBlIGxpbmsgJg0KICAgIGxpbmtfbmFtZSAgICAgPSAucGVuZHVsdW0ubGluay5yb2Rfc2hhcGUgJg0KICAgIHBhcnRfbmFtZSAgICAgPSAucGVuZHVsdW0ubGluayAmDQogICAgaV9tYXJrZXJfbmFtZSA9IC5wZW5kdWx1bS5saW5rLnBpbl9ta3IgJg0KICAgIGpfbWFya2VyX25hbWUgPSAucGVuZHVsdW0ubGluay50aXBfbWtyICYNCiAgICB3aWR0aCAgICAgICAgID0gOC4wICYNCiAgICBkZXB0aCAgICAgICAgID0gOC4wDQoNCiEgU3BoZXJlIGF0IHRoZSB0aXAgdG8gcmVwcmVzZW50IHRoZSBwZW5kdWx1bSBib2INCmdlb21ldHJ5IGNyZWF0ZSBzaGFwZSBzcGhlcmUgJg0KICAgIHNwaGVyZV9uYW1lICAgPSAucGVuZHVsdW0ubGluay5zcGhlcmVfYm9iICYNCiAgICBwYXJ0X25hbWUgICAgID0gLnBlbmR1bHVtLmxpbmsgJg0KICAgIGNlbnRlcl9tYXJrZXIgPSAucGVuZHVsdW0ubGluay50aXBfbWtyICYNCiAgICByYWRpdXMgICAgICAgID0gMTIuMA0KDQohIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KISA2LiBSZXZvbHV0ZSBqb2ludCBhdCB0aGUgcGl2b3QNCiEgICAgUm90YXRpb24gYWJvdXQgdGhlIFotYXhpcyBvZiBwaXZvdF9ta3IgKD0gZ2xvYmFsIFopDQohIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KY29uc3RyYWludCBjcmVhdGUgam9pbnQgcmV2b2x1dGUgJg0KICAgIGpvaW50X25hbWUgICAgPSAucGVuZHVsdW0ucmV2X3Bpdm90ICYNCiAgICBpX21hcmtlcl9uYW1lID0gLnBlbmR1bHVtLmxpbmsucGluX21rciAmDQogICAgal9tYXJrZXJfbmFtZSA9IC5wZW5kdWx1bS5ncm91bmQucGl2b3RfbWtyDQoNCiEgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQohIDcuIEluaXRpYWwgY29uZGl0aW9uIOKAlCByZWxlYXNlIGZyb20gNDUgZGVncmVlcw0KISAgICBCb2R5LTMxMyBFdWxlciBhbmdsZXMgKFBTST0wLCBUSEVUQT0wLCBQSEk9NDUpOg0KISAgICBuZXQgZWZmZWN0IGlzIGEgNDXCsCByb3RhdGlvbiBhYm91dCB0aGUgZ2xvYmFsIFotYXhpcy4NCiEgICAgVGhlIHRpcCBtb3ZlcyBmcm9tICgwLCAtMjAwLCAwKSB0byAoKzE0MS40LCAtMTQxLjQsIDApLg0KISAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCnBhcnQgbW9kaWZ5IHJpZ2lkX2JvZHkgbmFtZV9hbmRfcG9zaXRpb24gJg0KICAgIHBhcnRfbmFtZSAgID0gLnBlbmR1bHVtLmxpbmsgJg0KICAgIG9yaWVudGF0aW9uID0gMC4wRCwgMC4wRCwgNDUuMEQNCg0KISAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiEgOC4gR3Jhdml0eSAgKGcgPSA5ODA2LjY1IG1tL3PCsiBpbiAtWSBkaXJlY3Rpb24pDQohIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KZm9yY2UgY3JlYXRlIGJvZHkgZ3Jhdml0YXRpb25hbCAmDQogICAgZ3Jhdml0eV9maWVsZF9uYW1lICA9IC5wZW5kdWx1bS5ncmF2aXR5ICYNCiAgICB4X2NvbXBvbmVudF9ncmF2aXR5ID0gMC4wICYNCiAgICB5X2NvbXBvbmVudF9ncmF2aXR5ID0gLTk4MDYuNjUgJg0KICAgIHpfY29tcG9uZW50X2dyYXZpdHkgPSAwLjANCg0KISA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCiEgRW5kIG9mIHBlbmR1bHVtLmNtZA0KIQ0KISBTdWdnZXN0ZWQgc2ltdWxhdGlvbiBzZXR0aW5nczoNCiEgICBzaW11bGF0ZSB0cmFuc2llbnQgZW5kX3RpbWUgPSAyLjAgc3RlcF9zaXplID0gMC4wMDINCiENCiEgVGhlb3JldGljYWwgbmF0dXJhbCBwZXJpb2Q6ICBUID0gMs+AIOKImihJX3Bpdm90IC8gKG0gZyBMX2NtKSkNCiEgICB3aGVyZSBJX3Bpdm90ID0gKDEvMykqbSpMwrIgPSAoMS8zKSoxKjIwMMKyID0gMTMzMzMuMzMga2fCt21twrINCiEgICAgICAgICBMX2NtICAgID0gMTAwIG1tICAoZGlzdGFuY2UgZnJvbSBwaXZvdCB0byBDTSkNCiEgICAgICAgICBUID0gMs+AIOKImigxMzMzMy4zMyAvICgxICogOTgwNi42NSAqIDEwMCkpDQohICAgICAgICAgICDiiYggMs+AIOKImigwLjAwMTM1OSkNCiEgICAgICAgICAgIOKJiCAyz4AgKiAwLjAzNjg3DQohICAgICAgICAgICDiiYggMC44OTcgcw0KISA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCg=="}, {"name": "response.md", "type": "text", "content": "# Simple Pendulum \u00e2\u20ac\u201d Adams CMD Script\n\n## Task\n\nWrite an Adams CMD script to create a simple pendulum with:\n- A single rigid link of length 200 mm and mass 1 kg\n- Pinned to the ground at its top end by a revolute joint\n- Gravity acting in the \u00e2\u20ac\u201cY direction\n- Released from 45 degrees from the vertical\n\n---\n\n## Approach\n\nThe script follows the Adams CMD build-order convention from the skill:\n\n> **model \u00e2\u2020\u2019 parts \u00e2\u2020\u2019 markers \u00e2\u2020\u2019 geometry \u00e2\u2020\u2019 data elements \u00e2\u2020\u2019 constraints \u00e2\u2020\u2019 forces/motions**\n\n### Model topology\n\n```\n.pendulum\n\u00e2\u201d\u0153\u00e2\u201d\u20ac\u00e2\u201d\u20ac ground\n\u00e2\u201d\u201a   \u00e2\u201d\u201d\u00e2\u201d\u20ac\u00e2\u201d\u20ac pivot_mkr        (fixed pin point at global origin)\n\u00e2\u201d\u201d\u00e2\u201d\u20ac\u00e2\u201d\u20ac link\n    \u00e2\u201d\u0153\u00e2\u201d\u20ac\u00e2\u201d\u20ac cm               (centre of mass, auto-placed at midpoint)\n    \u00e2\u201d\u0153\u00e2\u201d\u20ac\u00e2\u201d\u20ac pin_mkr          (top end of rod \u00e2\u20ac\u201d coincides with pivot_mkr)\n    \u00e2\u201d\u201d\u00e2\u201d\u20ac\u00e2\u201d\u20ac tip_mkr          (bottom end, 200 mm below pin along \u00e2\u20ac\u201cY)\n```\n\nThe revolute joint connects `link.pin_mkr` (I marker, on the moving part) to `ground.pivot_mkr` (J marker, fixed), constraining rotation to the global Z-axis.\n\n---\n\n## Key Design Decisions\n\n### Coordinate layout\n\nThe link hangs in the \u00e2\u20ac\u201cY direction at rest. With units in mm:\n\n| Marker | Local position on `link` |\n|--------|--------------------------|\n| `pin_mkr` | 0, 0, 0 (part origin, coincides with pivot) |\n| `cm` | 0, \u00e2\u20ac\u201c100, 0 (midpoint of rod) |\n| `tip_mkr` | 0, \u00e2\u20ac\u201c200, 0 (free end) |\n\n### Mass and inertia\n\nFor a uniform slender rod (m = 1 kg, L = 200 mm), the principal moments of inertia about the centre of mass are:\n\n| Component | Value | Notes |\n|-----------|-------|-------|\n| `ixx` | 3333.33 kg\u00c2\u00b7mm\u00c2\u00b2 | (1/12) m L\u00c2\u00b2 \u00e2\u20ac\u201d bending about X |\n| `iyy` | 0.0 kg\u00c2\u00b7mm\u00c2\u00b2 | Along rod axis \u00e2\u20ac\u201d negligible for thin rod |\n| `izz` | 3333.33 kg\u00c2\u00b7mm\u00c2\u00b2 | (1/12) m L\u00c2\u00b2 \u00e2\u20ac\u201d **pendulum swing axis** |\n\n### Initial condition (45\u00c2\u00b0)\n\nAchieved with a `part modify` call setting the part orientation to Body-313 Euler angles (PSI=0\u00c2\u00b0, THETA=0\u00c2\u00b0, PHI=45\u00c2\u00b0), which is a net 45\u00c2\u00b0 rotation about global Z. The revolute joint constraint is satisfied because the pin marker (at the part origin = 0,0,0) remains coincident with the ground pivot marker throughout.\n\nAfter rotation the tip position in global coordinates is:\n- x = 200 \u00c3\u2014 sin(45\u00c2\u00b0) \u00e2\u2030\u02c6 141.4 mm\n- y = \u00e2\u20ac\u201c200 \u00c3\u2014 cos(45\u00c2\u00b0) \u00e2\u2030\u02c6 \u00e2\u20ac\u201c141.4 mm\n\n### Gravity\n\n`force create body gravitational` with `y_component_gravity = -9806.65` (mm/s\u00c2\u00b2).\n\n### Visualization geometry\n\nA `geometry create shape link` is used for the rod (draws a bar directly between `pin_mkr` and `tip_mkr`, always aligned with the rod regardless of orientation). A sphere of radius 12 mm is added at `tip_mkr` as a bob.\n\n---\n\n## Theoretical period (small-angle approximation)\n\nFor a physical pendulum:\n\n$$T = 2\\pi \\sqrt{\\frac{I_{\\text{pivot}}}{mgd}}$$\n\nwhere:\n- $I_{\\text{pivot}} = \\tfrac{1}{3}mL^2 = \\tfrac{1}{3}(1)(200)^2 = 13{,}333.33 \\text{ kg\u00c2\u00b7mm}^2$\n- $g = 9806.65 \\text{ mm/s}^2$\n- $d = 100 \\text{ mm}$ (pivot-to-CM distance)\n\n$$T = 2\\pi \\sqrt{\\frac{13333.33}{1 \\times 9806.65 \\times 100}} \\approx 2\\pi \\times 0.03687 \\approx 0.897 \\text{ s}$$\n\n> Note: 45\u00c2\u00b0 is outside the small-angle regime, so the actual period from simulation will be slightly longer (~4\u00e2\u20ac\u201c5 % longer at 45\u00c2\u00b0).\n\n---\n\n## Script summary\n\n| Step | Command | Notes |\n|------|---------|-------|\n| 1 | `model create` | Model name: `pendulum` |\n| 2 | `defaults units` | mm, newton, kg, sec |\n| 3 | `marker create` (ground) | `pivot_mkr` at origin |\n| 4 | `part create \u00e2\u20ac\u00a6 name_and_position` | `link` at origin |\n| 5 | `marker create` \u00c3\u2014 3 (link) | `cm`, `pin_mkr`, `tip_mkr` |\n| 6 | `part create \u00e2\u20ac\u00a6 mass_properties` | m=1 kg, Ixx=Izz=3333.33 |\n| 7 | `geometry create shape link` | Rod shape pin\u00e2\u2020\u2019tip |\n| 8 | `geometry create shape sphere` | Bob at tip, r=12 mm |\n| 9 | `constraint create joint revolute` | Pivot joint |\n| 10 | `part modify \u00e2\u20ac\u00a6 name_and_position` | 45\u00c2\u00b0 initial orientation |\n| 11 | `force create body gravitational` | g = \u00e2\u20ac\u201c9806.65 mm/s\u00c2\u00b2 in Y |\n\n---\n\n## Output file\n\n`pendulum.cmd` \u00e2\u20ac\u201d complete, ready-to-import Adams CMD script.\n\nTo run a simulation after importing:\n\n```cmd\nsimulate transient end_time = 2.0 step_size = 0.002\n```\n\n---\n\n## Issues encountered\n\nNone. The script follows all Adams CMD rules from the skill:\n- All keywords spelled in full (no abbreviations)\n- Dot-path hierarchy used throughout (`.pendulum.link.pin_mkr`)\n- Line continuation with `&`\n- `adams_id` not manually specified\n- Angles expressed with `D` suffix (e.g., `45.0D`)\n- Build order respected (model \u00e2\u2020\u2019 parts \u00e2\u2020\u2019 markers \u00e2\u2020\u2019 geometry \u00e2\u2020\u2019 constraints \u00e2\u2020\u2019 forces)\n"}], "grading": {"expectations": [{"text": "Script contains a model create command", "passed": true, "evidence": "Found: 'model create model_name = pendulum'"}, {"text": "A rigid body part is created with part create rigid_body", "passed": true, "evidence": "Found: 'part create rigid_body name_and_position  part_name = .pendulum.link' and 'part create rigid_body mass_properties  part_name = .pendulum.link'"}, {"text": "At least one marker is created on the link and at least one on ground", "passed": true, "evidence": "Ground marker: '.pendulum.ground.pivot_mkr'. Link markers: '.pendulum.link.cm', '.pendulum.link.pin_mkr', '.pendulum.link.tip_mkr'"}, {"text": "A revolute joint is created using constraint create joint revolute with i_marker_name and j_marker_name", "passed": true, "evidence": "Found: 'constraint create joint revolute  joint_name = .pendulum.rev_pivot  i_marker_name = .pendulum.link.pin_mkr  j_marker_name = .pendulum.ground.pivot_mkr'"}, {"text": "Gravity is created with force create body gravitational (not force create body_force or any other variant)", "passed": true, "evidence": "Found: 'force create body gravitational  gravity_field_name = .pendulum.gravity  y_component_gravity = -9806.65'"}, {"text": "Initial orientation set to 45 degrees for the release angle", "passed": true, "evidence": "Found: 'part modify rigid_body name_and_position  part_name = .pendulum.link  orientation = 0.0D, 0.0D, 45.0D'"}, {"text": "All keywords spelled out fully (no abbreviations)", "passed": true, "evidence": "All commands use full keyword forms: 'model create', 'defaults units', 'marker create', 'part create rigid_body name_and_position', 'part create rigid_body mass_properties', 'constraint create joint revolute', 'force create body gravitational'"}, {"text": "No adams_id specified anywhere in the script", "passed": true, "evidence": "Searched entire script for 'adams_id' \u00e2\u20ac\u201d not found"}], "summary": {"passed": 8, "failed": 0, "total": 8, "pass_rate": 1.0}}}, {"id": "simple-pendulum-script-without_skill", "prompt": "Write an Adams CMD script to create a simple pendulum. It should have a single rigid link of length 200 mm and mass 1 kg, pinned to the ground at its top end by a revolute joint, with gravity acting in the -Y direction. Release it from 45 degrees.", "eval_id": "simple-pendulum-script", "outputs": [{"name": "pendulum.cmd", "type": "binary", "mime": "application/octet-stream", "data_uri": "data:application/octet-stream;base64,IS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQohIFNpbXBsZSBQZW5kdWx1bSAtIEFkYW1zL1ZpZXcgQ01EIFNjcmlwdA0KIQ0KISBEZXNjcmlwdGlvbjoNCiEgICBTaW5nbGUgcmlnaWQgbGluayBwZW5kdWx1bSwgMjAwIG1tIGxlbmd0aCwgMSBrZyBtYXNzLg0KISAgIFBpbm5lZCBhdCB0b3AgZW5kIHRvIGdyb3VuZCBieSBhIHJldm9sdXRlIGpvaW50Lg0KISAgIEdyYXZpdHkgYWN0cyBpbiAtWSBkaXJlY3Rpb24gKGcgPSA5ODA2LjY1IG1tL3NeMikuDQohICAgUmVsZWFzZWQgZnJvbSByZXN0IGF0IDQ1IGRlZ3JlZXMgZnJvbSB2ZXJ0aWNhbC4NCiENCiEgQ29vcmRpbmF0ZSBzeXN0ZW06DQohICAgWS1heGlzOiB2ZXJ0aWNhbCAodXApDQohICAgR3Jhdml0eTogLVkgZGlyZWN0aW9uDQohICAgUGVuZHVsdW0gc3dpbmdzIGluIHRoZSBYWSBwbGFuZSwgcm90YXRpbmcgYWJvdXQgdGhlIFotYXhpcw0KIQ0KISBJbml0aWFsIGNvbmZpZ3VyYXRpb24gKDQ1IGRlZyBmcm9tIHZlcnRpY2FsLCBkaXNwbGFjZWQgdG93YXJkICtYKToNCiEgICBQaXZvdCBsb2NhdGlvbiAod29ybGQpOiAgKDAsIDAsIDApIG1tDQohICAgTGluayBkaXJlY3Rpb24gdmVjdG9yOiAgIChzaW40NSwgLWNvczQ1LCAwKSA9ICgwLjcwNzEsIC0wLjcwNzEsIDApDQohICAgQ00gbG9jYXRpb24gKHdvcmxkKTogICAgICg3MC43MTEsIC03MC43MTEsIDApIG1tDQohICAgVGlwIGxvY2F0aW9uICh3b3JsZCk6ICAgICgxNDEuNDIxLCAtMTQxLjQyMSwgMCkgbW0NCiENCiEgTWFzcyBwcm9wZXJ0aWVzICh1bmlmb3JtIHRoaW4gcm9kLCBheGlzIGFsb25nIGxvY2FsIFgpOg0KISAgIE1hc3M6ICAxIGtnDQohICAgSV95eSA9IElfenogPSBtICogTF4yIC8gMTIgPSAxICogMjAwXjIgLyAxMiA9IDMzMzMuMzMga2cqbW1eMg0KISAgIElfeHggIH4gMCAoYWxvbmcgcm9kIGF4aXMpDQohLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCg0KbW9kZWwgY3JlYXRlICYNCiAgIG1vZGVsX25hbWUgPSBQRU5EVUxVTQ0KDQohLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiEgVW5pdHMNCiEtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KZGVmYXVsdHMgdW5pdHMgJg0KICAgbGVuZ3RoID0gbW0gJg0KICAgbWFzcyA9IGtnICYNCiAgIGZvcmNlID0gbmV3dG9uICYNCiAgIHRpbWUgPSBzZWMNCg0KIS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQohIEdyYXZpdHk6IC1ZIGRpcmVjdGlvbg0KISBTdGFuZGFyZCBncmF2aXR5ID0gOS44MDY2NSBtL3NeMiA9IDk4MDYuNjUgbW0vc14yDQohLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCmZvcmNlIGNyZWF0ZSBib2R5IGdyYXZpdGF0aW9uYWwgJg0KICAgZ3Jhdml0eV9maWVsZF9uYW1lID0gLlBFTkRVTFVNLmdyYXZpdHkgJg0KICAgeF9jb21wb25lbnRfZ3Jhdml0eSA9IDAuMCAmDQogICB5X2NvbXBvbmVudF9ncmF2aXR5ID0gLTk4MDYuNjUgJg0KICAgel9jb21wb25lbnRfZ3Jhdml0eSA9IDAuMA0KDQohLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiEgUEVORFVMVU0gTElOSyAtIFJpZ2lkIGJvZHkNCiENCiEgVGhlIHBhcnQgZnJhbWUgb3JpZ2luIGlzIHBsYWNlZCBhdCB0aGUgaW5pdGlhbCBDTSBwb3NpdGlvbiBpbg0KISB3b3JsZCBjb29yZGluYXRlczogKDcwLjcxMSwgLTcwLjcxMSwgMCkgbW0uDQohDQohIFRoZSBwYXJ0IGZyYW1lIGlzIHJvdGF0ZWQgLTQ1IGRlZ3JlZXMgYWJvdXQgdGhlIHdvcmxkIFotYXhpcyBzbw0KISB0aGF0IHRoZSBsb2NhbCBYLWF4aXMgYWxpZ25zIHdpdGggdGhlIGxpbmsgZGlyZWN0aW9uOg0KISAgIFJfeigtNDUpICogWzEsMCwwXSA9IChjb3MoLTQ1KSwgc2luKC00NSksIDApID0gKDAuNzA3MSwgLTAuNzA3MSwgMCkNCiENCiEgV2l0aCB0aGlzIG9yaWVudGF0aW9uLCBhIG1hcmtlciBhdCBsb2NhbCBwb3NpdGlvbiAoLTEwMCwgMCwgMCkNCiEgbWFwcyB0byB3b3JsZCBwb3NpdGlvbiAoMCwgMCwgMCkgLS0gdGhlIHBpdm90IHBvaW50Lg0KISAgIFdvcmxkID0gQ01fd29ybGQgKyBSX3ooLTQ1KSpbLTEwMCwwLDBdDQohICAgICAgICAgPSAoNzAuNzExLC03MC43MTEsMCkgKyAoLTcwLjcxMSwgNzAuNzExLCAwKSA9ICgwLCAwLCAwKSAgW2NoZWNrXQ0KIS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpwYXJ0IGNyZWF0ZSByaWdpZF9ib2R5IG5hbWVfYW5kX3Bvc2l0aW9uICYNCiAgIHBhcnRfbmFtZSA9IC5QRU5EVUxVTS5MSU5LICYNCiAgIGFkYW1zX2lkID0gMiAmDQogICBsb2NhdGlvbiA9IDcwLjcxMSwgLTcwLjcxMSwgMC4wICYNCiAgIG9yaWVudGF0aW9uID0gLTQ1LjAsIDAuMCwgMC4wDQoNCiEtLS0gTWFzcyBwcm9wZXJ0aWVzIC0tLQ0KISBVbmlmb3JtIHRoaW4gcm9kIG9mIGxlbmd0aCBMID0gMjAwIG1tLCBtYXNzIG0gPSAxIGtnDQohICAgSV94eCAoYWxvbmcgcm9kKSAgICAgICAgIH4gIDEuMCAgICBrZyptbV4yICAoc21hbGwsIHJvZCBheGlzKQ0KISAgIElfeXkgKHBlcnBlbmRpY3VsYXIpICAgICA9IDMzMzMuMzMga2cqbW1eMiAgKD0gbSpMXjIvMTIpDQohICAgSV96eiAocGVycGVuZGljdWxhcikgICAgID0gMzMzMy4zMyBrZyptbV4yICAoPSBtKkxeMi8xMikNCiEgVGhlIHBlbmR1bHVtIHJvdGF0ZXMgYWJvdXQgd29ybGQgWjsgd2l0aCBsb2NhbCBaID0gd29ybGQgWiBhdCB0PTAsDQohIElfenogPSAzMzMzLjMzIGtnKm1tXjIgaXMgdGhlIGdvdmVybmluZyBwbGFuYXIgaW5lcnRpYS4NCnBhcnQgY3JlYXRlIHJpZ2lkX2JvZHkgbWFzc19wcm9wZXJ0aWVzICYNCiAgIHBhcnRfbmFtZSA9IC5QRU5EVUxVTS5MSU5LICYNCiAgIG1hc3MgPSAxLjAgJg0KICAgaXh4ID0gMS4wICYNCiAgIGl5eSA9IDMzMzMuMzMgJg0KICAgaXp6ID0gMzMzMy4zMyAmDQogICBpeHkgPSAwLjAgJg0KICAgaXp4ID0gMC4wICYNCiAgIGl5eiA9IDAuMA0KDQohLS0tIEdlb21ldHJ5OiByZWN0YW5ndWxhciBib3ggcmVwcmVzZW50aW5nIHRoZSBsaW5rIC0tLQ0KISBEaW1lbnNpb25zOiAyMDAgbW0gKGxvY2FsIFgpIHggMTAgbW0gKGxvY2FsIFkpIHggMTAgbW0gKGxvY2FsIFopDQohIENlbnRlcmVkIGF0IHRoZSBDTSAocGFydCBvcmlnaW4pDQpnZW9tZXRyeSBjcmVhdGUgc2hhcGUgYm94ICYNCiAgIGJveF9uYW1lID0gLlBFTkRVTFVNLkxJTksuTElOS19CT1ggJg0KICAgY2VudGVyX21hcmtlciA9IC5QRU5EVUxVTS5MSU5LLmNtICYNCiAgIHhfc2lkZV9sZW5ndGggPSAyMDAuMCAmDQogICB5X3NpZGVfbGVuZ3RoID0gMTAuMCAmDQogICB6X3NpZGVfbGVuZ3RoID0gMTAuMA0KDQohLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiEgTUFSS0VSUyBmb3IgdGhlIHJldm9sdXRlIGpvaW50DQohLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCg0KISBHcm91bmQgcGl2b3QgbWFya2VyOiBhdCB3b3JsZCBvcmlnaW4sIGF4ZXMgYWxpZ25lZCB3aXRoIHdvcmxkIGZyYW1lLg0KISBaLWF4aXMgPSB3b3JsZCBaID0gcm90YXRpb24gYXhpcyBvZiB0aGUgam9pbnQuDQptYXJrZXIgY3JlYXRlICYNCiAgIG1hcmtlcl9uYW1lID0gLlBFTkRVTFVNLmdyb3VuZC5HUk5EX1BJVk9UICYNCiAgIGFkYW1zX2lkID0gMSAmDQogICBsb2NhdGlvbiA9IDAuMCwgMC4wLCAwLjAgJg0KICAgb3JpZW50YXRpb24gPSAwLjAsIDAuMCwgMC4wDQoNCiEgTGluayBwaXZvdCBtYXJrZXI6IGF0IHRoZSB0b3AgKHBpdm90KSBlbmQgb2YgdGhlIGxpbmsuDQohIEluIHRoZSBwYXJ0J3MgbG9jYWwgZnJhbWUsIHRoZSBwaXZvdCBlbmQgaXMgMTAwIG1tIGJlaGluZCB0aGUgQ00NCiEgYWxvbmcgdGhlIGxvY2FsIFgtYXhpcywgaS5lLiwgYXQgbG9jYWwgcG9zaXRpb24gKC0xMDAsIDAsIDApLg0KISBBdCB0aGUgaW5pdGlhbCBjb25maWd1cmF0aW9uIHRoaXMgcmVzb2x2ZXMgdG8gd29ybGQgKDAsIDAsIDApLg0KISBPcmllbnRhdGlvbiAoMCwwLDApIGluIGxvY2FsIGZyYW1lID0+IGxvY2FsIFogPSBwYXJ0IGxvY2FsIFogPSB3b3JsZCBaLA0KISB3aGljaCBtYXRjaGVzIEdSTkRfUElWT1QncyBaLWF4aXMgZm9yIGNvbnNpc3RlbmN5IHdpdGggdGhlIGpvaW50Lg0KbWFya2VyIGNyZWF0ZSAmDQogICBtYXJrZXJfbmFtZSA9IC5QRU5EVUxVTS5MSU5LLkxJTktfUElWT1QgJg0KICAgYWRhbXNfaWQgPSAzICYNCiAgIGxvY2F0aW9uID0gLTEwMC4wLCAwLjAsIDAuMCAmDQogICBvcmllbnRhdGlvbiA9IDAuMCwgMC4wLCAwLjANCg0KIS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQohIFJFVk9MVVRFIEpPSU5UDQohDQohIEpvaW5zIHRoZSBsaW5rIHRvIGdyb3VuZCBhdCB0aGUgcGl2b3QgcG9pbnQgKHdvcmxkIG9yaWdpbikuDQohIFRoZSBqb2ludCBaLWF4aXMgKHNoYXJlZCBaIG9mIGJvdGggbWFya2VycykgZGVmaW5lcyB0aGUgcm90YXRpb24gYXhpcy4NCiEgUmVtb3ZlcyA1IERPRnMgKDMgdHJhbnNsYXRpb25zICsgMiByb3RhdGlvbnMpLCBsZWF2aW5nIDEgcm90YXRpb25hbCBET0YuDQohIFRoZSBsaW5rIGlzIGZyZWUgdG8gcm90YXRlIGFib3V0IHRoZSB3b3JsZCBaLWF4aXMuDQohLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCmNvbnN0cmFpbnQgY3JlYXRlIGpvaW50IHJldm9sdXRlICYNCiAgIGpvaW50X25hbWUgPSAuUEVORFVMVU0uUkVWX0pPSU5UICYNCiAgIGFkYW1zX2lkID0gMSAmDQogICBpX21hcmtlcl9uYW1lID0gLlBFTkRVTFVNLkxJTksuTElOS19QSVZPVCAmDQogICBqX21hcmtlcl9uYW1lID0gLlBFTkRVTFVNLmdyb3VuZC5HUk5EX1BJVk9UDQoNCiEtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KISBTSU1VTEFUSU9OIFNFVFRJTkdTDQohIER1cmF0aW9uOiA1IHNlY29uZHMsIDUwMCBvdXRwdXQgc3RlcHMgKGR0ID0gMC4wMSBzKQ0KISBObyBpbml0aWFsIHN0YXRpYyBlcXVpbGlicml1bSAobW9kZWwgc3RhcnRzIGZyb20gc3BlY2lmaWVkIElDKQ0KIS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpzaW11bGF0aW9uIHNpbmdsZV9ydW4gdHJhbnNpZW50ICYNCiAgIHNpbV9uYW1lID0gLlBFTkRVTFVNLnNpbTEgJg0KICAgaW5pdGlhbF9zdGF0aWMgPSBubyAmDQogICBlbmRfdGltZSA9IDUuMCAmDQogICBudW1iZXJfb2Zfc3RlcHMgPSA1MDANCg0KIS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQohIEVORCBPRiBQRU5EVUxVTSBNT0RFTA0KIS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo="}, {"name": "response.md", "type": "text", "content": "# Simple Pendulum \u00e2\u20ac\u201d Adams CMD Script\n\n## Summary\n\nI created an Adams/View CMD script (`pendulum.cmd`) to model a simple pendulum with the following specification:\n\n- **Link**: Single rigid body, 200 mm long, 1 kg mass\n- **Joint**: Revolute joint at the top end of the link, connecting it to the ground\n- **Gravity**: \u00e2\u02c6\u2019Y direction, g = 9806.65 mm/s\u00c2\u00b2 (standard gravity in mm units)\n- **Initial condition**: Released from rest at 45 degrees from the vertical (displaced toward +X)\n- **Simulation**: 5 seconds, 500 output steps\n\n---\n\n## Model Construction\n\n### Units\n`mm`, `kg`, `N`, `s` \u00e2\u20ac\u201d consistent with Adams/View SI-mm conventions.\n\n### Coordinate System\n- Y-axis is vertical (up)\n- Gravity acts in the \u00e2\u02c6\u2019Y direction\n- The pendulum swings in the XY plane, rotating about the Z-axis\n\n### Initial Position (45 degrees from vertical)\nAt 45\u00c2\u00b0 from the downward vertical (\u00e2\u02c6\u2019Y axis), displaced toward +X:\n\n| Point | World coordinates (mm) |\n|-------|------------------------|\n| Pivot (top end) | (0, 0, 0) |\n| Centre of mass | (70.711, \u00e2\u02c6\u201970.711, 0) |\n| Tip (bottom end) | (141.421, \u00e2\u02c6\u2019141.421, 0) |\n\nComputed as:\n- Link direction unit vector: `(sin 45\u00c2\u00b0, \u00e2\u02c6\u2019cos 45\u00c2\u00b0, 0) = (0.7071, \u00e2\u02c6\u20190.7071, 0)`\n- CM at 100 mm from pivot along this direction\n\n### Part Frame Orientation\nThe LINK part's local X-axis is aligned with the link direction. This is achieved by rotating the part frame **\u00e2\u02c6\u201945\u00c2\u00b0 about the world Z-axis**:\n\n```\nR_z(\u00e2\u02c6\u201945\u00c2\u00b0) \u00c2\u00b7 [1, 0, 0] = (cos(\u00e2\u02c6\u201945\u00c2\u00b0), sin(\u00e2\u02c6\u201945\u00c2\u00b0), 0) = (0.7071, \u00e2\u02c6\u20190.7071, 0)  \u00e2\u0153\u201c\n```\n\nThis means markers defined at `(\u00e2\u02c6\u2019100, 0, 0)` in the part's local frame (the pivot end) map to world position `(0, 0, 0)` at time zero:\n\n```\nWorld = CM_world + R_z(\u00e2\u02c6\u201945\u00c2\u00b0) \u00c2\u00b7 [\u00e2\u02c6\u2019100, 0, 0]\n      = (70.711, \u00e2\u02c6\u201970.711, 0) + (\u00e2\u02c6\u201970.711, 70.711, 0) = (0, 0, 0)  \u00e2\u0153\u201c\n```\n\n### Mass Properties\nModelled as a uniform thin rod (axis along local X):\n\n| Property | Value | Formula |\n|----------|-------|---------|\n| Mass | 1.0 kg | \u00e2\u20ac\u201d |\n| I_xx (along rod) | 1.0 kg\u00c2\u00b7mm\u00c2\u00b2 | \u00e2\u2030\u02c6 0 for thin rod |\n| I_yy (perpendicular) | 3333.33 kg\u00c2\u00b7mm\u00c2\u00b2 | m\u00c2\u00b7L\u00c2\u00b2/12 |\n| I_zz (perpendicular) | 3333.33 kg\u00c2\u00b7mm\u00c2\u00b2 | m\u00c2\u00b7L\u00c2\u00b2/12 |\n\nThe pendulum rotates about the Z-axis; `I_zz = 3333.33 kg\u00c2\u00b7mm\u00c2\u00b2` is the governing planar inertia. Because I_yy = I_zz, the apparent inertia is constant throughout the swing.\n\n### Geometry\nA rectangular box (200 mm \u00c3\u2014 10 mm \u00c3\u2014 10 mm) centred on the CM marker is used for visualisation.\n\n### Markers\n| Marker | Part | Local position | World position at t=0 |\n|--------|------|----------------|----------------------|\n| `GRND_PIVOT` | ground | (0, 0, 0) | (0, 0, 0) |\n| `LINK_PIVOT` | LINK | (\u00e2\u02c6\u2019100, 0, 0) | (0, 0, 0) |\n\nBoth markers have default orientation `(0, 0, 0)` in their respective frames, so their Z-axes both point in the world Z direction \u00e2\u20ac\u201d the revolute joint rotation axis.\n\n### Revolute Joint\n```\ni_marker = .PENDULUM.LINK.LINK_PIVOT\nj_marker = .PENDULUM.ground.GRND_PIVOT\n```\nThe joint removes 5 DOFs (3 translational + 2 rotational), leaving one rotational DOF about the Z-axis.\n\n---\n\n## Expected Behaviour\n\nThe pendulum should exhibit simple harmonic-like motion (large-angle pendulum). The theoretical period for a point mass at length L = 200 mm from the pivot is:\n\n```\nL_eq = L/2 + I_cm / (m\u00c2\u00b7L/2) = 100 + 3333.33 / (1 \u00c3\u2014 100) = 133.33 mm\nT = 2\u00cf\u20ac \u00e2\u02c6\u0161(L_eq / g) = 2\u00cf\u20ac \u00e2\u02c6\u0161(133.33 / 9806.65) \u00e2\u2030\u02c6 0.732 s\n```\n\nFor a uniform rod released from 45\u00c2\u00b0, the motion will be non-linear (not simple harmonic), so the actual period will differ slightly from this small-angle estimate.\n\n---\n\n## Issues / Notes\n\n- No issues encountered during script construction.\n- The `simulation single_run transient` block at the end will initiate the simulation when the CMD file is executed in Adams/View. If only model creation is desired, that block can be commented out before importing.\n- Gravity is defined using `force create body gravitational`; ensure Adams/View does not already have a gravity object defined when importing into an existing model.\n"}], "grading": {"expectations": [{"text": "Script contains a model create command", "passed": true, "evidence": "Found: 'model create model_name = PENDULUM'"}, {"text": "A rigid body part is created with part create rigid_body", "passed": true, "evidence": "Found: 'part create rigid_body name_and_position  part_name = .PENDULUM.LINK' and 'part create rigid_body mass_properties'"}, {"text": "At least one marker is created on the link and at least one on ground", "passed": true, "evidence": "Ground marker: '.PENDULUM.ground.GRND_PIVOT'. Link marker: '.PENDULUM.LINK.LINK_PIVOT'"}, {"text": "A revolute joint is created using constraint create joint revolute with i_marker_name and j_marker_name", "passed": true, "evidence": "Found: 'constraint create joint revolute  joint_name = .PENDULUM.REV_JOINT  i_marker_name = .PENDULUM.LINK.LINK_PIVOT  j_marker_name = .PENDULUM.ground.GRND_PIVOT'"}, {"text": "Gravity is created with force create body gravitational (not force create body_force or any other variant)", "passed": true, "evidence": "Found: 'force create body gravitational  gravity_field_name = .PENDULUM.gravity  y_component_gravity = -9806.65'"}, {"text": "Initial orientation set to 45 degrees for the release angle", "passed": true, "evidence": "Part placed at the initial 45\u00c2\u00b0 configuration: 'part create rigid_body name_and_position  part_name = .PENDULUM.LINK  location = 70.711, -70.711, 0.0  orientation = -45.0, 0.0, 0.0'"}, {"text": "All keywords spelled out fully (no abbreviations)", "passed": true, "evidence": "Full keyword forms used throughout the script"}, {"text": "No adams_id specified anywhere in the script", "passed": false, "evidence": "Found multiple explicit adams_id values: 'adams_id = 2' on LINK part, 'adams_id = 1' on GRND_PIVOT marker, 'adams_id = 3' on LINK_PIVOT marker, 'adams_id = 1' on REV_JOINT"}], "summary": {"passed": 7, "failed": 1, "total": 8, "pass_rate": 0.875}}}, {"id": "spring-damper-force-with_skill", "prompt": "How do I create a spring-damper force between two parts in Adams CMD? The spring should have stiffness 5000 N/mm and damping 100 N\u00b7s/mm, with a free length of 250 mm.", "eval_id": "spring-damper-force", "outputs": [{"name": "response.md", "type": "text", "content": "# Creating a Spring-Damper Force in Adams CMD\n\n## Overview\n\nUse `force create element_like spring_damper` to add a 1-DOF spring-damper between two parts. The element connects an **I marker** on one part to a **J marker** on another. Adams resolves the instantaneous distance between the markers and applies:\n\n```\nForce = \u00e2\u02c6\u2019K \u00c3\u2014 (current_length \u00e2\u02c6\u2019 free_length) \u00e2\u02c6\u2019 C \u00c3\u2014 d/dt(current_length)\n```\n\nPositive force = compression (pushing the markers apart).\n\n---\n\n## Prerequisites: Markers on Each Part\n\nBefore creating the spring-damper, each part needs a marker at the connection point. The spring acts along the **line connecting the I and J markers**, so place them accurately.\n\n```cmd\n! Marker on part_a at the spring attach point\nmarker create &\n    marker_name = .my_model.part_a.M_SPR_I &\n    location    = 0.0, 0.0, 200.0 &\n    orientation = 0.0D, 0.0D, 0.0D\n\n! Marker on part_b at the spring attach point\nmarker create &\n    marker_name = .my_model.part_b.M_SPR_J &\n    location    = 0.0, 0.0, 450.0 &\n    orientation = 0.0D, 0.0D, 0.0D\n```\n\n> **Note:** The initial separation between `M_SPR_I` and `M_SPR_J` does not need to equal the free length \u00e2\u20ac\u201d Adams handles preload automatically.\n\n---\n\n## Spring-Damper Command\n\n```cmd\nforce create element_like spring_damper &\n    spring_damper_name = .my_model.SPR_MAIN &\n    i_marker_name      = .my_model.part_a.M_SPR_I &\n    j_marker_name      = .my_model.part_b.M_SPR_J &\n    stiffness          = 5000.0 &\n    damping            = 100.0 &\n    length             = 250.0\n```\n\n| Parameter | Value | Meaning |\n|-----------|-------|---------|\n| `stiffness` | `5000.0` | Spring stiffness K = 5000 N/mm |\n| `damping` | `100.0` | Viscous damping C = 100 N\u00c2\u00b7s/mm |\n| `length` | `250.0` | Free (natural) length = 250 mm |\n\n---\n\n## Complete Worked Example\n\nThe example below creates a simple two-part model with a vertical spring-damper:\n\n- **`ground`** \u00e2\u20ac\u201d the fixed reference part (always present).\n- **`slider`** \u00e2\u20ac\u201d a moving part (mass = 2 kg) that can only translate vertically.\n- A **translational joint** constrains the slider to the vertical axis.\n- The **spring-damper** acts between the base of `ground` and the bottom of `slider`.\n\n```cmd\n! ============================================================\n! Spring-Damper Example\n! Units: mm, Newton, kg, second\n! ============================================================\n\n! 1. Create model\nmodel create model_name = my_model\n\n! 2. Set units\ndefaults units &\n    length = mm &\n    force  = newton &\n    mass   = kg &\n    time   = sec\n\n! 3. Gravity (\u00e2\u02c6\u2019Y direction in mm-kg-s: \u00e2\u02c6\u20199806.65 mm/s\u00c2\u00b2)\nforce create body gravitational &\n    gravity_field_name  = .my_model.gravity &\n    x_component_gravity = 0.0 &\n    y_component_gravity = -9806.65 &\n    z_component_gravity = 0.0\n\n! ============================================================\n! Parts and Markers\n! ============================================================\n\n! Ground reference marker (spring J end \u00e2\u20ac\u201d fixed)\nmarker create &\n    marker_name = .my_model.ground.M_SPR_J &\n    location    = 0.0, 0.0, 0.0 &\n    orientation = 0.0D, 0.0D, 0.0D\n\n! Ground reference marker for translational joint (J side)\nmarker create &\n    marker_name = .my_model.ground.M_TRANS_J &\n    location    = 0.0, 0.0, 0.0 &\n    orientation = 0.0D, 90.0D, 0.0D  ! Z-axis of marker points along global Y\n\n! Create the slider part at initial height = free length = 250 mm\npart create rigid_body name_and_position &\n    part_name   = .my_model.slider &\n    location    = 0.0, 250.0, 0.0 &\n    orientation = 0.0D, 0.0D, 0.0D\n\n! Mass properties for slider\npart create rigid_body mass_properties &\n    part_name             = .my_model.slider &\n    mass                  = 2.0 &\n    center_of_mass_marker = .my_model.slider.cm &\n    ixx                   = 5000.0 &\n    iyy                   = 5000.0 &\n    izz                   = 500.0\n\n! Slider marker for spring I end (at bottom of slider = its origin)\nmarker create &\n    marker_name = .my_model.slider.M_SPR_I &\n    location    = 0.0, 250.0, 0.0 &\n    orientation = 0.0D, 0.0D, 0.0D\n\n! Slider marker for translational joint (I side)\nmarker create &\n    marker_name = .my_model.slider.M_TRANS_I &\n    location    = 0.0, 250.0, 0.0 &\n    orientation = 0.0D, 90.0D, 0.0D  ! Must match J marker orientation\n\n! ============================================================\n! Translational Joint (constrains slider to vertical axis)\n! ============================================================\n\nconstraint create joint translational &\n    joint_name   = .my_model.TRANS_VERT &\n    i_marker_name = .my_model.slider.M_TRANS_I &\n    j_marker_name = .my_model.ground.M_TRANS_J\n\n! ============================================================\n! Spring-Damper Force\n! K = 5000 N/mm, C = 100 N\u00c2\u00b7s/mm, free length = 250 mm\n! ============================================================\n\nforce create element_like spring_damper &\n    spring_damper_name = .my_model.SPR_MAIN &\n    i_marker_name      = .my_model.slider.M_SPR_I &\n    j_marker_name      = .my_model.ground.M_SPR_J &\n    stiffness          = 5000.0 &\n    damping            = 100.0 &\n    length             = 250.0\n```\n\n---\n\n## Key Notes\n\n### Units\nThe parameter values must match the model's active unit system. In this example (`mm`, `newton`, `kg`, `sec`):\n- `stiffness` is in **N/mm**\n- `damping` is in **N\u00c2\u00b7s/mm**\n- `length` is in **mm**\n\nIf your model uses MKS (m, N, kg, s), convert accordingly:\n- 5000 N/mm \u00e2\u2020\u2019 5,000,000 N/m\n- 100 N\u00c2\u00b7s/mm \u00e2\u2020\u2019 100,000 N\u00c2\u00b7s/m\n- 250 mm \u00e2\u2020\u2019 0.25 m\n\n### Free Length vs. Initial Separation\nThe `length` parameter is the **free (natural) length** \u00e2\u20ac\u201d the length at which the spring force is zero. If the initial marker separation differs from `length`, the spring starts with a preload at t = 0. This is intentional and physically correct.\n\n### Naming Convention\nFollowing Adams CMD best practices:\n- Spring-damper names are prefixed with `SPR_` (e.g., `SPR_MAIN`)\n- Markers are prefixed with `M_` (e.g., `M_SPR_I`, `M_SPR_J`)\n- Full dot-path names are always used in file-based scripts\n\n### Rendering\nTo display the spring-damper graphically in Adams View, it is rendered automatically as a coil-and-dashpot symbol between the I and J markers. No additional geometry command is needed.\n\n### Modifying After Creation\nTo change properties after creation, use `force modify`:\n\n```cmd\nforce modify element_like spring_damper &\n    spring_damper_name = .my_model.SPR_MAIN &\n    stiffness          = 6000.0 &\n    damping            = 120.0\n```\n\n---\n\n## Summary\n\n| Step | CMD construct |\n|------|---------------|\n| Create I marker on part_a | `marker create marker_name = .model.part_a.M_SPR_I ...` |\n| Create J marker on part_b | `marker create marker_name = .model.part_b.M_SPR_J ...` |\n| Create spring-damper | `force create element_like spring_damper spring_damper_name = ... stiffness = 5000.0 damping = 100.0 length = 250.0` |\n"}], "grading": {"expectations": [{"text": "Uses force create element_like spring_damper (not single_component_force or bushing)", "passed": true, "evidence": "Found: 'force create element_like spring_damper  spring_damper_name = .my_model.SPR_MAIN'"}, {"text": "Includes stiffness = 5000", "passed": true, "evidence": "Found: 'stiffness = 5000.0'"}, {"text": "Includes damping = 100", "passed": true, "evidence": "Found: 'damping = 100.0'"}, {"text": "Includes length = 250 (free length)", "passed": true, "evidence": "Found: 'length = 250.0' \u00e2\u20ac\u201d correct parameter name for free length"}, {"text": "References both i_marker_name and j_marker_name", "passed": true, "evidence": "Found: 'i_marker_name = .my_model.part_a.M_SPR_I  j_marker_name = .my_model.part_b.M_SPR_J'"}, {"text": "Explains that spring_damper is for 1-DOF along a line of action", "passed": true, "evidence": "Response states: 'The element connects an I marker on one part to a J marker on another. Adams resolves the instantaneous distance between the markers and applies the force along the line connecting the I and J markers' describing the 1-DOF line-of-action nature."}], "summary": {"passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0}}}, {"id": "spring-damper-force-without_skill", "prompt": "How do I create a spring-damper force between two parts in Adams CMD? The spring should have stiffness 5000 N/mm and damping 100 N\u00b7s/mm, with a free length of 250 mm.", "eval_id": "spring-damper-force", "outputs": [{"name": "response.md", "type": "text", "content": "# Creating a Spring-Damper Force in Adams CMD\n\n## Overview\n\nIn Adams, a translational spring-damper is created as a **TSDA (Translational Spring-Damper-Actuator)** force element using the `force create element_like spring_damper` command. It acts along the line connecting an I marker (on one part) and a J marker (on another part), applying equal and opposite forces based on the relative displacement and velocity between those markers.\n\n---\n\n## Prerequisites\n\nBefore creating the spring-damper, you need:\n\n1. Two parts already defined in the model.\n2. A **marker on each part** at the desired attachment points. The spring acts along the vector from the I marker to the J marker.\n\n---\n\n## Step 1 \u00e2\u20ac\u201c Define the Units\n\nEnsure the model is set to mm/N/s units so that the stiffness (N/mm) and damping (N\u00c2\u00b7s/mm) values are entered directly:\n\n```cmd\nunits set &\n   length = mm &\n   mass = kg &\n   force = newton &\n   time = second\n```\n\n---\n\n## Step 2 \u00e2\u20ac\u201c Create Attachment Markers\n\nPlace a marker on each part at the spring attachment location. The free length is 250 mm, so if one end is at the origin of `part_1`, position the `part_2` marker 250 mm away along the spring axis (e.g., the X-axis):\n\n```cmd\n! Marker on the first part\nmarker create &\n   marker_name = .model.part_1.spring_i &\n   location = 0.0, 0.0, 0.0 &\n   orientation = 0.0, 0.0, 0.0\n\n! Marker on the second part (250 mm away along X)\nmarker create &\n   marker_name = .model.part_2.spring_j &\n   location = 250.0, 0.0, 0.0 &\n   orientation = 0.0, 0.0, 0.0\n```\n\n> **Note:** Adjust the `location` values to match the actual geometry of your model. The `orientation` of the markers does not affect the spring-damper behaviour \u00e2\u20ac\u201d only their positions matter for a TSDA.\n\n---\n\n## Step 3 \u00e2\u20ac\u201c Create the Spring-Damper Force\n\nUse `force create element_like spring_damper` to define the TSDA with the specified stiffness, damping, and free length:\n\n```cmd\nforce create element_like spring_damper &\n   spring_damper_name = .model.spr_damp_1 &\n   i_marker_name      = .model.part_1.spring_i &\n   j_marker_name      = .model.part_2.spring_j &\n   stiffness          = 5000.0 &\n   damping            = 100.0 &\n   free_length        = 250.0\n```\n\n| Parameter            | Value  | Units    | Description                                   |\n|---------------------|--------|----------|-----------------------------------------------|\n| `stiffness`         | 5000.0 | N/mm     | Linear spring stiffness coefficient           |\n| `damping`           | 100.0  | N\u00c2\u00b7s/mm   | Linear viscous damping coefficient            |\n| `free_length`       | 250.0  | mm       | Natural (unstretched) length of the spring    |\n\n---\n\n## How Adams Computes the Force\n\nAdams calculates the spring-damper force as:\n\n$$F = k \\cdot (L - L_0) + c \\cdot \\dot{L}$$\n\nWhere:\n- $k$ = stiffness = 5000 N/mm\n- $L$ = current distance between the I and J markers\n- $L_0$ = free length = 250 mm\n- $c$ = damping = 100 N\u00c2\u00b7s/mm\n- $\\dot{L}$ = time derivative of $L$ (relative velocity along the spring axis)\n\nA positive force (compression) acts to push the markers apart; a negative force (tension) pulls them together.\n\n---\n\n## Complete Example Script\n\nThe following self-contained CMD script creates a minimal two-part model with a spring-damper:\n\n```cmd\n! ============================================================\n! Spring-Damper Example\n! Units: mm, kg, N, s\n! Stiffness: 5000 N/mm  Damping: 100 N*s/mm  Free length: 250 mm\n! ============================================================\n\ndefaults model &\n   model_name = .spring_model\n\nunits set &\n   length = mm &\n   mass = kg &\n   force = newton &\n   time = second\n\n! --- Ground part (part_1 is the ground) ---\npart create rigid_body ground &\n   part_name = .spring_model.ground\n\n! --- Moving part ---\npart create rigid_body mass &\n   part_name    = .spring_model.moving_part &\n   mass         = 10.0 &\n   center_of_mass_marker_name = .spring_model.moving_part.cm\n\n! --- Attachment markers ---\nmarker create &\n   marker_name = .spring_model.ground.spring_i &\n   location    = 0.0, 0.0, 0.0\n\nmarker create &\n   marker_name = .spring_model.moving_part.spring_j &\n   location    = 250.0, 0.0, 0.0\n\n! --- Spring-damper force element ---\nforce create element_like spring_damper &\n   spring_damper_name = .spring_model.spr_damp_1 &\n   i_marker_name      = .spring_model.ground.spring_i &\n   j_marker_name      = .spring_model.moving_part.spring_j &\n   stiffness          = 5000.0 &\n   damping            = 100.0 &\n   free_length        = 250.0\n```\n\n---\n\n## Notes and Tips\n\n- **Nonlinear stiffness/damping**: If you need nonlinear behaviour, replace the numeric constants with spline-based expressions using `AKISPL` or `CUBSPL` functions, e.g.:\n  ```cmd\n  stiffness = (AKISPL(DM(.spring_model.moving_part.spring_j, .spring_model.ground.spring_i), 0, .spring_model.stiffness_spline))\n  ```\n\n- **Preload**: To apply a preload force, set `free_length` to a value different from the initial distance between the markers. If the initial separation is 250 mm and `free_length = 240 mm`, the spring starts with 10 mm of compression (a 50,000 N preload at 5000 N/mm).\n\n- **Viewing results**: After simulation, you can plot the spring force using the Measure or PostProcessor by selecting the `spr_damp_name` element and requesting the `force` output component.\n\n- **Rotational spring-damper**: For a torsional spring-damper (RSDA), use `force create element_like rotational_spring_damper` with the same parameter structure but different units (N\u00c2\u00b7mm/deg, etc.).\n"}], "grading": {"expectations": [{"text": "Uses force create element_like spring_damper (not single_component_force or bushing)", "passed": true, "evidence": "Found: 'force create element_like spring_damper  spring_damper_name = .model.spr_damp_1'"}, {"text": "Includes stiffness = 5000", "passed": true, "evidence": "Found: 'stiffness = 5000.0'"}, {"text": "Includes damping = 100", "passed": true, "evidence": "Found: 'damping = 100.0'"}, {"text": "Includes length = 250 (free length)", "passed": false, "evidence": "Used 'free_length = 250.0' instead of 'length = 250.0'. The correct Adams CMD parameter name is 'length', not 'free_length'."}, {"text": "References both i_marker_name and j_marker_name", "passed": true, "evidence": "Found: 'i_marker_name = .model.part_1.spring_i  j_marker_name = .model.part_2.spring_j'"}, {"text": "Explains that spring_damper is for 1-DOF along a line of action", "passed": true, "evidence": "Response explains: 'It acts along the line connecting an I marker (on one part) and a J marker (on another part), applying equal and opposite forces based on relative displacement and velocity'"}], "summary": {"passed": 5, "failed": 1, "total": 6, "pass_rate": 0.833}}}], "previous_feedback": {"eval-2-with_skill": "The model said this\n\n> | Displacement Var | `DZ(.MY_MODEL.BODY.cm, .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF)` | Z-component of the vector from `FLOOR_REF` to `BODY.cm`, measured along global Z |\n> | Velocity Var | `VZ(.MY_MODEL.BODY.cm, .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF)` | Z-velocity of `BODY.cm` relative to `FLOOR_REF` in the global frame\n\nit is not correct about these being in the global frame. he third argument to DZ is the frame, so these are in the FLOOR_REF frame\n\nSingle component force command is `force create direct single_component_force` (llm used `force create body_force ...`), \nsame mistake for vector force\n\nneither of the force commands have a `force_name` argument. It is `single_component_force_name` and `force_vector_name`\n\nAlso, the `force create direct force_vector ` is the command, not `vector_force`\n\nAlso, FLOOR_REF is not a floating marker, that is a different type. The easiest way to fix this is to use `j_part_name=.MYMODEL.ground` instead. This automatically creates the floating marker. **ONLY APPLIES FOR vector_force** see next comment for single_component_force\n\nsingle_component_force doesn't use a *floating* marker for j. Just a normal marker. So llm incorrectly passed `j_floating_marker=.MY_MODEL.ground.FLOOR_REF`  when it should have just been `j_marker=.MY_MODEL.ground.FLOOR_REF`\n\nyou said \"`single_component_force` applies the force along the **z-axis of the i_marker**.\" That is not correct. It applies the force along the line of sight between the i and j markers. This would have led to chaotic/undefined behavior when the two markers are very close. The llm was correct to recommend vector force for this application, it just got the reasoning wrong.", "eval-0-with_skill": "`forces create body_force gravity_field` should be `force create body gravitational`\n\nllm ran `part create rigid_body ... part_name= .PENDULUM.LINK` twice. The second one would have caused an error. SHould have been `part modify ...`\n\nllm is manually creating adams ids with `adams_id=...`. This is unnecessary and error prone. best practice is to just leave this argument off. Adams will auto assign the ids.\n\n\nAdams automatically updates the location of the auto generated .cm marker as the geometry of the part is modified. So this block was unnecessary and would break the auto update\n```\n! Reposition the auto-created cm marker from part origin to actual CM\nmarker modify &\n    marker_name = .PENDULUM.LINK.cm &\n    location    = 0.0, -100.0, 0.0\n```\n\n", "eval-0-without_skill": "This one was better **without** the skill", "eval-1-with_skill": "same problems as previous eval"}, "previous_outputs": {"eval-2-with_skill": [{"name": "response.md", "type": "text", "content": "# One-Sided Floor Contact: FUNCTION= Expression\n\n## Overview\n\nThe `IMPACT` function is the correct choice for a one-sided contact because it activates only when a displacement variable drops below a trigger value, and produces a smoothly-ramped repulsive force with nonlinear stiffness and viscous damping.\n\n**Contact activates when:** `DZ(part_CM, floor_ref) < 0.0` (part's CM penetrates the Z = 0 plane)\n\n**Force equation during penetration** (penetration depth `d = 0.0 \u00e2\u02c6\u2019 DZ`):\n\n$$F = K \\cdot d^{e} - C \\cdot \\text{STEP}(d,\\, 0,\\, 0,\\, \\delta,\\, 1) \\cdot \\dot{z}$$\n\nwhere `K = 1e5`, `e = 1.5`, `C = 50`, `\u00ce\u00b4 = 0.1 mm`.\n\n---\n\n## The FUNCTION= Expression\n\n```cmd\nfunction = \"IMPACT( &\n    DZ(.MY_MODEL.BODY.cm, .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF), &\n    VZ(.MY_MODEL.BODY.cm, .MY_MODEL.ground.FLOOR_REF, &\n       .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF), &\n    0.0, 1.0E5, 1.5, 50.0, 0.1)\"\n```\n\n### Argument-by-argument breakdown\n\n| Argument | Value | Meaning |\n|---|---|---|\n| Displacement Var | `DZ(.MY_MODEL.BODY.cm, .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF)` | Z-component of the vector from `FLOOR_REF` to `BODY.cm`, measured along global Z |\n| Velocity Var | `VZ(.MY_MODEL.BODY.cm, .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF)` | Z-velocity of `BODY.cm` relative to `FLOOR_REF` in the global frame |\n| Trigger | `0.0` | Floor is at Z = 0; contact activates when `DZ < 0.0` |\n| K | `1.0E5` | Contact stiffness (N/mm^1.5 in mm-kg-s) |\n| e | `1.5` | Hertz exponent \u00e2\u20ac\u201d models elastic contact between curved surfaces |\n| C | `50.0` | Maximum damping coefficient (N\u00c2\u00b7s/mm) |\n| d | `0.1` | Damping ramp-up distance (mm); damping ramps from 0 \u00e2\u2020\u2019 C over first 0.1 mm of penetration to avoid a step change at contact initiation |\n\n> **Critical pairing rule:** The `Along Marker` and `Reference Frame` arguments of `VZ` must match the `Along Marker` argument of `DZ`. Both use `FLOOR_REF` here to ensure the velocity fed to IMPACT is the true time derivative of the displacement fed to IMPACT.\n\n---\n\n## Full CMD Implementation\n\nThis snippet creates the required ground reference marker and the contact force element. Substitute `.MY_MODEL` and `.MY_MODEL.BODY` with your actual model and part names.\n\n```cmd\n! \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac Prerequisites \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\n! Assumes the following already exist in the model:\n!   .MY_MODEL              \u00e2\u20ac\u201c the model\n!   .MY_MODEL.BODY         \u00e2\u20ac\u201c the part whose CM is monitored\n!   .MY_MODEL.BODY.cm      \u00e2\u20ac\u201c Adams-generated CM marker (created automatically\n!                            when mass properties are set on the part)\n! \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\n\n! Step 1: Create a reference marker on ground at the floor plane (Z = 0)\n! Default orientation \u00e2\u2020\u2019 z-axis points in global +Z (upward)\nmarker create &\n    marker_name = .MY_MODEL.ground.FLOOR_REF &\n    location    = 0.0, 0.0, 0.0 &\n    orientation = 0.0D, 0.0D, 0.0D\n\n! Step 2: Create the contact force\n! action_only = on   \u00e2\u2020\u2019 no equal-and-opposite reaction on the ground\n! Force acts along the z-axis of the i_marker (.MY_MODEL.BODY.cm)\n! Ensure the i_marker's z-axis points in global +Z at the start of simulation\nforce create body_force single_component_force &\n    force_name        = .MY_MODEL.FLOOR_CONTACT &\n    adams_id          = 10 &\n    i_marker_name     = .MY_MODEL.BODY.cm &\n    j_floating_marker = .MY_MODEL.ground.FLOOR_REF &\n    action_only       = on &\n    function          = \"IMPACT( &\n        DZ(.MY_MODEL.BODY.cm, .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF), &\n        VZ(.MY_MODEL.BODY.cm, .MY_MODEL.ground.FLOOR_REF, &\n           .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF), &\n        0.0, 1.0E5, 1.5, 50.0, 0.1)\"\n```\n\n---\n\n## Notes and Caveats\n\n### Units\nThe parameters above assume a **mm-kg-s** unit system:\n- K = 1\u00c3\u201410\u00e2\ufffd\u00b5 N/mm^1.5\n- C = 50 N\u00c2\u00b7s/mm\n- d = 0.1 mm\n\nIf your model uses **MKS (m-kg-s)**, convert accordingly: K in N/m^1.5, C in N\u00c2\u00b7s/m, d in m (0.0001 m for 0.1 mm).\n\n### Force direction and part rotation\n`single_component_force` applies the force along the **z-axis of the i_marker**. Here the i_marker is `.MY_MODEL.BODY.cm`. If the part undergoes significant rotation during simulation such that the cm marker's z-axis deviates from global +Z, the contact force direction will deviate accordingly.\n\nFor bodies that rotate substantially, use a `vector_force` instead to guarantee the contact force always acts in global +Z:\n\n```cmd\nforce create body_force vector_force &\n    force_name          = .MY_MODEL.FLOOR_CONTACT &\n    adams_id            = 10 &\n    i_marker_name       = .MY_MODEL.BODY.cm &\n    j_floating_marker   = .MY_MODEL.ground.FLOOR_REF &\n    ref_marker_name     = .MY_MODEL.ground.FLOOR_REF &\n    function_x          = \"0\" &\n    function_y          = \"0\" &\n    function_z          = \"IMPACT( &\n        DZ(.MY_MODEL.BODY.cm, .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF), &\n        VZ(.MY_MODEL.BODY.cm, .MY_MODEL.ground.FLOOR_REF, &\n           .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF), &\n        0.0, 1.0E5, 1.5, 50.0, 0.1)\"\n```\n\n### Why IMPACT and not IF or STEP?\n- `IF` introduces a derivative discontinuity at contact; the solver must take a very small step at the transition and may struggle with convergence.\n- `IMPACT` ramps damping smoothly over the first `d = 0.1 mm` of penetration via an internal `STEP`, giving the integrator a smooth transition from zero force to full contact force. This is the recommended approach for contact modeling in Adams.\n\n### Choosing the damping ramp-up distance `d`\nThe value `d = 0.1 mm` means damping reaches its full value `C = 50 N\u00c2\u00b7s/mm` after 0.1 mm of penetration. If `d` is too large relative to expected penetration, the contact will feel underdamped; if too small, it approximates a step and can cause integrator step-size reduction. A good heuristic: set `d` to roughly 1\u00e2\u20ac\u201c10% of the expected maximum penetration depth.\n"}], "eval-2-without_skill": [{"name": "response.md", "type": "text", "content": "# One-Sided Floor Contact Force Expression in Adams/View\n\n## Overview\n\nTo model a one-sided contact force that activates when a part's center of mass (CM) falls below Z = 0 (a floor), Adams provides the built-in **IMPACT** function. This function computes a penetration-based contact force using a Hertzian stiffness law combined with a damping term that ramps in smoothly with penetration depth.\n\n---\n\n## IMPACT Function Syntax\n\n```\nIMPACT(x, x_dot, x1, k, e, cmax, d, order)\n```\n\n| Argument | Description |\n|----------|-------------|\n| `x`      | The displacement variable being monitored (position) |\n| `x_dot`  | Time derivative of `x` (velocity) |\n| `x1`     | Threshold value \u00e2\u20ac\u201d contact activates when `x < x1` |\n| `k`      | Stiffness coefficient |\n| `e`      | Force exponent (Hertzian: typically 1.5 for sphere-on-flat) |\n| `cmax`   | Maximum damping coefficient |\n| `d`      | Penetration depth at which full damping (`cmax`) is applied |\n| `order`  | Order of the STEP function used to ramp damping (0 = cubic) |\n\nWhen `x \u00e2\u2030\u00a5 x1`, the function returns **0** (no contact).  \nWhen `x < x1`, the force is:\n\n$$F = k \\cdot (x_1 - x)^e + c(x) \\cdot \\dot{x}$$\n\nwhere $c(x)$ ramps from 0 (at $x = x_1$) to $c_{\\max}$ (at $x = x_1 - d$) using a smooth STEP function.\n\n---\n\n## Parameters for This Problem\n\n| Parameter | Value |\n|-----------|-------|\n| Floor Z-level (`x1`) | `0.0` |\n| Stiffness (`k`) | `1.0E+05` |\n| Exponent (`e`) | `1.5` |\n| Max damping (`cmax`) | `50.0` |\n| Penetration depth (`d`) | `0.1` (mm, if model units are mm) |\n| Order | `0` |\n\n---\n\n## FUNCTION= Expression\n\nThe Z-position and Z-velocity of the part's CM relative to the global frame are obtained using `DZ` and `VZ` Adams runtime functions:\n\n```\nFUNCTION = IMPACT(DZ(cm_marker, 0, 0), VZ(cm_marker, 0, 0), 0.0, 1.0E+05, 1.5, 50.0, 0.1, 0)\n```\n\n- `DZ(cm_marker, 0, 0)` \u00e2\u20ac\u201d Z-displacement of the CM marker relative to the global origin, expressed in the global frame (`0` = global reference).\n- `VZ(cm_marker, 0, 0)` \u00e2\u20ac\u201d Z-velocity of the CM marker in the global frame.\n- `0.0` \u00e2\u20ac\u201d Floor is at Z = 0.\n- Contact force is zero when `DZ \u00e2\u2030\u00a5 0`, and ramps on as the CM penetrates below Z = 0.\n\n---\n\n## Full Adams CMD SFORCE Definition\n\nTo apply this as a vertical (Z-direction) force on the part, define a translational `SFORCE` using the `ACTIONONLY` flag so the reaction is absorbed by ground:\n\n```adams\nSFORCE/1\n, I = <cm_marker_id>\n, J = <ground_ref_marker_id>\n, ACTIONONLY\n, TRANSLATIONAL\n, FUNCTION = IMPACT(DZ(cm_marker_id, 0, 0), VZ(cm_marker_id, 0, 0), 0.0, 1.0E+05, 1.5, 50.0, 0.1, 0)\n```\n\n**Notes:**\n- Replace `<cm_marker_id>` with the integer ID of the CM marker on your part.\n- Replace `<ground_ref_marker_id>` with a ground-fixed reference marker whose Z-axis is aligned with the global Z-axis. A marker at the global origin with default orientation works.\n- The `TRANSLATIONAL` keyword means the force is applied along the Z-axis of the **I marker**. Ensure the I marker's Z-axis points in the global +Z direction (upward) so the contact force pushes the part upward when it penetrates the floor.\n- The `ACTIONONLY` flag means no reaction force is applied to the J (ground) marker body, which is the typical convention for contact with the ground.\n\n---\n\n## Behavior Summary\n\n| Condition | Contact Force |\n|-----------|--------------|\n| CM at Z > 0 (above floor) | 0 \u00e2\u20ac\u201d no contact |\n| CM at Z = 0 (just touching) | 0 \u00e2\u20ac\u201d contact initiating |\n| CM at Z = \u00e2\u02c6\u20190.05 mm (half penetration) | Partial stiffness + partial damping |\n| CM at Z = \u00e2\u02c6\u20190.1 mm (full damping depth) | Full stiffness + full damping (`cmax = 50`) |\n\nThe STEP-based damping ramp prevents a discontinuous jump in damping force at first contact, improving numerical stability during simulation.\n\n---\n\n## Unit Consistency Note\n\nThe penetration depth `d = 0.1` is in the model's length units. This expression assumes **millimeters**. If your model uses **meters**, change `0.1` to `0.0001`. Similarly, ensure the stiffness `k = 1E+05` has consistent units (e.g., N/mm^1.5 for mm-tonne-s or N/m^1.5 for MKS).\n"}], "eval-0-with_skill": [{"name": "pendulum.cmd", "type": "binary", "mime": "application/octet-stream", "data_uri": "data:application/octet-stream;base64,ISA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCiEgU2ltcGxlIFBlbmR1bHVtIOKAlCBBZGFtcyBDTUQgU2NyaXB0DQohDQohIEEgc2luZ2xlIDIwMCBtbSByaWdpZCBsaW5rIHBpbm5lZCB0byBncm91bmQgYXQgdGhlIHRvcCBlbmQsDQohIHJlbGVhc2VkIGZyb20gNDXCsCBhbmQgYWxsb3dlZCB0byBzd2luZyBmcmVlbHkgdW5kZXIgZ3Jhdml0eS4NCiEgR3Jhdml0eSBhY3RzIGluIHRoZSAtWSBkaXJlY3Rpb24uDQohDQohIE1vZGVsIHN0cnVjdHVyZToNCiEgICAuUEVORFVMVU0NCiEgICDilJzilIDilIAgZ3JvdW5kDQohICAg4pSCICAg4pSU4pSA4pSAIE1fUElWT1QgICAgICAgICAgKHBpdm90IGF0dGFjaG1lbnQgcG9pbnQsIGF0IG9yaWdpbikNCiEgICDilJTilIDilIAgTElOSw0KISAgICAgICDilJzilIDilIAgY20gICAgICAgICAgICAgICAoYXV0by1jcmVhdGVkOyByZXBvc2l0aW9uZWQgdG8gbWlkcG9pbnQpDQohICAgICAgIOKUnOKUgOKUgCBNX1BJTiAgICAgICAgICAgICh1cHBlciBlbmQg4oCUIGNvaW5jaWRlcyB3aXRoIE1fUElWT1QpDQohICAgICAgIOKUnOKUgOKUgCBNX0NNICAgICAgICAgICAgIChjZW50ZXIgb2YgbWFzcywgMTAwIG1tIGJlbG93IHBpbikNCiEgICAgICAg4pSc4pSA4pSAIE1fVElQICAgICAgICAgICAgKGxvd2VyIGVuZCwgMjAwIG1tIGJlbG93IHBpbikNCiEgICAgICAg4pSU4pSA4pSAIE1fUk9EX1ZJUyAgICAgICAgKGdlb21ldHJ5IHJlZmVyZW5jZTsgWiBheGlzIOKGkiDiiJJZIGRpcmVjdGlvbikNCiENCiEgUGVuZHVsdW0gcHJvcGVydGllczoNCiEgICBMZW5ndGggICAgICAgIEwgPSAyMDAgbW0NCiEgICBNYXNzICAgICAgICAgIG0gPSAxIGtnICAodW5pZm9ybSByb2QpDQohICAgSXh4IGFib3V0IENNICA9ICgxLzEyKSptKkzCsiA9IDMzMzMuMzMga2fCt21twrIgIChiZW5kaW5nIGFib3V0IFgpDQohICAgSXl5IGFib3V0IENNICA9IDAuMCBrZ8K3bW3CsiAgICAgICAgICAgICAgICAgICAgICh0aGluLXJvZCB0b3JzaW9uKQ0KISAgIEl6eiBhYm91dCBDTSAgPSAoMS8xMikqbSpMwrIgPSAzMzMzLjMzIGtnwrdtbcKyICAocGVuZHVsdW0gc3dpbmcgYWJvdXQgWikNCiEgICBJenogYWJvdXQgcGluID0gSXp6X2NtICsgbSooTC8yKcKyID0gMTMzMzMuMzMga2fCt21twrINCiEgICAgICAgICAgICAgICAgID0gKDEvMykqbSpMwrIgIOKckw0KISAgIFJlbGVhc2UgYW5nbGUgzrEgPSA0NcKwICAoZnJvbSB2ZXJ0aWNhbCwgbm8gaW5pdGlhbCB2ZWxvY2l0eSkNCiEgICBQZXJpb2QgICAgICAgICBUIOKJiCAyz4DiiJooSXp6X3BpbiAvIChtKmcqKEwvMikpKQ0KISAgICAgICAgICAgICAgICAgICAg4omIIDLPgOKImigxMzMzMy4zMyAvICgxKjk4MDYuNjUqMTAwKSkNCiEgICAgICAgICAgICAgICAgICAgIOKJiCAwLjczMyBzICAoc21hbGwtYW5nbGUgcGVyaW9kOyA0NcKwIGVsb25nYXRlcyBzbGlnaHRseSkNCiEgPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQoNCg0KISAtLS0gMS4gTW9kZWwgYW5kIHVuaXRzIC0tLQ0KDQptb2RlbCBjcmVhdGUgbW9kZWxfbmFtZSA9IFBFTkRVTFVNDQoNCmRlZmF1bHRzIHVuaXRzICYNCiAgICBsZW5ndGggPSBtbSAgICAmDQogICAgZm9yY2UgID0gbmV3dG9uICYNCiAgICBtYXNzICAgPSBrZyAgICAmDQogICAgdGltZSAgID0gc2VjDQoNCg0KISAtLS0gMi4gR3Jhdml0eSAoLVkgZGlyZWN0aW9uLCBnID0gOTgwNi42NSBtbS9zwrIpIC0tLQ0KDQpmb3JjZXMgY3JlYXRlIGJvZHlfZm9yY2UgZ3Jhdml0eV9maWVsZCAmDQogICAgZ3Jhdml0eV9maWVsZF9uYW1lICA9IC5QRU5EVUxVTS5HUkFWSVRZICYNCiAgICB4X2NvbXBvbmVudF9ncmF2aXR5ID0gMC4wICAgICAgJg0KICAgIHlfY29tcG9uZW50X2dyYXZpdHkgPSAtOTgwNi42NSAmDQogICAgel9jb21wb25lbnRfZ3Jhdml0eSA9IDAuMA0KDQoNCiEgLS0tIDMuIEdyb3VuZCBtYXJrZXIgYXQgdGhlIHBpdm90IHBvaW50IC0tLQ0KDQptYXJrZXIgY3JlYXRlICYNCiAgICBtYXJrZXJfbmFtZSA9IC5QRU5EVUxVTS5ncm91bmQuTV9QSVZPVCAmDQogICAgYWRhbXNfaWQgICAgPSAxICAgICAgICAgICAgICAgICAgICAgICAgJg0KICAgIGxvY2F0aW9uICAgID0gMC4wLCAwLjAsIDAuMCAgICAgICAgICAgJg0KICAgIG9yaWVudGF0aW9uID0gMC4wRCwgMC4wRCwgMC4wRA0KDQoNCiEgLS0tIDQuIENyZWF0ZSB0aGUgbGluayBwYXJ0IC0tLQ0KISAgICAgUGFydCBvcmlnaW4gaXMgcGxhY2VkIGF0IHRoZSBwaXZvdC4NCiEgICAgIEluIGVxdWlsaWJyaXVtIHRoZSByb2QgaGFuZ3Mgc3RyYWlnaHQgZG93biAo4oiSWSBkaXJlY3Rpb24pLg0KDQpwYXJ0IGNyZWF0ZSByaWdpZF9ib2R5IG5hbWVfYW5kX3Bvc2l0aW9uICYNCiAgICBwYXJ0X25hbWUgICA9IC5QRU5EVUxVTS5MSU5LICAgICAgICAmDQogICAgYWRhbXNfaWQgICAgPSAyICAgICAgICAgICAgICAgICAgICAgJg0KICAgIGxvY2F0aW9uICAgID0gMC4wLCAwLjAsIDAuMCAgICAgICAgJg0KICAgIG9yaWVudGF0aW9uID0gMC4wRCwgMC4wRCwgMC4wRA0KDQohIE1hc3MgcHJvcGVydGllcyDigJQgdW5pZm9ybSByaWdpZCByb2QsIDEga2csIDIwMCBtbSBsb25nLCByb2QgYXhpcyBhbG9uZyBZOg0KISAgIGl4eCA9ICgxLzEyKSptKkzCsiA9IDMzMzMuMzMga2fCt21twrIgICAoYmVuZGluZywgcm9kIOKKpSBYKQ0KISAgIGl5eSA9IDAuMCBrZ8K3bW3CsiAgICAgICAgICAgICAgICAgICAgICAodG9yc2lvbiwgcm9kIOKIpSBZIOKAlCB0aGluIHJvZCkNCiEgICBpenogPSAoMS8xMikqbSpMwrIgPSAzMzMzLjMzIGtnwrdtbcKyICAgKHBlbmR1bHVtIHN3aW5nLCByb2Qg4oqlIFopDQpwYXJ0IGNyZWF0ZSByaWdpZF9ib2R5IG1hc3NfcHJvcGVydGllcyAmDQogICAgcGFydF9uYW1lICAgICAgICAgICAgID0gLlBFTkRVTFVNLkxJTksgJg0KICAgIG1hc3MgICAgICAgICAgICAgICAgICA9IDEuMCAgICAgICAgICAgICYNCiAgICBjZW50ZXJfb2ZfbWFzc19tYXJrZXIgPSAuUEVORFVMVU0uTElOSy5jbSAmDQogICAgaXh4ICAgICAgICAgICAgICAgICAgID0gMzMzMy4zMyAgICAgICAgJg0KICAgIGl5eSAgICAgICAgICAgICAgICAgICA9IDAuMCAgICAgICAgICAgICYNCiAgICBpenogICAgICAgICAgICAgICAgICAgPSAzMzMzLjMzICAgICAgICAmDQogICAgaXh5ICAgICAgICAgICAgICAgICAgID0gMC4wICAgICAgICAgICAgJg0KICAgIGl5eiAgICAgICAgICAgICAgICAgICA9IDAuMCAgICAgICAgICAgICYNCiAgICBpenggICAgICAgICAgICAgICAgICAgPSAwLjANCg0KDQohIC0tLSA1LiBNYXJrZXJzIG9uIHRoZSBsaW5rIC0tLQ0KDQohIFBpbiBtYXJrZXIgYXQgdGhlIHRvcCBvZiB0aGUgcm9kIChjb2luY2lkZW50IHdpdGggTV9QSVZPVCBhdCBwYXJ0IG9yaWdpbikNCm1hcmtlciBjcmVhdGUgJg0KICAgIG1hcmtlcl9uYW1lID0gLlBFTkRVTFVNLkxJTksuTV9QSU4gICYNCiAgICBhZGFtc19pZCAgICA9IDIgICAgICAgICAgICAgICAgICAgICAmDQogICAgbG9jYXRpb24gICAgPSAwLjAsICAgIDAuMCwgMC4wICAgICAgJg0KICAgIG9yaWVudGF0aW9uID0gMC4wRCwgMC4wRCwgMC4wRA0KDQohIENlbnRlci1vZi1tYXNzIG1hcmtlciDigJQgMTAwIG1tIGJlbG93IHBpbiBhbG9uZyByb2QgKHBhcnQg4oiSWSkNCm1hcmtlciBjcmVhdGUgJg0KICAgIG1hcmtlcl9uYW1lID0gLlBFTkRVTFVNLkxJTksuTV9DTSAgICYNCiAgICBhZGFtc19pZCAgICA9IDMgICAgICAgICAgICAgICAgICAgICAmDQogICAgbG9jYXRpb24gICAgPSAwLjAsIC0xMDAuMCwgMC4wICAgICAgJg0KICAgIG9yaWVudGF0aW9uID0gMC4wRCwgMC4wRCwgMC4wRA0KDQohIFRpcCBtYXJrZXIg4oCUIDIwMCBtbSBiZWxvdyBwaW4gKGJvdHRvbSBlbmQgb2Ygcm9kKQ0KbWFya2VyIGNyZWF0ZSAmDQogICAgbWFya2VyX25hbWUgPSAuUEVORFVMVU0uTElOSy5NX1RJUCAgJg0KICAgIGFkYW1zX2lkICAgID0gNCAgICAgICAgICAgICAgICAgICAgICYNCiAgICBsb2NhdGlvbiAgICA9IDAuMCwgLTIwMC4wLCAwLjAgICAgICAmDQogICAgb3JpZW50YXRpb24gPSAwLjBELCAwLjBELCAwLjBEDQoNCiEgVmlzdWFsaXphdGlvbiBtYXJrZXIgZm9yIGN5bGluZGVyIGdlb21ldHJ5Og0KISAgIEF0IHBpbiBsb2NhdGlvbjsgb3JpZW50YXRpb24gMEQsIDkwRCwgMEQgb3JpZW50cyB0aGUgbWFya2VyJ3MNCiEgICBsb2NhbCBaIGF4aXMgdG8gcG9pbnQgaW4gdGhlIHBhcnQg4oiSWSBkaXJlY3Rpb24gKEJvZHktMzEzIEV1bGVyOg0KISAgIDkwwrAgcm90YXRpb24gYWJvdXQgWCBtYXBzIFog4oaSIOKIklkpLiAgVGhlIGN5bGluZGVyIHRoZW4gZXh0ZW5kcw0KISAgIGNsZWFubHkgYWxvbmcgdGhlIHJvZCBmcm9tIHBpbiB0byB0aXAuDQptYXJrZXIgY3JlYXRlICYNCiAgICBtYXJrZXJfbmFtZSA9IC5QRU5EVUxVTS5MSU5LLk1fUk9EX1ZJUyAmDQogICAgYWRhbXNfaWQgICAgPSA1ICAgICAgICAgICAgICAgICAgICAgICAgJg0KICAgIGxvY2F0aW9uICAgID0gMC4wLCAwLjAsIDAuMCAgICAgICAgICAgJg0KICAgIG9yaWVudGF0aW9uID0gMC4wRCwgOTAuMEQsIDAuMEQNCg0KISBSZXBvc2l0aW9uIHRoZSBhdXRvLWNyZWF0ZWQgY20gbWFya2VyIGZyb20gcGFydCBvcmlnaW4gdG8gYWN0dWFsIENNDQptYXJrZXIgbW9kaWZ5ICYNCiAgICBtYXJrZXJfbmFtZSA9IC5QRU5EVUxVTS5MSU5LLmNtICYNCiAgICBsb2NhdGlvbiAgICA9IDAuMCwgLTEwMC4wLCAwLjANCg0KDQohIC0tLSA2LiBSZXZvbHV0ZSBqb2ludCBhdCB0aGUgcGl2b3QgLS0tDQohICAgICBBbGxvd3Mgcm90YXRpb24gYWJvdXQgdGhlIFotYXhpcyBvZiBNX1BJVk9UICg9IGdsb2JhbCBaKS4NCiEgICAgIEkgbWFya2VyIGlzIG9uIHRoZSBtb3ZpbmcgTElOSzsgSiBtYXJrZXIgaXMgb24gZml4ZWQgZ3JvdW5kLg0KDQpjb25zdHJhaW50IGNyZWF0ZSBqb2ludCByZXZvbHV0ZSAmDQogICAgam9pbnRfbmFtZSAgICA9IC5QRU5EVUxVTS5SRVZfUElWT1QgICAgICAgICYNCiAgICBhZGFtc19pZCAgICAgID0gMSAgICAgICAgICAgICAgICAgICAgICAgICAgJg0KICAgIGlfbWFya2VyX25hbWUgPSAuUEVORFVMVU0uTElOSy5NX1BJTiAgICAgICAmDQogICAgal9tYXJrZXJfbmFtZSA9IC5QRU5EVUxVTS5ncm91bmQuTV9QSVZPVA0KDQoNCiEgLS0tIDcuIEluaXRpYWwgY29uZGl0aW9uczogcmVsZWFzZSBmcm9tIDQ1wrAgLS0tDQohICAgICBSb3RhdGUgdGhlIGxpbmsgNDXCsCBhYm91dCBaIChDQ1cgd2hlbiB2aWV3ZWQgZnJvbSArWikuDQohICAgICBUaGUgcm9kIHN0YXJ0cyBhdCA0NcKwIGZyb20gdGhlIGRvd253YXJkIHZlcnRpY2FsOg0KISAgICAgICB0aXAgZ2xvYmFsIHBvc2l0aW9uIOKJiCAoMTQxLjQsIOKIkjE0MS40LCAwKSBtbQ0KISAgICAgWmVybyBpbml0aWFsIGFuZ3VsYXIgdmVsb2NpdHkgKHJlbGVhc2VkIGZyb20gcmVzdCkuDQoNCnBhcnQgbW9kaWZ5IHJpZ2lkX2JvZHkgbmFtZV9hbmRfcG9zaXRpb24gJg0KICAgIHBhcnRfbmFtZSAgID0gLlBFTkRVTFVNLkxJTksgICAgICAgICYNCiAgICBvcmllbnRhdGlvbiA9IDAuMEQsIDAuMEQsIDQ1LjBEDQoNCg0KISAtLS0gOC4gVmlzdWFsaXphdGlvbiBnZW9tZXRyeSAocHVyZWx5IGNvc21ldGljOyBubyBlZmZlY3Qgb24gZHluYW1pY3MpIC0tLQ0KDQohIFNwaGVyZSBhdCB0aGUgdGlwIHRvIHJlcHJlc2VudCB0aGUgcGVuZHVsdW0gYm9iIChyID0gMTIgbW0pDQpnZW9tZXRyeSBjcmVhdGUgc2hhcGUgc3BoZXJlICYNCiAgICBzcGhlcmVfbmFtZSAgID0gLlBFTkRVTFVNLkxJTksuU1BIRVJFX0JPQiAmDQogICAgYWRhbXNfaWQgICAgICA9IDEgICAgICAgICAgICAgICAgICAgICAgICAgJg0KICAgIHBhcnRfbmFtZSAgICAgPSAuUEVORFVMVU0uTElOSyAgICAgICAgICAgICYNCiAgICBjZW50ZXJfbWFya2VyID0gLlBFTkRVTFVNLkxJTksuTV9USVAgICAgICAmDQogICAgcmFkaXVzICAgICAgICA9IDEyLjANCg0KISBDeWxpbmRlciBmb3IgdGhlIHJvZCBib2R5OyBleHRlbmRzIDIwMCBtbSBhbG9uZyBNX1JPRF9WSVMgbG9jYWwgWiAoPSBwYXJ0IOKIklkpDQpnZW9tZXRyeSBjcmVhdGUgc2hhcGUgY3lsaW5kZXIgICAgICAgICAgICAgICAgICAgJg0KICAgIGN5bGluZGVyX25hbWUgICAgICAgICAgICA9IC5QRU5EVUxVTS5MSU5LLkNZTF9ST0QgJg0KICAgIGFkYW1zX2lkICAgICAgICAgICAgICAgICA9IDIgICAgICAgICAgICAgICAgICAgICAgJg0KICAgIHBhcnRfbmFtZSAgICAgICAgICAgICAgICA9IC5QRU5EVUxVTS5MSU5LICAgICAgICAgJg0KICAgIGNlbnRlcl9tYXJrZXIgICAgICAgICAgICA9IC5QRU5EVUxVTS5MSU5LLk1fUk9EX1ZJUyAmDQogICAgbGVuZ3RoICAgICAgICAgICAgICAgICAgID0gMjAwLjAgICAgICAgICAgICAgICAgICAmDQogICAgcmFkaXVzICAgICAgICAgICAgICAgICAgID0gNC4wICAgICAgICAgICAgICAgICAgICAmDQogICAgYW5nbGVfZXh0ZW50ICAgICAgICAgICAgID0gMzYwLjBEICAgICAgICAgICAgICAgICAmDQogICAgc2lkZV9jb3VudF9mb3JfcGVyaW1ldGVyID0gMTYNCg0KDQohID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KISBUbyBzaW11bGF0ZSAoMiBzLCAxIG1zIHN0ZXBzIOKAlCBnaXZlcyB+MyBmdWxsIHN3aW5ncyk6DQohDQohICAgc2ltdWxhdGUgdHJhbnNpZW50IGVuZF90aW1lID0gMi4wIHN0ZXBfc2l6ZSA9IDAuMDAxDQohDQohIEV4cGVjdGVkIGJlaGF2aW91cjoNCiEgICAtIFBlbmR1bHVtIHJlbGVhc2VkIGZyb20gNDXCsCBmcm9tIHZlcnRpY2FsIHdpdGggemVybyB2ZWxvY2l0eS4NCiEgICAtIFN3aW5ncyBmcmVlbHkgdW5kZXIgZ3Jhdml0eTsgbm8gZGFtcGluZyDigJQgZW5lcmd5IGlzIGNvbnNlcnZlZC4NCiEgICAtIFNtYWxsLWFuZ2xlIHBlcmlvZCBUIOKJiCAwLjczMyBzOyA0NcKwIGFtcGxpdHVkZSBwZXJpb2Qgc2xpZ2h0bHkNCiEgICAgIGxvbmdlciAofjAuNzU5IHMgYnkgZWxsaXB0aWMgaW50ZWdyYWwpLg0KISAgIC0gTWF4aW11bSB0aXAgc3BlZWQgb2NjdXJzIGF0IHRoZSBsb3dlc3QgcG9pbnQgKM64ID0gMCkuDQohID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0K"}, {"name": "response.md", "type": "text", "content": "# Adams CMD Script: Simple Pendulum\n\n## Model Description\n\nA single rigid rod (200 mm long, 1 kg uniform mass) pinned to ground at its top end by a revolute joint. Gravity acts in the \u00e2\u02c6\u2019Y direction. The pendulum is released from rest at 45\u00c2\u00b0 from the downward vertical.\n\n---\n\n## Model Topology\n\n```\n.PENDULUM\n\u00e2\u201d\u0153\u00e2\u201d\u20ac\u00e2\u201d\u20ac ground\n\u00e2\u201d\u201a   \u00e2\u201d\u201d\u00e2\u201d\u20ac\u00e2\u201d\u20ac M_PIVOT          origin (0, 0, 0) \u00e2\u20ac\u201d fixed pivot attachment point\n\u00e2\u201d\u201d\u00e2\u201d\u20ac\u00e2\u201d\u20ac LINK                 rigid part; origin at pivot\n    \u00e2\u201d\u0153\u00e2\u201d\u20ac\u00e2\u201d\u20ac cm               auto-created; repositioned to (0, \u00e2\u02c6\u2019100, 0)\n    \u00e2\u201d\u0153\u00e2\u201d\u20ac\u00e2\u201d\u20ac M_PIN            top of rod \u00e2\u20ac\u201d (0, 0, 0) in part frame\n    \u00e2\u201d\u0153\u00e2\u201d\u20ac\u00e2\u201d\u20ac M_CM             centre of mass \u00e2\u20ac\u201d (0, \u00e2\u02c6\u2019100, 0) in part frame\n    \u00e2\u201d\u0153\u00e2\u201d\u20ac\u00e2\u201d\u20ac M_TIP            bottom of rod \u00e2\u20ac\u201d (0, \u00e2\u02c6\u2019200, 0) in part frame\n    \u00e2\u201d\u201d\u00e2\u201d\u20ac\u00e2\u201d\u20ac M_ROD_VIS        geometry helper; Z axis points in \u00e2\u02c6\u2019Y direction\n```\n\n---\n\n## Design Notes\n\n### Units\n`mm`, `newton`, `kg`, `sec`. Gravity is therefore `\u00e2\u02c6\u20199806.65 mm/s\u00c2\u00b2` (9.80665 m/s\u00c2\u00b2 \u00c3\u2014 1000 mm/m).\n\n### Part placement and build order\nThe LINK part origin is placed at the pivot (0, 0, 0). In the default orientation (0\u00c2\u00b0) the rod hangs straight down: M_PIN at the origin, M_TIP at (0, \u00e2\u02c6\u2019200, 0). The initial 45\u00c2\u00b0 offset is applied **after** the joint is created so that Adams records it as an initial condition, not as a permanent geometry offset.\n\n### Mass properties\nFor a uniform rigid rod of mass *m* = 1 kg and length *L* = 200 mm, with the rod axis along the part Y direction, the principal moments of inertia about the centre of mass are:\n\n| Component | Formula | Value |\n|-----------|---------|-------|\n| $I_{xx}$ (bending, rod \u00e2\u0160\u00a5 X) | $\\frac{1}{12}mL^2$ | **3333.33 kg\u00c2\u00b7mm\u00c2\u00b2** |\n| $I_{yy}$ (torsion, rod \u00e2\u02c6\u00a5 Y) | \u00e2\u2030\u02c6 0 (thin rod) | **0.0 kg\u00c2\u00b7mm\u00c2\u00b2** |\n| $I_{zz}$ (swing, rod \u00e2\u0160\u00a5 Z) | $\\frac{1}{12}mL^2$ | **3333.33 kg\u00c2\u00b7mm\u00c2\u00b2** |\n\nThe pendulum swings in the XY plane (rotation about Z), so $I_{zz,cm} = 3333.33\\ \\text{kg\u00c2\u00b7mm}^2$ is the physically important value. By the parallel-axis theorem the effective inertia about the pivot is:\n\n$$I_{pin} = I_{zz,cm} + m\\left(\\tfrac{L}{2}\\right)^2 = 3333.33 + 1 \\times 100^2 = 13\\,333.33\\ \\text{kg\u00c2\u00b7mm}^2 = \\tfrac{1}{3}mL^2\\ \u00e2\u0153\u201c$$\n\n### Revolute joint\nA revolute joint between `LINK.M_PIN` (I marker, moving part) and `ground.M_PIVOT` (J marker, fixed part) locks all translational DOF and removes two of three rotational DOF, leaving one rotational DOF about the J-marker Z axis (= global Z). The pendulum is therefore free to swing only in the XY plane.\n\n### Initial condition \u00e2\u20ac\u201d 45\u00c2\u00b0 release\n```cmd\npart modify rigid_body name_and_position &\n    part_name   = .PENDULUM.LINK        &\n    orientation = 0.0D, 0.0D, 45.0D\n```\nSetting `phi = 45D` in the Body-313 Euler sequence rotates the part 45\u00c2\u00b0 counter-clockwise about Z. Starting from the down-hanging position the tip moves to approximately (141.4, \u00e2\u02c6\u2019141.4, 0) mm \u00e2\u20ac\u201d 45\u00c2\u00b0 from the vertical. No initial velocity is specified, so the pendulum is released from rest.\n\n### Cylinder geometry orientation\nAdams `geometry create shape cylinder` extends the cylinder along the **local Z axis** of its `center_marker`. Because the rod lies along the part \u00e2\u02c6\u2019Y axis we use a dedicated marker `M_ROD_VIS` with `orientation = 0.0D, 90.0D, 0.0D`. The Body-313 Euler sequence (Z\u00e2\u20ac\u201cX\u00e2\u20ac\u201cZ) with \u00ce\u00b8 = 90\u00c2\u00b0 rotates local Z onto global \u00e2\u02c6\u2019Y, so the cylinder correctly extends from the pin to the tip along the rod.\n\n### Expected simulation behaviour\nSimulating for 2 s at 1 ms step size gives approximately 2\u00e2\u20ac\u201c3 full swings:\n\n| Quantity | Value |\n|----------|-------|\n| Small-angle period $T \\approx 2\\pi\\sqrt{I_{pin}/(mgd)}$ | \u00e2\u2030\u02c6 0.733 s |\n| Corrected period at 45\u00c2\u00b0 amplitude (elliptic integral) | \u00e2\u2030\u02c6 0.759 s |\n| Maximum tip speed (at lowest point, from energy conservation) | \u00e2\u2030\u02c6 538 mm/s |\n\nEnergy conservation check for max tip speed: $v_{tip,max} = \\sqrt{2g \\cdot \\frac{L}{2}(1 - \\cos 45\u00c2\u00b0)} \\cdot \\frac{L}{L/2}$  \nMore precisely: $\\omega_{max} = \\sqrt{2 m g (L/2)(1-\\cos\\alpha)/I_{pin}}$, $v_{tip} = \\omega_{max} \\cdot L$.\n\n---\n\n## CMD Script\n\n```cmd\n! ============================================================\n! Simple Pendulum \u00e2\u20ac\u201d Adams CMD Script\n!\n! A single 200 mm rigid link pinned to ground at the top end,\n! released from 45\u00c2\u00b0 and allowed to swing freely under gravity.\n! Gravity acts in the -Y direction.\n!\n! Model structure:\n!   .PENDULUM\n!   \u00e2\u201d\u0153\u00e2\u201d\u20ac\u00e2\u201d\u20ac ground\n!   \u00e2\u201d\u201a   \u00e2\u201d\u201d\u00e2\u201d\u20ac\u00e2\u201d\u20ac M_PIVOT          (pivot attachment point, at origin)\n!   \u00e2\u201d\u201d\u00e2\u201d\u20ac\u00e2\u201d\u20ac LINK\n!       \u00e2\u201d\u0153\u00e2\u201d\u20ac\u00e2\u201d\u20ac cm               (auto-created; repositioned to midpoint)\n!       \u00e2\u201d\u0153\u00e2\u201d\u20ac\u00e2\u201d\u20ac M_PIN            (upper end \u00e2\u20ac\u201d coincides with M_PIVOT)\n!       \u00e2\u201d\u0153\u00e2\u201d\u20ac\u00e2\u201d\u20ac M_CM             (center of mass, 100 mm below pin)\n!       \u00e2\u201d\u0153\u00e2\u201d\u20ac\u00e2\u201d\u20ac M_TIP            (lower end, 200 mm below pin)\n!       \u00e2\u201d\u201d\u00e2\u201d\u20ac\u00e2\u201d\u20ac M_ROD_VIS        (geometry reference; Z axis \u00e2\u2020\u2019 \u00e2\u02c6\u2019Y direction)\n!\n! Pendulum properties:\n!   Length        L = 200 mm\n!   Mass          m = 1 kg  (uniform rod)\n!   Ixx about CM  = (1/12)*m*L\u00c2\u00b2 = 3333.33 kg\u00c2\u00b7mm\u00c2\u00b2  (bending about X)\n!   Iyy about CM  = 0.0 kg\u00c2\u00b7mm\u00c2\u00b2                     (thin-rod torsion)\n!   Izz about CM  = (1/12)*m*L\u00c2\u00b2 = 3333.33 kg\u00c2\u00b7mm\u00c2\u00b2  (pendulum swing about Z)\n!   Izz about pin = Izz_cm + m*(L/2)\u00c2\u00b2 = 13333.33 kg\u00c2\u00b7mm\u00c2\u00b2\n!                 = (1/3)*m*L\u00c2\u00b2  \u00e2\u0153\u201c\n!   Release angle \u00ce\u00b1 = 45\u00c2\u00b0  (from vertical, no initial velocity)\n!   Period         T \u00e2\u2030\u02c6 2\u00cf\u20ac\u00e2\u02c6\u0161(Izz_pin / (m*g*(L/2)))\n!                    \u00e2\u2030\u02c6 2\u00cf\u20ac\u00e2\u02c6\u0161(13333.33 / (1*9806.65*100))\n!                    \u00e2\u2030\u02c6 0.733 s  (small-angle period; 45\u00c2\u00b0 elongates slightly)\n! ============================================================\n\n\n! --- 1. Model and units ---\n\nmodel create model_name = PENDULUM\n\ndefaults units &\n    length = mm    &\n    force  = newton &\n    mass   = kg    &\n    time   = sec\n\n\n! --- 2. Gravity (-Y direction, g = 9806.65 mm/s\u00c2\u00b2) ---\n\nforces create body_force gravity_field &\n    gravity_field_name  = .PENDULUM.GRAVITY &\n    x_component_gravity = 0.0      &\n    y_component_gravity = -9806.65 &\n    z_component_gravity = 0.0\n\n\n! --- 3. Ground marker at the pivot point ---\n\nmarker create &\n    marker_name = .PENDULUM.ground.M_PIVOT &\n    adams_id    = 1                        &\n    location    = 0.0, 0.0, 0.0           &\n    orientation = 0.0D, 0.0D, 0.0D\n\n\n! --- 4. Create the link part ---\n!     Part origin is placed at the pivot.\n!     In equilibrium the rod hangs straight down (\u00e2\u02c6\u2019Y direction).\n\npart create rigid_body name_and_position &\n    part_name   = .PENDULUM.LINK        &\n    adams_id    = 2                     &\n    location    = 0.0, 0.0, 0.0        &\n    orientation = 0.0D, 0.0D, 0.0D\n\n! Mass properties \u00e2\u20ac\u201d uniform rigid rod, 1 kg, 200 mm long, rod axis along Y:\n!   ixx = (1/12)*m*L\u00c2\u00b2 = 3333.33 kg\u00c2\u00b7mm\u00c2\u00b2   (bending, rod \u00e2\u0160\u00a5 X)\n!   iyy = 0.0 kg\u00c2\u00b7mm\u00c2\u00b2                      (torsion, rod \u00e2\u02c6\u00a5 Y \u00e2\u20ac\u201d thin rod)\n!   izz = (1/12)*m*L\u00c2\u00b2 = 3333.33 kg\u00c2\u00b7mm\u00c2\u00b2   (pendulum swing, rod \u00e2\u0160\u00a5 Z)\npart create rigid_body mass_properties &\n    part_name             = .PENDULUM.LINK &\n    mass                  = 1.0            &\n    center_of_mass_marker = .PENDULUM.LINK.cm &\n    ixx                   = 3333.33        &\n    iyy                   = 0.0            &\n    izz                   = 3333.33        &\n    ixy                   = 0.0            &\n    iyz                   = 0.0            &\n    izx                   = 0.0\n\n\n! --- 5. Markers on the link ---\n\n! Pin marker at the top of the rod (coincident with M_PIVOT at part origin)\nmarker create &\n    marker_name = .PENDULUM.LINK.M_PIN  &\n    adams_id    = 2                     &\n    location    = 0.0,    0.0, 0.0      &\n    orientation = 0.0D, 0.0D, 0.0D\n\n! Center-of-mass marker \u00e2\u20ac\u201d 100 mm below pin along rod (part \u00e2\u02c6\u2019Y)\nmarker create &\n    marker_name = .PENDULUM.LINK.M_CM   &\n    adams_id    = 3                     &\n    location    = 0.0, -100.0, 0.0      &\n    orientation = 0.0D, 0.0D, 0.0D\n\n! Tip marker \u00e2\u20ac\u201d 200 mm below pin (bottom end of rod)\nmarker create &\n    marker_name = .PENDULUM.LINK.M_TIP  &\n    adams_id    = 4                     &\n    location    = 0.0, -200.0, 0.0      &\n    orientation = 0.0D, 0.0D, 0.0D\n\n! Visualization marker for cylinder geometry:\n!   At pin location; orientation 0D, 90D, 0D orients the marker's\n!   local Z axis to point in the part \u00e2\u02c6\u2019Y direction (Body-313 Euler:\n!   90\u00c2\u00b0 rotation about X maps Z \u00e2\u2020\u2019 \u00e2\u02c6\u2019Y).  The cylinder then extends\n!   cleanly along the rod from pin to tip.\nmarker create &\n    marker_name = .PENDULUM.LINK.M_ROD_VIS &\n    adams_id    = 5                        &\n    location    = 0.0, 0.0, 0.0           &\n    orientation = 0.0D, 90.0D, 0.0D\n\n! Reposition the auto-created cm marker from part origin to actual CM\nmarker modify &\n    marker_name = .PENDULUM.LINK.cm &\n    location    = 0.0, -100.0, 0.0\n\n\n! --- 6. Revolute joint at the pivot ---\n!     Allows rotation about the Z-axis of M_PIVOT (= global Z).\n!     I marker is on the moving LINK; J marker is on fixed ground.\n\nconstraint create joint revolute &\n    joint_name    = .PENDULUM.REV_PIVOT        &\n    adams_id      = 1                          &\n    i_marker_name = .PENDULUM.LINK.M_PIN       &\n    j_marker_name = .PENDULUM.ground.M_PIVOT\n\n\n! --- 7. Initial conditions: release from 45\u00c2\u00b0 ---\n!     Rotate the link 45\u00c2\u00b0 about Z (CCW when viewed from +Z).\n!     The rod starts at 45\u00c2\u00b0 from the downward vertical:\n!       tip global position \u00e2\u2030\u02c6 (141.4, \u00e2\u02c6\u2019141.4, 0) mm\n!     Zero initial angular velocity (released from rest).\n\npart modify rigid_body name_and_position &\n    part_name   = .PENDULUM.LINK        &\n    orientation = 0.0D, 0.0D, 45.0D\n\n\n! --- 8. Visualization geometry (purely cosmetic; no effect on dynamics) ---\n\n! Sphere at the tip to represent the pendulum bob (r = 12 mm)\ngeometry create shape sphere &\n    sphere_name   = .PENDULUM.LINK.SPHERE_BOB &\n    adams_id      = 1                         &\n    part_name     = .PENDULUM.LINK            &\n    center_marker = .PENDULUM.LINK.M_TIP      &\n    radius        = 12.0\n\n! Cylinder for the rod body; extends 200 mm along M_ROD_VIS local Z (= part \u00e2\u02c6\u2019Y)\ngeometry create shape cylinder                   &\n    cylinder_name            = .PENDULUM.LINK.CYL_ROD &\n    adams_id                 = 2                      &\n    part_name                = .PENDULUM.LINK         &\n    center_marker            = .PENDULUM.LINK.M_ROD_VIS &\n    length                   = 200.0                  &\n    radius                   = 4.0                    &\n    angle_extent             = 360.0D                 &\n    side_count_for_perimeter = 16\n\n\n! ============================================================\n! To simulate (2 s, 1 ms steps \u00e2\u20ac\u201d gives ~3 full swings):\n!\n!   simulate transient end_time = 2.0 step_size = 0.001\n!\n! Expected behaviour:\n!   - Pendulum released from 45\u00c2\u00b0 from vertical with zero velocity.\n!   - Swings freely under gravity; no damping \u00e2\u20ac\u201d energy is conserved.\n!   - Small-angle period T \u00e2\u2030\u02c6 0.733 s; 45\u00c2\u00b0 amplitude period slightly\n!     longer (~0.759 s by elliptic integral).\n!   - Maximum tip speed occurs at the lowest point (\u00ce\u00b8 = 0).\n! ============================================================\n```\n\n---\n\n## How to Load and Run\n\n1. Open **Adams View**.\n2. Go to **File \u00e2\u2020\u2019 Import \u00e2\u2020\u2019 Adams View Command File** (`.cmd`).\n3. Select `pendulum.cmd`.\n4. In the **Simulate** panel set **End Time = 2.0 s**, **Step Size = 0.001 s**, then click **Start**.\n\nAlternatively, paste the simulation command directly into the Adams View command line after loading the model:\n\n```cmd\nsimulate transient end_time = 2.0 step_size = 0.001\n```\n\n---\n\n## Verification Checklist\n\n| Check | Expected |\n|-------|----------|\n| DOF count | 1 (revolute removes 5 from 6, ground and gravity add none) |\n| Initial angle | 45\u00c2\u00b0 \u00e2\u20ac\u201d tip at \u00e2\u2030\u02c6 (141.4, \u00e2\u02c6\u2019141.4, 0) mm |\n| CM location | (0, \u00e2\u02c6\u2019100, 0) mm in part frame |\n| Gravity direction | \u00e2\u02c6\u2019Y |\n| Period (animation) | \u00e2\u2030\u02c6 0.73\u00e2\u20ac\u201c0.76 s |\n| Energy (no damping) | Total mechanical energy conserved throughout |\n"}], "eval-0-without_skill": [{"name": "pendulum.cmd", "type": "binary", "mime": "application/octet-stream", "data_uri": "data:application/octet-stream;base64,ISA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KISBTaW1wbGUgUGVuZHVsdW0gTW9kZWwg4oCUIEFkYW1zL1ZpZXcgQ29tbWFuZCBGaWxlDQohDQohIE1vZGVsIHByb3BlcnRpZXM6DQohICAgTGluayBsZW5ndGggIDogMjAwIG1tICh1bmlmb3JtIHNsZW5kZXIgcm9kKQ0KISAgIExpbmsgbWFzcyAgICA6IDEga2cNCiEgICBQaXZvdCBwb2ludCAgOiBHbG9iYWwgb3JpZ2luICgwLCAwLCAwKSDigJQgcGlubmVkIHRvIGdyb3VuZA0KISAgIEpvaW50IHR5cGUgICA6IFJldm9sdXRlIChyb3RhdGlvbiBhYm91dCBnbG9iYWwgWi1heGlzKQ0KISAgIEdyYXZpdHkgICAgICA6IOKIklkgZGlyZWN0aW9uLCA5ODA2LjY1IG1tL3PCsg0KISAgIEluaXRpYWwgYW5nbGU6IDQ1wrAgZnJvbSB2ZXJ0aWNhbCAo4oiSWSBheGlzKSwgdGlsdGVkIHRvd2FyZCArWA0KIQ0KISBVbml0czogbW0sIGtnLCBOLCBzLCBkZWcNCiENCiEgSW5pdGlhbCBnbG9iYWwgcG9zaXRpb25zIGF0IDQ1wrAgcmVsZWFzZSBhbmdsZToNCiEgICBQaXZvdCBlbmQgKHRvcCkgOiAoICAwLjAwMCwgICAwLjAwMCwgMCkNCiEgICBDZW50cmUgb2YgbWFzcyAgOiAoIDcwLjcxMSwgLTcwLjcxMSwgMCkNCiEgICBGcmVlIGVuZCAoYm90KSAgOiAoMTQxLjQyMSwgLTE0MS40MjEsIDApDQohID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQoNCg0KISAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KISAxLiBDcmVhdGUgbW9kZWwgYW5kIHNldCB3b3JraW5nIHVuaXRzDQohIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQptb2RlbCBjcmVhdGUgICYNCiAgIG1vZGVsX25hbWUgPSBzaW1wbGVfcGVuZHVsdW0NCg0KZGVmYXVsdHMgdW5pdHMgICYNCiAgIGxlbmd0aCA9IG1tICAmDQogICBhbmdsZSA9IGRlZyAgJg0KICAgZm9yY2UgPSBuZXd0b24gICYNCiAgIG1hc3MgPSBrZyAgJg0KICAgdGltZSA9IHNlYw0KDQoNCiEgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiEgMi4gR3Jhdml0eSAgKDk4MDYuNjUgbW0vc8KyIGluIHRoZSDiiJJZIGRpcmVjdGlvbikNCiEgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCmZvcmNlIGNyZWF0ZSBib2R5IGdyYXZpdGF0aW9uYWwgICYNCiAgIG1vZGVsX25hbWUgPSAuc2ltcGxlX3BlbmR1bHVtICAmDQogICB4X2NvbXBvbmVudF9ncmF2aXR5ID0gMC4wICAmDQogICB5X2NvbXBvbmVudF9ncmF2aXR5ID0gLTk4MDYuNjUgICYNCiAgIHpfY29tcG9uZW50X2dyYXZpdHkgPSAwLjANCg0KDQohIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQohIDMuIFBlbmR1bHVtIGxpbmsgcGFydA0KIQ0KISAgICBUaGUgQ00gaXMgcGxhY2VkIGF0IHRoZSA0NcKwIGluaXRpYWwgcG9zaXRpb246DQohICAgICAgeCA9IChMLzIpwrdzaW4oNDXCsCkgPSAgNzAuNzExIG1tDQohICAgICAgeSA9IChMLzIpwrdjb3MoNDXCsCkgPSDiiJI3MC43MTEgbW0gIChiZWxvdyBwaXZvdCkNCiENCiEgICAgT3JpZW50YXRpb246IGJvZHkgWC1heGlzIHBvaW50cyBhbG9uZyB0aGUgbGluaw0KISAgICAoZnJvbSBwaXZvdCB0b3dhcmQgZnJlZSBlbmQpLg0KISAgICBBIHJvdGF0aW9uIG9mIOKIkjQ1wrAgYWJvdXQgdGhlIGdsb2JhbCBaLWF4aXMgbWFwcyBnbG9iYWwgWA0KISAgICBvbnRvIHRoZSBkaXJlY3Rpb24gKHNpbiA0NcKwLCDiiJJjb3MgNDXCsCwgMCkgPSBsaW5rIGRpcmVjdGlvbg0KISAgICBhdCA0NcKwIGZyb20g4oiSWSB2ZXJ0aWNhbC4NCiEgICAg4oaSIEJvZHkgMy0xLTMgRXVsZXIgYW5nbGVzOiAocHNpID0g4oiSNDXCsCwgdGhldGEgPSAwwrAsIHBoaSA9IDDCsCkNCiEgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCnBhcnQgY3JlYXRlIHJpZ2lkX2JvZHkgbmFtZV9hbmRfcG9zaXRpb24gICYNCiAgIHBhcnRfbmFtZSA9IC5zaW1wbGVfcGVuZHVsdW0ubGluayAgJg0KICAgbG9jYXRpb24gPSA3MC43MTEsIC03MC43MTEsIDAuMCAgJg0KICAgb3JpZW50YXRpb24gPSAtNDUuMCwgMC4wLCAwLjANCg0KISBJbmVydGlhIG9mIGEgdW5pZm9ybSBzbGVuZGVyIHJvZCBhYm91dCBpdHMgQ00gKEwgPSAyMDAgbW0sIG0gPSAxIGtnKToNCiEgICBJeHggIChhbG9uZyByb2Qg4oCUIGJvZHkgWC1heGlzKSAgICDiiYggMCAg4oaSICBzZXQgdG8gMS4wIGtnwrdtbcKyIHRvDQohICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBhdm9pZCBhIHplcm8taW5lcnRpYSB3YXJuaW5nDQohICAgSXl5ID0gSXp6IChwZXJwZW5kaWN1bGFyIHRvIHJvZCkgID0gKDEvMTIpwrdtwrdMwrINCiEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPSAoMS8xMinCtzHCtzIwMMKyDQohICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID0gMzMzMy4zMyBrZ8K3bW3Csg0KIQ0KISBUaGUgcGVuZHVsdW0gcm90YXRlcyBhYm91dCB0aGUgZ2xvYmFsL2JvZHkgWi1heGlzLCBzbyBJenogZ292ZXJucw0KISB0aGUgZHluYW1pY3MuICBQYXJhbGxlbC1heGlzIGNoZWNrOiBJenpfcGl2b3QgPSBJenpfY20gKyBtwrdkwrINCiEgICA9IDMzMzMuMzMgKyAxwrcxMDDCsiA9IDEzIDMzMy4zMyBrZ8K3bW3CsiAgPSAgKDEvMynCt23Ct0zCsiAg4pyTDQpwYXJ0IG1vZGlmeSByaWdpZF9ib2R5IG1hc3NfcHJvcGVydGllcyAgJg0KICAgcGFydF9uYW1lID0gLnNpbXBsZV9wZW5kdWx1bS5saW5rICAmDQogICBtYXNzID0gMS4wICAmDQogICBjZW50ZXJfb2ZfbWFzc19tYXJrZXIgPSAuc2ltcGxlX3BlbmR1bHVtLmxpbmsuY20gICYNCiAgIGl4eCA9IDEuMCAgJg0KICAgaXl5ID0gMzMzMy4zMzMgICYNCiAgIGl6eiA9IDMzMzMuMzMzICAmDQogICBpeHkgPSAwLjAgICYNCiAgIGl6eCA9IDAuMCAgJg0KICAgaXl6ID0gMC4wDQoNCg0KISAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KISA0LiBNYXJrZXJzDQohICAgIEFsbCBsb2NhdGlvbnMgYXJlIGdpdmVuIGluIGdsb2JhbCAoZ3JvdW5kKSBjb29yZGluYXRlcw0KISAgICBhdCB0aGUgNDXCsCBpbml0aWFsIGNvbmZpZ3VyYXRpb24uDQohIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQoNCiEgSS1tYXJrZXIgb24gdGhlIGxpbmsgYXQgdGhlIHBpdm90IGVuZCDigJQgYWxzbyB1c2VkIGZvciB0aGUgam9pbnQNCm1hcmtlciBjcmVhdGUgICYNCiAgIG1hcmtlcl9uYW1lID0gLnNpbXBsZV9wZW5kdWx1bS5saW5rLnBpdm90X0kgICYNCiAgIHBhcnRfbmFtZSA9IC5zaW1wbGVfcGVuZHVsdW0ubGluayAgJg0KICAgbG9jYXRpb24gPSAwLjAsIDAuMCwgMC4wICAmDQogICBvcmllbnRhdGlvbiA9IDAuMCwgMC4wLCAwLjANCg0KISBNYXJrZXIgb24gdGhlIGxpbmsgYXQgdGhlIGZyZWUgKGJvdHRvbSkgZW5kIOKAlCBmb3IgZ2VvbWV0cnkNCm1hcmtlciBjcmVhdGUgICYNCiAgIG1hcmtlcl9uYW1lID0gLnNpbXBsZV9wZW5kdWx1bS5saW5rLmZyZWVfZW5kICAmDQogICBwYXJ0X25hbWUgPSAuc2ltcGxlX3BlbmR1bHVtLmxpbmsgICYNCiAgIGxvY2F0aW9uID0gMTQxLjQyMSwgLTE0MS40MjEsIDAuMCAgJg0KICAgb3JpZW50YXRpb24gPSAwLjAsIDAuMCwgMC4wDQoNCiEgSi1tYXJrZXIgb24gZ3JvdW5kIGF0IHRoZSBwaXZvdCBwb2ludA0KbWFya2VyIGNyZWF0ZSAgJg0KICAgbWFya2VyX25hbWUgPSAuc2ltcGxlX3BlbmR1bHVtLmdyb3VuZC5waXZvdF9KICAmDQogICBwYXJ0X25hbWUgPSAuc2ltcGxlX3BlbmR1bHVtLmdyb3VuZCAgJg0KICAgbG9jYXRpb24gPSAwLjAsIDAuMCwgMC4wICAmDQogICBvcmllbnRhdGlvbiA9IDAuMCwgMC4wLCAwLjANCg0KDQohIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQohIDUuIExpbmsgZ2VvbWV0cnkgIChyZWN0YW5ndWxhciBjcm9zcy1zZWN0aW9uOiAxMCBtbSDDlyAxMCBtbSkNCiEgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCmdlb21ldHJ5IGNyZWF0ZSBzaGFwZSBsaW5rICAmDQogICBwYXJ0X25hbWUgPSAuc2ltcGxlX3BlbmR1bHVtLmxpbmsgICYNCiAgIGxpbmtfbmFtZSA9IC5zaW1wbGVfcGVuZHVsdW0ubGluay5nZW9tICAmDQogICBpX21hcmtlcl9uYW1lID0gLnNpbXBsZV9wZW5kdWx1bS5saW5rLnBpdm90X0kgICYNCiAgIGpfbWFya2VyX25hbWUgPSAuc2ltcGxlX3BlbmR1bHVtLmxpbmsuZnJlZV9lbmQgICYNCiAgIHdpZHRoID0gMTAuMCAgJg0KICAgZGVwdGggPSAxMC4wDQoNCg0KISAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KISA2LiBSZXZvbHV0ZSBqb2ludA0KISAgICBDb25zdHJhaW5zIHRoZSBsaW5rIHRvIHJvdGF0ZSBhYm91dCB0aGUgZ2xvYmFsIFotYXhpcyBhdA0KISAgICB0aGUgcGl2b3QgcG9pbnQuICBCb3RoIG1hcmtlcnMgaGF2ZSBaIGFsaWduZWQgd2l0aCBnbG9iYWwgWg0KISAgICBzbyB0aGUgam9pbnQgYXhpcyBpcyBjb3JyZWN0bHkgZGVmaW5lZC4NCiEgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCmNvbnN0cmFpbnQgY3JlYXRlIGpvaW50IHJldm9sdXRlICAmDQogICBqb2ludF9uYW1lID0gLnNpbXBsZV9wZW5kdWx1bS5yZXZfam9pbnQgICYNCiAgIGlfbWFya2VyX25hbWUgPSAuc2ltcGxlX3BlbmR1bHVtLmxpbmsucGl2b3RfSSAgJg0KICAgal9tYXJrZXJfbmFtZSA9IC5zaW1wbGVfcGVuZHVsdW0uZ3JvdW5kLnBpdm90X0oNCg0KDQohIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQohIDcuIFRyYW5zaWVudCBzaW11bGF0aW9uICAoNSBzLCA1MDAgb3V0cHV0IHN0ZXBzKQ0KISAgICBSZW1vdmUgb3IgY29tbWVudCB0aGlzIGJsb2NrIHRvIGJ1aWxkIHRoZSBtb2RlbCBvbmx5Lg0KISAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0Kc2ltdWxhdGlvbiBzaW5nbGVfcnVuIHRyYW5zaWVudCAgJg0KICAgc2ltX25hbWUgPSAuc2ltcGxlX3BlbmR1bHVtLmxhc3RfcnVuICAmDQogICB0aW1lX2R1cmF0aW9uID0gNS4wICAmDQogICBudW1iZXJfb2Zfc3RlcHMgPSA1MDAgICYNCiAgIG1vZGVsX25hbWUgPSAuc2ltcGxlX3BlbmR1bHVtDQo="}, {"name": "response.md", "type": "text", "content": "# Simple Pendulum \u00e2\u20ac\u201d Adams CMD Script\n\n## Model Description\n\nA single rigid link of length 200 mm and mass 1 kg, pinned to the ground at its top end by a revolute joint. Gravity acts in the \u00e2\u02c6\u2019Y direction. The pendulum is released from rest at 45\u00c2\u00b0 from the vertical.\n\n---\n\n## Coordinate System and Setup\n\n| Quantity | Value |\n|---|---|\n| Length | mm |\n| Mass | kg |\n| Force | Newton |\n| Time | s |\n| Angle | deg |\n| Gravity | \u00e2\u02c6\u2019Y, 9806.65 mm/s\u00c2\u00b2 |\n\nThe pivot is fixed at the **global origin (0, 0, 0)**. The pendulum swings in the global XY-plane and rotates about the global Z-axis.\n\n---\n\n## Initial Configuration (45\u00c2\u00b0 from Vertical)\n\nAt release the link is tilted 45\u00c2\u00b0 from the downward vertical (\u00e2\u02c6\u2019Y axis) toward +X:\n\n| Point | Global position (mm) |\n|---|---|\n| Pivot end (top) | (0.000, 0.000, 0) |\n| Centre of mass | (70.711, \u00e2\u02c6\u201970.711, 0) |\n| Free end (bottom) | (141.421, \u00e2\u02c6\u2019141.421, 0) |\n\nThe CM coordinates are derived from:\n\n$$x_{cm} = \\frac{L}{2}\\sin(45\u00c2\u00b0) = 100 \\times 0.7071 = 70.711 \\text{ mm}$$\n\n$$y_{cm} = -\\frac{L}{2}\\cos(45\u00c2\u00b0) = -100 \\times 0.7071 = -70.711 \\text{ mm}$$\n\n---\n\n## Part Properties\n\n### Mass and Geometry\n\n- **Mass:** 1 kg, uniformly distributed\n- **Length:** 200 mm\n- **Visualisation:** rectangular cross-section, 10 mm \u00c3\u2014 10 mm\n\n### Moments of Inertia (about the CM, in the body frame)\n\nThe body X-axis is defined along the rod (from pivot toward free end). For a uniform slender rod of length $L = 200\\text{ mm}$, mass $m = 1\\text{ kg}$:\n\n| Component | Axis | Formula | Value |\n|---|---|---|---|\n| $I_{xx}$ | Along rod | \u00e2\u2030\u02c6 0 | 1.0 kg\u00c2\u00b7mm\u00c2\u00b2 *(nominal)* |\n| $I_{yy}$ | \u00e2\u0160\u00a5 to rod | $\\frac{1}{12}mL^2$ | 3333.33 kg\u00c2\u00b7mm\u00c2\u00b2 |\n| $I_{zz}$ | \u00e2\u0160\u00a5 to rod | $\\frac{1}{12}mL^2$ | 3333.33 kg\u00c2\u00b7mm\u00c2\u00b2 |\n\n$I_{zz}$ (body Z = global Z = rotation axis) is the governing inertia for pendulum dynamics. The parallel-axis theorem confirms the moment of inertia about the pivot:\n\n$$I_\\text{pivot} = I_{zz,cm} + m \\cdot d^2 = 3333.33 + 1 \\times 100^2 = 13{,}333.33 \\text{ kg\u00c2\u00b7mm}^2 = \\frac{1}{3}mL^2 \\checkmark$$\n\n---\n\n## Part Orientation\n\nThe part is created with its body frame **rotated \u00e2\u02c6\u201945\u00c2\u00b0 about the global Z-axis** (Body 3-1-3 Euler angles: `\u00e2\u02c6\u201945, 0, 0`). This maps the body X-axis onto the direction $(\\sin 45\u00c2\u00b0,\\ -\\cos 45\u00c2\u00b0,\\ 0)$, i.e., along the link at the 45\u00c2\u00b0 starting angle.\n\n---\n\n## Joint and Constraints\n\nA **revolute joint** (`rev_joint`) connects the pivot marker on the link to a ground-fixed marker at the origin. Both markers have their Z-axes aligned with the global Z-axis, so the joint allows rotation about Z only \u00e2\u20ac\u201d exactly the single degree of freedom required.\n\n---\n\n## Validation: Small-Oscillation Period\n\nFor a uniform rod pendulum the linearised period is:\n\n$$T = 2\\pi\\sqrt{\\frac{I_\\text{pivot}}{mgd}} = 2\\pi\\sqrt{\\frac{13{,}333.33}{1 \\times 9806.65 \\times 100}} = 2\\pi\\sqrt{0.01360} \\approx 0.733 \\text{ s}$$\n\nAt the relatively large 45\u00c2\u00b0 release angle a small correction applies; the true period will be slightly longer (~2.5% by the elliptic-integral approximation), so expect a swing period of approximately **0.75 s**.\n\n---\n\n## Adams CMD Script\n\n```cmd\n! ==============================================================\n! Simple Pendulum Model \u00e2\u20ac\u201d Adams/View Command File\n!\n! Model properties:\n!   Link length  : 200 mm (uniform slender rod)\n!   Link mass    : 1 kg\n!   Pivot point  : Global origin (0, 0, 0) \u00e2\u20ac\u201d pinned to ground\n!   Joint type   : Revolute (rotation about global Z-axis)\n!   Gravity      : \u00e2\u02c6\u2019Y direction, 9806.65 mm/s\u00c2\u00b2\n!   Initial angle: 45\u00c2\u00b0 from vertical (\u00e2\u02c6\u2019Y axis), tilted toward +X\n!\n! Units: mm, kg, N, s, deg\n!\n! Initial global positions at 45\u00c2\u00b0 release angle:\n!   Pivot end (top) : (  0.000,   0.000, 0)\n!   Centre of mass  : ( 70.711, -70.711, 0)\n!   Free end (bot)  : (141.421, -141.421, 0)\n! ==============================================================\n\n\n! --------------------------------------------------------------\n! 1. Create model and set working units\n! --------------------------------------------------------------\nmodel create  &\n   model_name = simple_pendulum\n\ndefaults units  &\n   length = mm  &\n   angle = deg  &\n   force = newton  &\n   mass = kg  &\n   time = sec\n\n\n! --------------------------------------------------------------\n! 2. Gravity  (9806.65 mm/s\u00c2\u00b2 in the \u00e2\u02c6\u2019Y direction)\n! --------------------------------------------------------------\nforce create body gravitational  &\n   model_name = .simple_pendulum  &\n   x_component_gravity = 0.0  &\n   y_component_gravity = -9806.65  &\n   z_component_gravity = 0.0\n\n\n! --------------------------------------------------------------\n! 3. Pendulum link part\n!\n!    The CM is placed at the 45\u00c2\u00b0 initial position:\n!      x = (L/2)\u00c2\u00b7sin(45\u00c2\u00b0) =  70.711 mm\n!      y = (L/2)\u00c2\u00b7cos(45\u00c2\u00b0) = \u00e2\u02c6\u201970.711 mm  (below pivot)\n!\n!    Orientation: body X-axis points along the link\n!    (from pivot toward free end).\n!    A rotation of \u00e2\u02c6\u201945\u00c2\u00b0 about the global Z-axis maps global X\n!    onto the direction (sin 45\u00c2\u00b0, \u00e2\u02c6\u2019cos 45\u00c2\u00b0, 0) = link direction\n!    at 45\u00c2\u00b0 from \u00e2\u02c6\u2019Y vertical.\n!    \u00e2\u2020\u2019 Body 3-1-3 Euler angles: (psi = \u00e2\u02c6\u201945\u00c2\u00b0, theta = 0\u00c2\u00b0, phi = 0\u00c2\u00b0)\n! --------------------------------------------------------------\npart create rigid_body name_and_position  &\n   part_name = .simple_pendulum.link  &\n   location = 70.711, -70.711, 0.0  &\n   orientation = -45.0, 0.0, 0.0\n\n! Inertia of a uniform slender rod about its CM (L = 200 mm, m = 1 kg):\n!   Ixx  (along rod \u00e2\u20ac\u201d body X-axis)    \u00e2\u2030\u02c6 0  \u00e2\u2020\u2019  set to 1.0 kg\u00c2\u00b7mm\u00c2\u00b2\n!   Iyy = Izz (perpendicular to rod)  = (1/12)\u00c2\u00b7m\u00c2\u00b7L\u00c2\u00b2\n!                                     = (1/12)\u00c2\u00b71\u00c2\u00b7200\u00c2\u00b2\n!                                     = 3333.33 kg\u00c2\u00b7mm\u00c2\u00b2\npart modify rigid_body mass_properties  &\n   part_name = .simple_pendulum.link  &\n   mass = 1.0  &\n   center_of_mass_marker = .simple_pendulum.link.cm  &\n   ixx = 1.0  &\n   iyy = 3333.333  &\n   izz = 3333.333  &\n   ixy = 0.0  &\n   izx = 0.0  &\n   iyz = 0.0\n\n\n! --------------------------------------------------------------\n! 4. Markers\n!    All locations are given in global (ground) coordinates\n!    at the 45\u00c2\u00b0 initial configuration.\n! --------------------------------------------------------------\n\n! I-marker on the link at the pivot end \u00e2\u20ac\u201d also used for the joint\nmarker create  &\n   marker_name = .simple_pendulum.link.pivot_I  &\n   part_name = .simple_pendulum.link  &\n   location = 0.0, 0.0, 0.0  &\n   orientation = 0.0, 0.0, 0.0\n\n! Marker on the link at the free (bottom) end \u00e2\u20ac\u201d for geometry\nmarker create  &\n   marker_name = .simple_pendulum.link.free_end  &\n   part_name = .simple_pendulum.link  &\n   location = 141.421, -141.421, 0.0  &\n   orientation = 0.0, 0.0, 0.0\n\n! J-marker on ground at the pivot point\nmarker create  &\n   marker_name = .simple_pendulum.ground.pivot_J  &\n   part_name = .simple_pendulum.ground  &\n   location = 0.0, 0.0, 0.0  &\n   orientation = 0.0, 0.0, 0.0\n\n\n! --------------------------------------------------------------\n! 5. Link geometry  (rectangular cross-section: 10 mm \u00c3\u2014 10 mm)\n! --------------------------------------------------------------\ngeometry create shape link  &\n   part_name = .simple_pendulum.link  &\n   link_name = .simple_pendulum.link.geom  &\n   i_marker_name = .simple_pendulum.link.pivot_I  &\n   j_marker_name = .simple_pendulum.link.free_end  &\n   width = 10.0  &\n   depth = 10.0\n\n\n! --------------------------------------------------------------\n! 6. Revolute joint\n! --------------------------------------------------------------\nconstraint create joint revolute  &\n   joint_name = .simple_pendulum.rev_joint  &\n   i_marker_name = .simple_pendulum.link.pivot_I  &\n   j_marker_name = .simple_pendulum.ground.pivot_J\n\n\n! --------------------------------------------------------------\n! 7. Transient simulation  (5 s, 500 output steps)\n! --------------------------------------------------------------\nsimulation single_run transient  &\n   sim_name = .simple_pendulum.last_run  &\n   time_duration = 5.0  &\n   number_of_steps = 500  &\n   model_name = .simple_pendulum\n```\n\n---\n\n## How to Import into Adams/View\n\n1. Open Adams/View.\n2. **File \u00e2\u2020\u2019 Import \u00e2\u2020\u2019 Adams/View Command File\u00e2\u20ac\u00a6**\n3. Select `pendulum.cmd`.\n4. Adams will create the `simple_pendulum` model, build the geometry, apply the joint and gravity, and \u00e2\u20ac\u201d if the simulation block is present \u00e2\u20ac\u201d run a 5-second transient analysis automatically.\n\nTo run interactively instead, remove or comment out the `simulation single_run transient` block and use **Simulate \u00e2\u2020\u2019 Interactive Simulation**.\n\n---\n\n## Design Decisions and Assumptions\n\n| Decision | Rationale |\n|---|---|\n| 45\u00c2\u00b0 initial condition set by part position | Placing the CM and markers at their 45\u00c2\u00b0 global positions is the most portable approach across Adams versions, requiring no joint IC syntax. |\n| Body X-axis along the link | Keeps the inertia tensor diagonal with Ixx along the (physically small) rod axis, making mass properties intuitive. |\n| $I_{xx} = 1.0$ not 0 | Adams will warn or error on a zero principal inertia; 1.0 kg\u00c2\u00b7mm\u00c2\u00b2 is negligible relative to 3333 kg\u00c2\u00b7mm\u00c2\u00b2 and has no practical effect on the dynamics. |\n| Marker orientations = (0, 0, 0) | Both joint markers have Z aligned with global Z, so the revolute joint correctly constrains rotation about the global Z-axis. |\n| `geometry create shape link` | Creates a built-in Adams \"link\" primitive between the two end markers; visible in the Adams/View viewport without needing a separate part geometry. |\n| Gravity = 9806.65 mm/s\u00c2\u00b2 | $g = 9.80665\\ \\text{m/s}^2$ converted to mm/s\u00c2\u00b2 for the mm\u00e2\u20ac\u201ckg\u00e2\u20ac\u201cN\u00e2\u20ac\u201cs unit system. |\n"}], "eval-1-with_skill": [{"name": "response.md", "type": "text", "content": "# Creating a Spring-Damper Force Between Two Parts in Adams CMD\n\nA spring-damper force in Adams CMD connects two markers \u00e2\u20ac\u201d one on each part \u00e2\u20ac\u201d along their line of action. You use the `force create element_like spring_damper` command and supply the stiffness, damping, and free length directly as scalar parameters.\n\n---\n\n## How It Works\n\nAdams calculates the spring-damper force as:\n\n$$F = -K \\cdot (L - L_0) - C \\cdot \\dot{L}$$\n\nWhere:\n- $K$ = stiffness (N/mm)\n- $C$ = damping coefficient (N\u00c2\u00b7s/mm)\n- $L$ = current distance between the two markers\n- $L_0$ = free (natural) length\n- Positive force = compression\n\nThe force acts along the line joining the I and J markers.\n\n---\n\n## Step-by-Step CMD Script\n\nThe script below shows the complete build sequence: model \u00e2\u2020\u2019 parts \u00e2\u2020\u2019 markers \u00e2\u2020\u2019 spring-damper force. Units are mm, N, kg, s throughout.\n\n```cmd\n! ============================================================\n! Spring-Damper Force Example\n! K = 5000 N/mm, C = 100 N.s/mm, Free Length = 250 mm\n! ============================================================\n\n! 1. Create the model and set units\nmodel create model_name = SPRING_MODEL\n\ndefaults units &\n    length = mm &\n    force  = newton &\n    mass   = kg &\n    time   = sec\n\n! 2. Gravity (optional \u00e2\u20ac\u201d include if dynamics simulation)\nforces create body_force gravity_field &\n    gravity_field_name  = .SPRING_MODEL.GRAVITY &\n    x_component_gravity = 0.0 &\n    y_component_gravity = -9806.65 &\n    z_component_gravity = 0.0\n\n! ============================================================\n! 3. Create the two parts\n! ============================================================\n\n! Part A \u00e2\u20ac\u201d fixed base (or upper mounting body)\npart create rigid_body name_and_position &\n    part_name   = .SPRING_MODEL.PART_A &\n    adams_id    = 2 &\n    location    = 0.0, 0.0, 0.0 &\n    orientation = 0.0D, 0.0D, 0.0D\n\npart create rigid_body mass_properties &\n    part_name              = .SPRING_MODEL.PART_A &\n    mass                   = 5.0 &\n    center_of_mass_marker  = .SPRING_MODEL.PART_A.cm &\n    ixx = 1000.0 &\n    iyy = 1000.0 &\n    izz = 1000.0\n\n! Part B \u00e2\u20ac\u201d the moving body (e.g., suspended mass below PART_A)\npart create rigid_body name_and_position &\n    part_name   = .SPRING_MODEL.PART_B &\n    adams_id    = 3 &\n    location    = 0.0, -250.0, 0.0 &  ! 250 mm below PART_A at free length\n    orientation = 0.0D, 0.0D, 0.0D\n\npart create rigid_body mass_properties &\n    part_name              = .SPRING_MODEL.PART_B &\n    mass                   = 10.0 &\n    center_of_mass_marker  = .SPRING_MODEL.PART_B.cm &\n    ixx = 2000.0 &\n    iyy = 2000.0 &\n    izz = 2000.0\n\n! ============================================================\n! 4. Create the spring attachment markers\n!    I-marker on PART_A, J-marker on PART_B.\n!    Place them so that the initial distance equals the free length (250 mm).\n! ============================================================\n\nmarker create &\n    marker_name = .SPRING_MODEL.PART_A.M_SPR_I &\n    location    = 0.0, 0.0, 0.0 &\n    orientation = 0.0D, 0.0D, 0.0D\n\nmarker create &\n    marker_name = .SPRING_MODEL.PART_B.M_SPR_J &\n    location    = 0.0, -250.0, 0.0 &\n    orientation = 0.0D, 0.0D, 0.0D\n\n! ============================================================\n! 5. Create the spring-damper force\n! ============================================================\n\nforce create element_like spring_damper &\n    spring_damper_name = .SPRING_MODEL.SPR_MAIN &\n    adams_id           = 1 &\n    i_marker_name      = .SPRING_MODEL.PART_A.M_SPR_I &\n    j_marker_name      = .SPRING_MODEL.PART_B.M_SPR_J &\n    stiffness          = 5000.0 &\n    damping            = 100.0 &\n    length             = 250.0\n```\n\n---\n\n## Key Parameters Explained\n\n| Parameter | Value | Meaning |\n|-----------|-------|---------|\n| `stiffness` | `5000.0` | Spring rate \u00e2\u20ac\u201d 5000 N per mm of deformation |\n| `damping` | `100.0` | Damping coefficient \u00e2\u20ac\u201d 100 N\u00c2\u00b7s/mm of velocity |\n| `length` | `250.0` | Free (natural) length \u00e2\u20ac\u201d no force when the markers are 250 mm apart |\n| `i_marker_name` | On PART_A | The \"action\" attachment point |\n| `j_marker_name` | On PART_B | The \"reaction\" attachment point |\n\n---\n\n## Important Notes\n\n1. **Marker placement matters**: The initial distance between `M_SPR_I` and `M_SPR_J` determines the initial deformation. In the script above, both markers are 250 mm apart, matching the free length, so the initial spring force is zero.\n\n2. **Units must be consistent**: With `length = mm` and `force = newton`, stiffness is in N/mm, damping in N\u00c2\u00b7s/mm, and length in mm. Do not mix MKS values into an mm model.\n\n3. **The spring force is always along the line joining the two markers** \u00e2\u20ac\u201d the marker orientation does not affect the force direction for `spring_damper`.\n\n4. **Pre-loaded spring**: If you want the spring to start with a preload, offset the initial marker distance from the free length. For example, placing `M_SPR_J` at `y = -300.0` (50 mm compression at start) would produce an initial force of $5000 \\times 50 = 250{,}000$ N.\n\n5. **Build order**: Always create markers before the force that references them. The order in the script above follows: model \u00e2\u2020\u2019 parts \u00e2\u2020\u2019 markers \u00e2\u2020\u2019 forces.\n\n---\n\n## Verifying in Adams View\n\nAfter running the script, you can verify the spring in Adams View:\n\n- In the **Model Browser**, the spring appears under **Forces \u00e2\u2020\u2019 Spring-Dampers**.\n- Right-click `SPR_MAIN` \u00e2\u2020\u2019 **Modify** to inspect or update K, C, and free length.\n- Add a **Result Set** for `Element_Force` on `SPR_MAIN` to plot force vs. time after simulation.\n"}], "eval-1-without_skill": [{"name": "response.md", "type": "text", "content": "# Creating a Spring-Damper Force Between Two Parts in Adams CMD\n\n## Overview\n\nA translational spring-damper (TSDA \u00e2\u20ac\u201d Translational Spring Damper Actuator) connects two markers, one on each part. Adams computes the spring and damping forces along the line joining those two markers.\n\n**Given parameters:**\n- Stiffness: 5000 N/mm\n- Damping: 100 N\u00c2\u00b7s/mm\n- Free length: 250 mm\n\n---\n\n## Prerequisites\n\nYou need one marker on each part at the desired attachment points. If they do not already exist, create them first.\n\n### 1. Create Attachment Markers\n\n```cmd\n! Marker on Part 1 (e.g. at position 0, 0, 0 on Part 1)\nmarker create &\n    marker_name = .MODEL.PART_1.SPRING_MAR_I &\n    adams_id = 101 &\n    location = 0.0, 0.0, 0.0 &\n    orientation = 0.0, 0.0, 0.0\n\n! Marker on Part 2 (e.g. at position 0, 0, 250 on Part 2 \u00e2\u20ac\u201d 250 mm away)\nmarker create &\n    marker_name = .MODEL.PART_2.SPRING_MAR_J &\n    adams_id = 102 &\n    location = 0.0, 0.0, 250.0 &\n    orientation = 0.0, 0.0, 0.0\n```\n\n> **Note:** Replace `.MODEL`, `PART_1`, and `PART_2` with your actual model and part names. If your parts already have suitable markers, skip this step and reference those markers instead.\n\n---\n\n## 2. Create the Spring-Damper Force Element\n\nUse `force create element spring_damper_bushing` to create the translational spring-damper:\n\n```cmd\nforce create element spring_damper_bushing &\n    spring_damper_name = .MODEL.SPRING_DAMPER_1 &\n    adams_id = 1 &\n    i_marker_name = .MODEL.PART_1.SPRING_MAR_I &\n    j_marker_name = .MODEL.PART_2.SPRING_MAR_J &\n    stiffness = 5000.0 &\n    damping = 100.0 &\n    free_length = 250.0\n```\n\n### Parameter Explanation\n\n| Parameter              | Value                         | Description                                                    |\n|------------------------|-------------------------------|----------------------------------------------------------------|\n| `spring_damper_name`   | `.MODEL.SPRING_DAMPER_1`      | Fully qualified name of the new force element                  |\n| `adams_id`             | `1`                           | Integer ID (must be unique among TSDA elements in the model)   |\n| `i_marker_name`        | `.MODEL.PART_1.SPRING_MAR_I`  | Marker on the first (action) part                              |\n| `j_marker_name`        | `.MODEL.PART_2.SPRING_MAR_J`  | Marker on the second (reaction) part                           |\n| `stiffness`            | `5000.0`                      | Spring stiffness in N/mm                                       |\n| `damping`              | `100.0`                       | Damping coefficient in N\u00c2\u00b7s/mm                                  |\n| `free_length`          | `250.0`                       | Natural (unstretched) length of the spring in mm               |\n\n---\n\n## 3. Complete Example\n\nThe following is a self-contained example that builds two simple parts, places markers, and connects them with the spring-damper.\n\n```cmd\n! -------------------------------------------------------\n! Model setup \u00e2\u20ac\u201d assumes a model called MODEL already exists\n! -------------------------------------------------------\n\n! Create Part 1 (fixed ground connection handled separately)\npart create rigid_body name_and_position &\n    part_name = .MODEL.PART_1 &\n    location = 0.0, 0.0, 0.0\n\n! Create Part 2, offset 250 mm in the Z direction\npart create rigid_body name_and_position &\n    part_name = .MODEL.PART_2 &\n    location = 0.0, 0.0, 250.0\n\n! Add mass/inertia to Part 2 (example: 1 kg)\npart create rigid_body mass_properties &\n    part_name = .MODEL.PART_2 &\n    mass = 1.0 &\n    center_of_mass_marker = .MODEL.PART_2.cm &\n    ixx = 1.0 &\n    iyy = 1.0 &\n    izz = 1.0\n\n! -------------------------------------------------------\n! Spring-damper attachment markers\n! -------------------------------------------------------\n\nmarker create &\n    marker_name = .MODEL.PART_1.SPRING_MAR_I &\n    location = 0.0, 0.0, 0.0 &\n    orientation = 0.0, 0.0, 0.0\n\nmarker create &\n    marker_name = .MODEL.PART_2.SPRING_MAR_J &\n    location = 0.0, 0.0, 0.0 &\n    orientation = 0.0, 0.0, 0.0\n\n! -------------------------------------------------------\n! Spring-damper force element\n! -------------------------------------------------------\n\nforce create element spring_damper_bushing &\n    spring_damper_name = .MODEL.SPRING_DAMPER_1 &\n    adams_id = 1 &\n    i_marker_name = .MODEL.PART_1.SPRING_MAR_I &\n    j_marker_name = .MODEL.PART_2.SPRING_MAR_J &\n    stiffness = 5000.0 &\n    damping = 100.0 &\n    free_length = 250.0\n```\n\n---\n\n## How Adams Computes the Force\n\nAdams evaluates the spring-damper force at each time step as:\n\n$$F = -k (d - l_0) - c \\dot{d}$$\n\nWhere:\n- $k = 5000$ N/mm \u00e2\u20ac\u201d spring stiffness\n- $l_0 = 250$ mm \u00e2\u20ac\u201d free length\n- $c = 100$ N\u00c2\u00b7s/mm \u00e2\u20ac\u201d damping coefficient\n- $d$ \u00e2\u20ac\u201d current distance between the I and J markers\n- $\\dot{d}$ \u00e2\u20ac\u201d rate of change of that distance\n\nA positive force is compressive (pushes markers apart when $d < l_0$); a negative force is tensile (pulls them together when $d > l_0$).\n\n---\n\n## Notes\n\n- **Units:** The values above assume an **mm-N-s** unit system. If your model uses SI (m-N-s), convert: 5000 N/mm = 5,000,000 N/m and 250 mm = 0.25 m.\n- **Marker alignment:** For a 1-D translational spring-damper the marker orientations do not affect the force direction \u00e2\u20ac\u201d Adams always acts along the I-to-J line. However, aligned markers are good practice.\n- **Free length vs. initial separation:** If you place the two attachment markers exactly 250 mm apart initially, there is no initial force. If the initial separation differs from 250 mm, the spring will produce a nonzero force at time zero.\n- **`adams_id`:** Must be a positive integer unique among all TSDA elements. If you omit it, Adams assigns one automatically.\n- **Modifying after creation:** Use `force modify element spring_damper_bushing` with the same parameters to change stiffness, damping, or free length after creation.\n"}]}, "benchmark": {"metadata": {"skill_name": "adams-cmd-model-builder", "skill_path": "skills/adams-cmd-model-builder", "timestamp": "2026-03-13T00:00:00Z", "evals_run": ["simple-pendulum-script", "spring-damper-force", "contact-force-expression"], "runs_per_configuration": 1}, "runs": [{"eval_id": 1, "eval_name": "simple-pendulum-script", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 8, "failed": 0, "total": 8, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Script contains a model create command", "passed": true, "evidence": "Found: 'model create model_name = pendulum'"}, {"text": "A rigid body part is created with part create rigid_body", "passed": true, "evidence": "Found: 'part create rigid_body name_and_position  part_name = .pendulum.link' and 'part create rigid_body mass_properties  part_name = .pendulum.link'"}, {"text": "At least one marker is created on the link and at least one on ground", "passed": true, "evidence": "Ground marker: '.pendulum.ground.pivot_mkr'. Link markers: '.pendulum.link.cm', '.pendulum.link.pin_mkr', '.pendulum.link.tip_mkr'"}, {"text": "A revolute joint is created using constraint create joint revolute with i_marker_name and j_marker_name", "passed": true, "evidence": "Found: 'constraint create joint revolute  joint_name = .pendulum.rev_pivot  i_marker_name = .pendulum.link.pin_mkr  j_marker_name = .pendulum.ground.pivot_mkr'"}, {"text": "Gravity is created with force create body gravitational (not force create body_force or any other variant)", "passed": true, "evidence": "Found: 'force create body gravitational  gravity_field_name = .pendulum.gravity  y_component_gravity = -9806.65'"}, {"text": "Initial orientation set to 45 degrees for the release angle", "passed": true, "evidence": "Found: 'part modify rigid_body name_and_position  part_name = .pendulum.link  orientation = 0.0D, 0.0D, 45.0D'"}, {"text": "All keywords spelled out fully (no abbreviations)", "passed": true, "evidence": "All commands use full keyword forms throughout the script"}, {"text": "No adams_id specified anywhere in the script", "passed": true, "evidence": "Searched entire script for 'adams_id' \u00e2\u20ac\u201d not found"}], "notes": []}, {"eval_id": 1, "eval_name": "simple-pendulum-script", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.875, "passed": 7, "failed": 1, "total": 8, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Script contains a model create command", "passed": true, "evidence": "Found: 'model create model_name = PENDULUM'"}, {"text": "A rigid body part is created with part create rigid_body", "passed": true, "evidence": "Found: 'part create rigid_body name_and_position  part_name = .PENDULUM.LINK' and 'part create rigid_body mass_properties'"}, {"text": "At least one marker is created on the link and at least one on ground", "passed": true, "evidence": "Ground marker: '.PENDULUM.ground.GRND_PIVOT'. Link marker: '.PENDULUM.LINK.LINK_PIVOT'"}, {"text": "A revolute joint is created using constraint create joint revolute with i_marker_name and j_marker_name", "passed": true, "evidence": "Found: 'constraint create joint revolute  joint_name = .PENDULUM.REV_JOINT  i_marker_name = .PENDULUM.LINK.LINK_PIVOT  j_marker_name = .PENDULUM.ground.GRND_PIVOT'"}, {"text": "Gravity is created with force create body gravitational (not force create body_force or any other variant)", "passed": true, "evidence": "Found: 'force create body gravitational  gravity_field_name = .PENDULUM.gravity  y_component_gravity = -9806.65'"}, {"text": "Initial orientation set to 45 degrees for the release angle", "passed": true, "evidence": "Part placed at initial 45\u00c2\u00b0 configuration via location = 70.711, -70.711, 0.0 and orientation = -45.0, 0.0, 0.0"}, {"text": "All keywords spelled out fully (no abbreviations)", "passed": true, "evidence": "Full keyword forms used throughout the script"}, {"text": "No adams_id specified anywhere in the script", "passed": false, "evidence": "Found multiple explicit adams_id values: 'adams_id = 2' on LINK part, 'adams_id = 1' on GRND_PIVOT marker, 'adams_id = 3' on LINK_PIVOT marker, 'adams_id = 1' on REV_JOINT"}], "notes": []}, {"eval_id": 2, "eval_name": "spring-damper-force", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 6, "failed": 0, "total": 6, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Uses force create element_like spring_damper (not single_component_force or bushing)", "passed": true, "evidence": "Found: 'force create element_like spring_damper  spring_damper_name = .my_model.SPR_MAIN'"}, {"text": "Includes stiffness = 5000", "passed": true, "evidence": "Found: 'stiffness = 5000.0'"}, {"text": "Includes damping = 100", "passed": true, "evidence": "Found: 'damping = 100.0'"}, {"text": "Includes length = 250 (free length)", "passed": true, "evidence": "Found: 'length = 250.0' \u00e2\u20ac\u201d correct Adams CMD parameter name for free length"}, {"text": "References both i_marker_name and j_marker_name", "passed": true, "evidence": "Found: 'i_marker_name = .my_model.part_a.M_SPR_I  j_marker_name = .my_model.part_b.M_SPR_J'"}, {"text": "Explains that spring_damper is for 1-DOF along a line of action", "passed": true, "evidence": "Response states the element acts along the line connecting I and J markers, describing the 1-DOF nature"}], "notes": []}, {"eval_id": 2, "eval_name": "spring-damper-force", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.833, "passed": 5, "failed": 1, "total": 6, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Uses force create element_like spring_damper (not single_component_force or bushing)", "passed": true, "evidence": "Found: 'force create element_like spring_damper  spring_damper_name = .model.spr_damp_1'"}, {"text": "Includes stiffness = 5000", "passed": true, "evidence": "Found: 'stiffness = 5000.0'"}, {"text": "Includes damping = 100", "passed": true, "evidence": "Found: 'damping = 100.0'"}, {"text": "Includes length = 250 (free length)", "passed": false, "evidence": "Used 'free_length = 250.0' instead of 'length = 250.0'. The correct Adams CMD parameter name is 'length', not 'free_length'."}, {"text": "References both i_marker_name and j_marker_name", "passed": true, "evidence": "Found: 'i_marker_name = .model.part_1.spring_i  j_marker_name = .model.part_2.spring_j'"}, {"text": "Explains that spring_damper is for 1-DOF along a line of action", "passed": true, "evidence": "Response explains it acts along the line connecting I and J markers"}], "notes": []}, {"eval_id": 3, "eval_name": "contact-force-expression", "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 6, "failed": 0, "total": 6, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Uses the IMPACT() function (not BISTOP or a manual IF expression)", "passed": true, "evidence": "Found: 'IMPACT(DZ(.model.part.cm, .model.ground.floor_ref, .model.ground.floor_ref), ...'"}, {"text": "First arg uses DZ or similar displacement measuring penetration below floor", "passed": true, "evidence": "First arg is 'DZ(.model.part.cm, .model.ground.floor_ref, .model.ground.floor_ref)'"}, {"text": "Second arg uses VZ or matching velocity measure", "passed": true, "evidence": "Second arg is 'VZ(.model.part.cm, .model.ground.floor_ref, .model.ground.floor_ref, .model.ground.floor_ref)'"}, {"text": "Threshold value is 0.0 (or equivalent contact point)", "passed": true, "evidence": "Third argument is '0.0'"}, {"text": "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present", "passed": true, "evidence": "Found: '1.0E5, 1.5, 50.0, 0.1' in correct IMPACT argument positions"}, {"text": "Expression wrapped in double quotes as required for FUNCTION= parameter", "passed": true, "evidence": "Expression shown as '\"IMPACT(...)\"' \u00e2\u20ac\u201d properly quoted in both the display and the CMD block"}], "notes": []}, {"eval_id": 3, "eval_name": "contact-force-expression", "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.833, "passed": 5, "failed": 1, "total": 6, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "Uses the IMPACT() function (not BISTOP or a manual IF expression)", "passed": true, "evidence": "Main expression uses IMPACT(). An IF/STEP alternative is noted as secondary."}, {"text": "First arg uses DZ or similar displacement measuring penetration below floor", "passed": true, "evidence": "First arg is 'DZ(cm_marker, floor_marker, floor_marker)'"}, {"text": "Second arg uses VZ or matching velocity measure", "passed": true, "evidence": "Second arg is 'VZ(cm_marker, floor_marker, floor_marker)'"}, {"text": "Threshold value is 0.0 (or equivalent contact point)", "passed": true, "evidence": "Third argument is '0.0'"}, {"text": "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present", "passed": true, "evidence": "Found: '1.0E5, 1.5, 50.0, 0.1' in IMPACT expression"}, {"text": "Expression wrapped in double quotes as required for FUNCTION= parameter", "passed": false, "evidence": "Main expression section shows it without quotes: 'FUNCTION = IMPACT(DZ(...), ...)'. The CMD block uses Adams solver (.adm) notation with integer marker IDs rather than Adams View CMD syntax."}], "notes": []}], "run_summary": {"with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}, "time_seconds": {"mean": 0, "stddev": 0, "min": 0, "max": 0}, "tokens": {"mean": 0, "stddev": 0, "min": 0, "max": 0}}, "without_skill": {"pass_rate": {"mean": 0.847, "stddev": 0.024, "min": 0.833, "max": 0.875}, "time_seconds": {"mean": 0, "stddev": 0, "min": 0, "max": 0}, "tokens": {"mean": 0, "stddev": 0, "min": 0, "max": 0}}, "delta": {"pass_rate": "+0.153", "time_seconds": "N/A", "tokens": "N/A"}}, "notes": ["With-skill achieved 100% pass rate across all 20 assertions (8+6+6). Without-skill passed 17/20 (85%).", "The 3 failed without-skill assertions: 'No adams_id specified' (simple-pendulum), 'length = 250' param name (spring-damper uses wrong name free_length), 'Expression wrapped in double quotes' (contact-force reverts to .adm syntax).", "The adams_id failure is the most significant \u00e2\u20ac\u201d the baseline model consistently adds explicit IDs which is error-prone. The skill explicitly prohibits this.", "The 'length' vs 'free_length' failure shows the baseline model guesses a descriptive parameter name rather than the actual Adams CMD keyword.", "The FUNCTION= quoting failure shows the baseline model reverts to Adams solver .adm dataset notation rather than Adams View CMD syntax.", "Timing/token data was not captured for these runs.", "Compared to iteration-1 (100% with-skill, 87% without-skill), results are consistent. The small delta (+15%) reflects that these evals test relatively foundational Adams CMD patterns. Evals targeting more specialized topics (custom forces, parameterization, loops) would show larger deltas."]}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

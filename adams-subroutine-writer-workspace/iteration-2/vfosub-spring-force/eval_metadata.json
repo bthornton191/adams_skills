@@ -1,0 +1,17 @@
+{
+  "eval_id": "vfosub-spring-force",
+  "eval_name": "vfosub-spring-force",
+  "prompt": "I need a C user subroutine for an Adams VFORCE that applies a linear spring: Fx = -500*(DX - 100). The moving marker is 10, ground is marker 1. I need the whole thing - headers, the function, everything so I can compile it into a DLL.",
+  "assertions": [
+    "Uses struct-based C signature (sAdamsVforce* parameter), not Fortran-style flat params with trailing underscore",
+    "Includes adams_c_Vfosub forward declaration typedef",
+    "Includes slv_c_utils.h as the primary SDK header",
+    "Includes iflag guard that skips iflag 5, 7, 9",
+    "Uses c_sysary or c_sysfnc to query displacement (not a raw function call)",
+    "Uses c_errmes for error handling after utility function calls",
+    "Parameterizes markers or constants via PAR[] instead of hardcoding marker IDs in the function body",
+    "Build command uses correct library name adams_util.lib (not adams_utils.lib)",
+    "Build command uses mdi.bat (Windows) or mdi -c (Linux), not raw cl/gcc/ifort",
+    "Build instructions mention setting up the Adams environment before running mdi.bat"
+  ]
+}

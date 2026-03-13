@@ -1,0 +1,65 @@
+{
+  "expectations": [
+    {
+      "text": "CBKSUB uses struct-based C signature (sAdamsCbksub* parameter), not Fortran-style flat params",
+      "passed": false,
+      "evidence": "cbksub.c uses Fortran-style flat params: void cbksub_(int *id, double *time, double *par, int *npar, int *istate, int *nflag, int *errflg)"
+    },
+    {
+      "text": "CBKSUB includes adams_c_Callback forward declaration typedef",
+      "passed": false,
+      "evidence": "No forward declaration typedef present."
+    },
+    {
+      "text": "CBKSUB uses ev_ITERATION_BEG enum constant, not a raw integer like case 4",
+      "passed": false,
+      "evidence": "No event-based switch; uses CORRECTOR_PASS callback event concept without ev_* enum constants."
+    },
+    {
+      "text": "CBKSUB handles ev_PRIVATE_EVENT1/2 (ignores them without reading data[])",
+      "passed": false,
+      "evidence": "No event handling; no ev_PRIVATE_EVENT1/2 handling."
+    },
+    {
+      "text": "CBKSUB includes slv_c_utils.h as the primary SDK header",
+      "passed": true,
+      "evidence": "cbksub.c: #include \"slv_c_utils.h\""
+    },
+    {
+      "text": "VFOSUB uses struct-based C signature (sAdamsVforce* parameter) or correct pointer-based signature",
+      "passed": false,
+      "evidence": "Uses Fortran-style flat params: void vfosub_(int *id, double *time, double *par, int *npar, int *dflag, int *iflag, double *result)"
+    },
+    {
+      "text": "VFOSUB includes iflag guard that skips iflag 5, 7, 9",
+      "passed": false,
+      "evidence": "No iflag guard present; function body directly reads cached value."
+    },
+    {
+      "text": "VFOSUB is dflag-aware: uses cache when dflag==0, falls back to direct SYSARY when dflag==1",
+      "passed": false,
+      "evidence": "No dflag handling; always reads from cached global without any fallback."
+    },
+    {
+      "text": "Both files use c_errmes for error handling",
+      "passed": false,
+      "evidence": "cbksub.c uses c_errmes but vfosub.c does not; assertion requires both files."
+    },
+    {
+      "text": "Build command uses mdi.bat (Windows) or mdi -c (Linux), not raw cl/gcc/ifort",
+      "passed": false,
+      "evidence": "Uses raw cl /c and link /DLL on Windows; raw gcc -shared on Linux. mdi.bat is called but only as env setup, not as the build tool."
+    },
+    {
+      "text": "Build instructions mention setting up the Adams environment before running mdi.bat",
+      "passed": false,
+      "evidence": "Does not use mdi.bat as build tool; calls 'call mdi.bat' for env setup only then uses raw compiler commands."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 10,
+    "total": 11,
+    "pass_rate": 0.091
+  }
+}

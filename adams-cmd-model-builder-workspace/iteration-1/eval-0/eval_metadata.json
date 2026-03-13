@@ -1,0 +1,15 @@
+{
+  "eval_id": "simple-pendulum-script",
+  "eval_name": "simple-pendulum-script",
+  "prompt": "Write an Adams CMD script to create a simple pendulum. It should have a single rigid link of length 200 mm and mass 1 kg, pinned to the ground at its top end by a revolute joint, with gravity acting in the -Y direction. Release it from 45 degrees.",
+  "assertions": [
+    "Script contains a model create command",
+    "A rigid body part is created with part create rigid_body",
+    "At least one marker is created on the link and at least one on ground",
+    "A revolute joint is created using constraint create joint revolute with i_marker_name and j_marker_name",
+    "A gravity field is created with gravity_field_name and a negative Y component",
+    "Initial orientation is set to 45 degrees (or 45D)",
+    "All keywords are spelled out in full (no abbreviated forms like PART or CONST)",
+    "Object names use dot-path hierarchy (e.g. .MODEL_NAME.PART_NAME.MARKER_NAME)"
+  ]
+}

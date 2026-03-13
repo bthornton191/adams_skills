@@ -1,0 +1,50 @@
+{
+    "expectations":  [
+                         {
+                             "text":  "Script contains a model create command",
+                             "passed":  true,
+                             "evidence":  "Found: \u0027model create model_name = PENDULUM\u0027"
+                         },
+                         {
+                             "text":  "A rigid body part is created with part create rigid_body",
+                             "passed":  true,
+                             "evidence":  "Found: \u0027part create rigid_body name_and_position  part_name = .PENDULUM.LINK\u0027 and a second \u0027part create rigid_body mass_properties\u0027 for mass/inertia properties"
+                         },
+                         {
+                             "text":  "At least one marker is created on the link and at least one on ground",
+                             "passed":  true,
+                             "evidence":  "Ground marker: \u0027marker create marker_name = .PENDULUM.ground.M_PIVOT\u0027. Link markers: M_PIN, M_CM, M_TIP, and M_ROD_VIS all created with \u0027marker create marker_name = .PENDULUM.LINK.*\u0027"
+                         },
+                         {
+                             "text":  "A revolute joint is created using constraint create joint revolute with i_marker_name and j_marker_name",
+                             "passed":  true,
+                             "evidence":  "Found: \u0027constraint create joint revolute  joint_name = .PENDULUM.REV_PIVOT  i_marker_name = .PENDULUM.LINK.M_PIN  j_marker_name = .PENDULUM.ground.M_PIVOT\u0027"
+                         },
+                         {
+                             "text":  "A gravity field is created with gravity_field_name and a negative Y component",
+                             "passed":  true,
+                             "evidence":  "Found: \u0027forces create body_force gravity_field  gravity_field_name = .PENDULUM.GRAVITY  y_component_gravity = -9806.65\u0027"
+                         },
+                         {
+                             "text":  "Initial orientation is set to 45 degrees (or 45D)",
+                             "passed":  true,
+                             "evidence":  "Found: \u0027part modify rigid_body name_and_position  part_name = .PENDULUM.LINK  orientation = 0.0D, 0.0D, 45.0D\u0027"
+                         },
+                         {
+                             "text":  "All keywords are spelled out in full (no abbreviated forms like PART or CONST)",
+                             "passed":  true,
+                             "evidence":  "All commands use fully spelled keywords: \u0027model create\u0027, \u0027defaults units\u0027, \u0027forces create body_force gravity_field\u0027, \u0027marker create\u0027, \u0027part create rigid_body\u0027, \u0027constraint create joint revolute\u0027, \u0027part modify rigid_body\u0027, \u0027geometry create shape sphere/cylinder\u0027. No abbreviated forms found."
+                         },
+                         {
+                             "text":  "Object names use dot-path hierarchy (e.g. .MODEL_NAME.PART_NAME.MARKER_NAME)",
+                             "passed":  true,
+                             "evidence":  "All object names use dot-path hierarchy: .PENDULUM.GRAVITY, .PENDULUM.LINK, .PENDULUM.ground.M_PIVOT, .PENDULUM.LINK.M_PIN, .PENDULUM.LINK.M_CM, .PENDULUM.LINK.M_TIP, .PENDULUM.REV_PIVOT, etc."
+                         }
+                     ],
+    "summary":  {
+                    "pass_rate":  1,
+                    "passed":  8,
+                    "failed":  0,
+                    "total":  8
+                }
+}

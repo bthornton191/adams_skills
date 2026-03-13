@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Explicitly warns that VFOSUB cannot be called from within CBKSUB",
+      "passed": false,
+      "evidence": "Does not warn. Opens with 'The most straightforward is to directly call your VFOSUB function from within your CBKSUB' and presents it as valid."
+    },
+    {
+      "text": "Does NOT present calling VFOSUB directly from CBKSUB as a valid primary approach",
+      "passed": false,
+      "evidence": "Primary approach ('Shared Computation with Direct Call') calls vfosub() from cbksub(). Alternative section ('Direct Function Call (Simpler)') also calls vfosub() directly."
+    },
+    {
+      "text": "Suggests caching pattern: compute in CBKSUB via utility functions, read from VFOSUB via shared state",
+      "passed": false,
+      "evidence": "Uses shared static variables but the mechanism involves directly calling VFOSUB from CBKSUB (which is forbidden). Does not compute via utility functions alone — delegates to VFOSUB."
+    },
+    {
+      "text": "Uses ev_ITERATION_BEG enum constant (not raw integer) when showing the caching alternative",
+      "passed": false,
+      "evidence": "Uses raw integer: if (*itype == 3) /* Beginning of iteration */"
+    },
+    {
+      "text": "Uses c_sysary or c_sysfnc (allowed utility routines) for computation inside CBKSUB",
+      "passed": true,
+      "evidence": "Helper function compute_my_forces() uses c_sysary(\"DISP\", ...). CBKSUB calls c_sysfnc(\"TIME\", ...)."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 4,
+    "total": 5,
+    "pass_rate": 0.2
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Script contains a model create command",
+      "passed": true,
+      "evidence": "Found: 'model create model_name = PENDULUM'"
+    },
+    {
+      "text": "A rigid body part is created with part create rigid_body",
+      "passed": true,
+      "evidence": "Found: 'part create rigid_body name_and_position  part_name = .PENDULUM.LINK' and 'part create rigid_body mass_properties'"
+    },
+    {
+      "text": "At least one marker is created on the link and at least one on ground",
+      "passed": true,
+      "evidence": "Ground marker: '.PENDULUM.ground.GRND_PIVOT'. Link marker: '.PENDULUM.LINK.LINK_PIVOT'"
+    },
+    {
+      "text": "A revolute joint is created using constraint create joint revolute with i_marker_name and j_marker_name",
+      "passed": true,
+      "evidence": "Found: 'constraint create joint revolute  joint_name = .PENDULUM.REV_JOINT  i_marker_name = .PENDULUM.LINK.LINK_PIVOT  j_marker_name = .PENDULUM.ground.GRND_PIVOT'"
+    },
+    {
+      "text": "Gravity is created with force create body gravitational (not force create body_force or any other variant)",
+      "passed": true,
+      "evidence": "Found: 'force create body gravitational  gravity_field_name = .PENDULUM.gravity  y_component_gravity = -9806.65'"
+    },
+    {
+      "text": "Initial orientation set to 45 degrees for the release angle",
+      "passed": true,
+      "evidence": "Part placed at the initial 45° configuration: 'part create rigid_body name_and_position  part_name = .PENDULUM.LINK  location = 70.711, -70.711, 0.0  orientation = -45.0, 0.0, 0.0'"
+    },
+    {
+      "text": "All keywords spelled out fully (no abbreviations)",
+      "passed": true,
+      "evidence": "Full keyword forms used throughout the script"
+    },
+    {
+      "text": "No adams_id specified anywhere in the script",
+      "passed": false,
+      "evidence": "Found multiple explicit adams_id values: 'adams_id = 2' on LINK part, 'adams_id = 1' on GRND_PIVOT marker, 'adams_id = 3' on LINK_PIVOT marker, 'adams_id = 1' on REV_JOINT"
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 1,
+    "total": 8,
+    "pass_rate": 0.875
+  }
+}

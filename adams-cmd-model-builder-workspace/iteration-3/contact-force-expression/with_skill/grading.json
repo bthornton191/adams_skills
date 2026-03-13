@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Uses the IMPACT() function (not BISTOP or a manual IF expression)",
+      "passed": true,
+      "evidence": "Response uses IMPACT() function explicitly and notes 'Use IMPACT() for one-sided contact. It produces a smooth, continuous force... avoiding the derivative discontinuities that a manual IF() would introduce'"
+    },
+    {
+      "text": "First arg uses DZ or similar displacement measuring penetration below floor",
+      "passed": true,
+      "evidence": "Found: 'DZ(.model.body.cm, .model.ground.ref, .model.ground.ref)' as the first argument"
+    },
+    {
+      "text": "Second arg uses VZ or matching velocity measure",
+      "passed": true,
+      "evidence": "Found: 'VZ(.model.body.cm, .model.ground.ref, .model.ground.ref, .model.ground.ref)' as the second argument"
+    },
+    {
+      "text": "Threshold value is 0.0 (or equivalent contact point)",
+      "passed": true,
+      "evidence": "Found: '0.0' as the third argument (x1 threshold)"
+    },
+    {
+      "text": "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present",
+      "passed": true,
+      "evidence": "Found: '1.0E5, 1.5, 50.0, 0.1' in the correct positions"
+    },
+    {
+      "text": "Expression wrapped in double quotes as required for FUNCTION= parameter",
+      "passed": true,
+      "evidence": "Found: 'function = \"IMPACT(DZ(...), VZ(...), 0.0, 1.0E5, 1.5, 50.0, 0.1)\"' — correctly wrapped in double quotes"
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  }
+}

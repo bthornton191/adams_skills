@@ -1,0 +1,40 @@
+{
+    "expectations":  [
+                         {
+                             "text":  "Uses force create element_like spring_damper (not single_component_force, bushing, or beam)",
+                             "passed":  false,
+                             "evidence":  "The response uses \u0027force create element spring_damper_bushing\u0027 — a hallucinated command that appends \u0027bushing\u0027 to the element type. The correct element type is \u0027spring_damper\u0027. The assertion explicitly excludes \u0027bushing\u0027, and this command does not match the expected element type."
+                         },
+                         {
+                             "text":  "The stiffness parameter is set to 5000",
+                             "passed":  true,
+                             "evidence":  "stiffness = 5000.0 is present in the force create command."
+                         },
+                         {
+                             "text":  "The damping parameter is set to 100",
+                             "passed":  true,
+                             "evidence":  "damping = 100.0 is present in the force create command."
+                         },
+                         {
+                             "text":  "The length parameter (free length) is set to 250",
+                             "passed":  true,
+                             "evidence":  "free_length = 250.0 is present in the force create command."
+                         },
+                         {
+                             "text":  "References both i_marker_name and j_marker_name",
+                             "passed":  true,
+                             "evidence":  "i_marker_name = .MODEL.PART_1.SPRING_MAR_I and j_marker_name = .MODEL.PART_2.SPRING_MAR_J are both present in the command."
+                         },
+                         {
+                             "text":  "Explains or implies that spring_damper acts along the line joining the two markers",
+                             "passed":  true,
+                             "evidence":  "The overview states \u0027Adams computes the spring and damping forces along the line joining those two markers.\u0027 The notes also confirm \u0027Adams always acts along the I-to-J line.\u0027"
+                         }
+                     ],
+    "summary":  {
+                    "pass_rate":  0.8333,
+                    "passed":  5,
+                    "failed":  1,
+                    "total":  6
+                }
+}

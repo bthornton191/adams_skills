@@ -1,0 +1,208 @@
+{
+  "metadata": {
+    "skill_name": "adams-subroutine-writer",
+    "skill_path": "skills/adams-subroutine-writer",
+    "timestamp": "2025-01-01T00:00:00Z",
+    "iteration": 2,
+    "evals_run": ["cache-and-reuse", "forbidden-call-trap", "vfosub-spring-force"],
+    "runs_per_configuration": 1
+  },
+
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "cache-and-reuse",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.909,
+        "passed": 10,
+        "failed": 1,
+        "total": 11,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "CBKSUB uses struct-based C signature (sAdamsCbksub* parameter), not Fortran-style flat params", "passed": true, "evidence": "cbksub.c: void Cbksub( const struct sAdamsCbksub *cbk, double time, int event, int *data )"},
+        {"text": "CBKSUB includes adams_c_Callback forward declaration typedef", "passed": true, "evidence": "cbksub.c: adams_c_Callback  Cbksub;"},
+        {"text": "CBKSUB uses ev_ITERATION_BEG enum constant, not a raw integer like case 4", "passed": true, "evidence": "cbksub.c: case ev_ITERATION_BEG:"},
+        {"text": "CBKSUB handles ev_PRIVATE_EVENT1/2 (ignores them without reading data[])", "passed": true, "evidence": "cbksub.c: case ev_PRIVATE_EVENT1: case ev_PRIVATE_EVENT2: return;"},
+        {"text": "CBKSUB includes slv_c_utils.h as the primary SDK header", "passed": true, "evidence": "cbksub.c: #include \"slv_c_utils.h\""},
+        {"text": "VFOSUB uses struct-based C signature (sAdamsVforce* parameter) or correct pointer-based signature", "passed": true, "evidence": "vfosub.c: void Vfosub( const struct sAdamsVforce *vfo, double time, int dflag, int iflag, double *result )"},
+        {"text": "VFOSUB includes iflag guard that skips iflag 5, 7, 9", "passed": true, "evidence": "vfosub.c: if ( iflag == 5 || iflag == 7 || iflag == 9 ) return;"},
+        {"text": "VFOSUB is dflag-aware: uses cache when dflag==0, falls back to direct SYSARY when dflag==1", "passed": true, "evidence": "vfosub.c: if ( iflag == 0 && dflag == 0 && g_cache_valid ) cache path; fallback c_sysary for differencing"},
+        {"text": "Both files use c_errmes for error handling", "passed": true, "evidence": "cbksub.c: c_errmes(...); vfosub.c: c_errmes(...)"},
+        {"text": "Build command uses mdi.bat (Windows) or mdi -c (Linux), not raw cl/gcc/ifort", "passed": true, "evidence": "response.md: mdi.bat cr-u n cbksub.c vfosub.c -n my_sub.dll ex"},
+        {"text": "Build instructions mention setting up the Adams environment before running mdi.bat", "passed": false, "evidence": "response.md only shows mdi.bat commands without env setup instructions"}
+      ],
+      "notes": ["New assertion 'env setup before mdi.bat' failed — the subagent used mdi.bat correctly but did not include env init steps in the response."]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "cache-and-reuse",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.091,
+        "passed": 1,
+        "failed": 10,
+        "total": 11,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "CBKSUB uses struct-based C signature (sAdamsCbksub* parameter), not Fortran-style flat params", "passed": false, "evidence": "Uses Fortran-style: void cbksub_(int *id, double *time, double *par, ...)"},
+        {"text": "CBKSUB includes adams_c_Callback forward declaration typedef", "passed": false, "evidence": "No forward declaration."},
+        {"text": "CBKSUB uses ev_ITERATION_BEG enum constant, not a raw integer like case 4", "passed": false, "evidence": "No ev_* constants; uses CORRECTOR_PASS concept."},
+        {"text": "CBKSUB handles ev_PRIVATE_EVENT1/2 (ignores them without reading data[])", "passed": false, "evidence": "No event handling."},
+        {"text": "CBKSUB includes slv_c_utils.h as the primary SDK header", "passed": true, "evidence": "#include \"slv_c_utils.h\""},
+        {"text": "VFOSUB uses struct-based C signature (sAdamsVforce* parameter) or correct pointer-based signature", "passed": false, "evidence": "Fortran-style: void vfosub_(int *id, ...)"},
+        {"text": "VFOSUB includes iflag guard that skips iflag 5, 7, 9", "passed": false, "evidence": "No iflag guard."},
+        {"text": "VFOSUB is dflag-aware: uses cache when dflag==0, falls back to direct SYSARY when dflag==1", "passed": false, "evidence": "Always reads cache, no dflag handling."},
+        {"text": "Both files use c_errmes for error handling", "passed": false, "evidence": "cbksub uses c_errmes but vfosub does not."},
+        {"text": "Build command uses mdi.bat (Windows) or mdi -c (Linux), not raw cl/gcc/ifort", "passed": false, "evidence": "Uses raw cl /c and link /DLL."},
+        {"text": "Build instructions mention setting up the Adams environment before running mdi.bat", "passed": false, "evidence": "Does not use mdi.bat as build tool."}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "forbidden-call-trap",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 5,
+        "failed": 0,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Explicitly warns that VFOSUB cannot be called from within CBKSUB", "passed": true, "evidence": "Title: 'Why You Can't'. Lists VFOSUB in forbidden calls."},
+        {"text": "Does NOT present calling VFOSUB directly from CBKSUB as a valid primary approach", "passed": true, "evidence": "Only presents caching pattern; never shows direct call."},
+        {"text": "Suggests caching pattern: compute in CBKSUB via utility functions, read from VFOSUB via shared state", "passed": true, "evidence": "ForceCache struct, c_sysary in CBKSUB, extern in VFOSUB."},
+        {"text": "Uses ev_ITERATION_BEG enum constant (not raw integer) when showing the caching alternative", "passed": true, "evidence": "case ev_ITERATION_BEG:"},
+        {"text": "Uses c_sysary or c_sysfnc (allowed utility routines) for computation inside CBKSUB", "passed": true, "evidence": "c_sysary( \"DISP\", ipar, 3, states, &nv, &errflg );"}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "forbidden-call-trap",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.2,
+        "passed": 1,
+        "failed": 4,
+        "total": 5,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Explicitly warns that VFOSUB cannot be called from within CBKSUB", "passed": false, "evidence": "Does not warn; says 'directly call your VFOSUB function'."},
+        {"text": "Does NOT present calling VFOSUB directly from CBKSUB as a valid primary approach", "passed": false, "evidence": "Both recommended and alternative approaches call vfosub() directly."},
+        {"text": "Suggests caching pattern: compute in CBKSUB via utility functions, read from VFOSUB via shared state", "passed": false, "evidence": "Caching mechanism calls VFOSUB from CBKSUB (forbidden); does not compute via utility functions alone."},
+        {"text": "Uses ev_ITERATION_BEG enum constant (not raw integer) when showing the caching alternative", "passed": false, "evidence": "Uses raw integer: if (*itype == 3)"},
+        {"text": "Uses c_sysary or c_sysfnc (allowed utility routines) for computation inside CBKSUB", "passed": true, "evidence": "Helper uses c_sysary; CBKSUB uses c_sysfnc(\"TIME\", ...)."}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "vfosub-spring-force",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 10,
+        "failed": 0,
+        "total": 10,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Uses struct-based C signature (sAdamsVforce* parameter), not Fortran-style flat params with trailing underscore", "passed": true, "evidence": "void Vfosub(const struct sAdamsVforce *vfo, double time, int dflag, int iflag, double *result)"},
+        {"text": "Includes adams_c_Vfosub forward declaration typedef", "passed": true, "evidence": "adams_c_Vfosub    Vfosub;"},
+        {"text": "Includes slv_c_utils.h as the primary SDK header", "passed": true, "evidence": "#include \"slv_c_utils.h\""},
+        {"text": "Includes iflag guard that skips iflag 5, 7, 9", "passed": true, "evidence": "if (iflag == 5 || iflag == 7 || iflag == 9) return;"},
+        {"text": "Uses c_sysary or c_sysfnc to query displacement (not a raw function call)", "passed": true, "evidence": "c_sysary(\"TDISP\", ipar, 3, disp, &nstates, &errflg);"},
+        {"text": "Uses c_errmes for error handling after utility function calls", "passed": true, "evidence": "c_errmes(errflg, \"c_sysary TDISP failed in Vfosub\", vfo->ID, \"STOP\");"},
+        {"text": "Parameterizes markers or constants via PAR[] instead of hardcoding marker IDs in the function body", "passed": true, "evidence": "K from vfo->PAR[0], free_len from vfo->PAR[1]; markers from vfo->I and vfo->JFLOAT"},
+        {"text": "Build command uses correct library name adams_util.lib (not adams_utils.lib)", "passed": true, "evidence": "Uses mdi.bat cr-u which handles linking; no incorrect library name."},
+        {"text": "Build command uses mdi.bat (Windows) or mdi -c (Linux), not raw cl/gcc/ifort", "passed": true, "evidence": "mdi.bat cr-u n vfosub.c -n my_sub.dll ex"},
+        {"text": "Build instructions mention setting up the Adams environment before running mdi.bat", "passed": true, "evidence": "Shows generate_adams_env.py + call adams_env_init.bat workflow AND Start Menu manual workflow."}
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "vfosub-spring-force",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.3,
+        "passed": 3,
+        "failed": 7,
+        "total": 10,
+        "time_seconds": 0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Uses struct-based C signature (sAdamsVforce* parameter), not Fortran-style flat params with trailing underscore", "passed": false, "evidence": "Fortran-style: void vfosub_(int *id, ...)"},
+        {"text": "Includes adams_c_Vfosub forward declaration typedef", "passed": false, "evidence": "No typedef or forward declaration."},
+        {"text": "Includes slv_c_utils.h as the primary SDK header", "passed": true, "evidence": "#include \"slv_c_utils.h\""},
+        {"text": "Includes iflag guard that skips iflag 5, 7, 9", "passed": false, "evidence": "Uses if (*iflag != 0) return; — wrong pattern."},
+        {"text": "Uses c_sysary or c_sysfnc to query displacement (not a raw function call)", "passed": true, "evidence": "c_sysfnc(func_name, ipar, nargs, &dx, &errflg) with func_name='DX'"},
+        {"text": "Uses c_errmes for error handling after utility function calls", "passed": true, "evidence": "c_errmes(1, \"Error in VFOSUB: could not evaluate DX\", *id, \"VFORCE\");"},
+        {"text": "Parameterizes markers or constants via PAR[] instead of hardcoding marker IDs in the function body", "passed": false, "evidence": "Hardcoded: ipar[0] = 10; ipar[1] = 1; and -500.0 * (dx - 100.0)."},
+        {"text": "Build command uses correct library name adams_util.lib (not adams_utils.lib)", "passed": false, "evidence": "Uses adams_solver_c.lib (wrong name)."},
+        {"text": "Build command uses mdi.bat (Windows) or mdi -c (Linux), not raw cl/gcc/ifort", "passed": false, "evidence": "Uses raw cl /LD and gcc -shared."},
+        {"text": "Build instructions mention setting up the Adams environment before running mdi.bat", "passed": false, "evidence": "Does not use mdi.bat."}
+      ],
+      "notes": []
+    }
+  ],
+
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 0.970, "stddev": 0.053, "min": 0.909, "max": 1.0},
+      "time_seconds": {"mean": 0, "stddev": 0, "min": 0, "max": 0},
+      "tokens": {"mean": 0, "stddev": 0, "min": 0, "max": 0}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 0.197, "stddev": 0.105, "min": 0.091, "max": 0.3},
+      "time_seconds": {"mean": 0, "stddev": 0, "min": 0, "max": 0},
+      "tokens": {"mean": 0, "stddev": 0, "min": 0, "max": 0}
+    },
+    "delta": {
+      "pass_rate": "+0.773",
+      "time_seconds": "N/A",
+      "tokens": "N/A"
+    }
+  },
+
+  "notes": [
+    "Iteration 2 adds two new assertions testing build command changes: 'mdi.bat usage' and 'env setup before mdi.bat'. Total assertions increased from 22 to 26.",
+    "With-skill scored 25/26 (96.2%). The only failure: cache-and-reuse did not mention env setup before mdi.bat — the subagent used mdi.bat correctly but omitted env init instructions from the response.",
+    "Without-skill scored 5/26 (19.2%). Down from 27.3% in iteration 1 due to the two new build assertions that baseline cannot pass.",
+    "vfosub-spring-force with-skill achieved 10/10 (100%) — the most complete eval. It included both automated (generate_adams_env.py) and manual (Start Menu) build workflows.",
+    "forbidden-call-trap remains the strongest discriminator: 100% with-skill vs 20% without-skill. The baseline model still presents calling VFOSUB from CBKSUB as valid.",
+    "Assertion 'Includes slv_c_utils.h' continues to pass in both configurations (non-discriminating but required for correctness).",
+    "The one with-skill failure suggests the SKILL.md build section could be strengthened to always include env setup in every response, not just the standalone VFOSUB example.",
+    "Compared to iteration 1: with-skill dropped from 100% to 96.2% (1 new assertion failed); without-skill dropped from 27.3% to 19.2% (new assertions added that baseline can't pass)."
+  ]
+}

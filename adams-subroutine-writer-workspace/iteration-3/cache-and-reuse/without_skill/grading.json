@@ -1,0 +1,70 @@
+{
+  "expectations": [
+    {
+      "text": "CBKSUB uses struct-based C signature (sAdamsCbksub* parameter), not Fortran-style flat params",
+      "passed": false,
+      "evidence": "cbksub.c uses Fortran-style flat params: void CBKSUB(int *id, double *time, double *par, ...)"
+    },
+    {
+      "text": "CBKSUB includes adams_c_Callback forward declaration typedef",
+      "passed": false,
+      "evidence": "No adams_c_Callback forward declaration; no typedef present"
+    },
+    {
+      "text": "CBKSUB uses ev_ITERATION_BEG enum constant, not a raw integer like case 4",
+      "passed": false,
+      "evidence": "Uses raw integer check: if (*iflag != 2) return; — no ev_* enum constants"
+    },
+    {
+      "text": "CBKSUB handles ev_PRIVATE_EVENT1/2 (ignores them without reading data[])",
+      "passed": false,
+      "evidence": "No ev_PRIVATE_EVENT1/2 handling; no switch statement on event type"
+    },
+    {
+      "text": "CBKSUB includes slv_c_utils.h as the primary SDK header",
+      "passed": false,
+      "evidence": "Does not include slv_c_utils.h; manually declares extern void c_sysfnc(...) and extern void c_errmes(...) instead"
+    },
+    {
+      "text": "VFOSUB uses struct-based C signature (sAdamsVforce* parameter) or correct pointer-based signature",
+      "passed": false,
+      "evidence": "vfosub.c uses Fortran-style flat params: void VFOSUB(int *id, double *time, int *dflag, int *iflag, double *result)"
+    },
+    {
+      "text": "VFOSUB includes iflag guard that skips iflag 5, 7, 9",
+      "passed": false,
+      "evidence": "No iflag 5/7/9 guard; only checks if (*iflag < 0) return for error states"
+    },
+    {
+      "text": "VFOSUB is dflag-aware: uses cache when dflag==0, falls back to direct SYSARY when dflag==1",
+      "passed": false,
+      "evidence": "No dflag-aware caching; reads from shared global unconditionally without dflag check or fallback"
+    },
+    {
+      "text": "Both files use c_errmes for error handling",
+      "passed": false,
+      "evidence": "Neither file uses c_errmes; error handling uses printf or is absent"
+    },
+    {
+      "text": "Build command uses mdi.bat (Windows) or mdi -c (Linux), not raw cl/gcc/ifort",
+      "passed": false,
+      "evidence": "response.md shows raw compiler commands: cl /LD /MD ... and gcc -shared -fPIC ... without mdi.bat"
+    },
+    {
+      "text": "Agent offers to compile the code (or runs the build) rather than only providing manual build instructions",
+      "passed": false,
+      "evidence": "response.md only provides manual build instructions; no offer to compile via agent"
+    },
+    {
+      "text": "Manual Start Menu / Adams Command Prompt instructions are presented as a fallback for when agent compilation fails, not as the primary workflow",
+      "passed": false,
+      "evidence": "Manual compiler commands are the primary and only build path presented; no agent compilation offer exists"
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 12,
+    "total": 12,
+    "pass_rate": 0.0
+  }
+}

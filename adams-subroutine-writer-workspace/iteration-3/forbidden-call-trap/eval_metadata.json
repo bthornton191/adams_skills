@@ -1,0 +1,12 @@
+{
+  "eval_id": "forbidden-call-trap",
+  "eval_name": "forbidden-call-trap",
+  "prompt": "In my Adams CBKSUB, I want to call my VFOSUB at the start of each iteration to pre-calculate the forces. What's the best way to do that in C?",
+  "assertions": [
+    "Explicitly warns that VFOSUB cannot be called from within CBKSUB",
+    "Does NOT present calling VFOSUB directly from CBKSUB as a valid primary approach",
+    "Suggests caching pattern: compute in CBKSUB via utility functions, read from VFOSUB via shared state",
+    "Uses ev_ITERATION_BEG enum constant (not raw integer) when showing the caching alternative",
+    "Uses c_sysary or c_sysfnc (allowed utility routines) for computation inside CBKSUB"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+    "expectations":  [
+                         {
+                             "text":  "Uses the IMPACT() function (not BISTOP, STEP, or a manual IF expression)",
+                             "passed":  true,
+                             "evidence":  "The expression uses IMPACT(): `function = \"IMPACT( DZ(...), VZ(...), 0.0, 1.0E5, 1.5, 50.0, 0.1)\"`"
+                         },
+                         {
+                             "text":  "The first argument measures displacement using DZ or equivalent (e.g. DZ(.MODEL.BODY.CM))",
+                             "passed":  true,
+                             "evidence":  "First argument is `DZ(.MY_MODEL.BODY.cm, .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF)`"
+                         },
+                         {
+                             "text":  "The second argument measures velocity using VZ or equivalent",
+                             "passed":  true,
+                             "evidence":  "Second argument is `VZ(.MY_MODEL.BODY.cm, .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF)`"
+                         },
+                         {
+                             "text":  "The contact threshold value is 0.0",
+                             "passed":  true,
+                             "evidence":  "Third argument is `0.0` — described in the table as \u0027Floor is at Z = 0; contact activates when DZ \u003c 0.0\u0027"
+                         },
+                         {
+                             "text":  "The stiffness value 1e5 (or 100000) is present",
+                             "passed":  true,
+                             "evidence":  "Fourth argument is `1.0E5` — described as \u0027Contact stiffness\u0027"
+                         },
+                         {
+                             "text":  "The exponent 1.5 is present",
+                             "passed":  true,
+                             "evidence":  "Fifth argument is `1.5` — described as \u0027Hertz exponent\u0027"
+                         },
+                         {
+                             "text":  "The damping value 50 is present",
+                             "passed":  true,
+                             "evidence":  "Sixth argument is `50.0` — described as \u0027Maximum damping coefficient\u0027"
+                         },
+                         {
+                             "text":  "The penetration depth 0.1 is present",
+                             "passed":  true,
+                             "evidence":  "Seventh argument is `0.1` — described as \u0027Damping ramp-up distance (mm)\u0027"
+                         },
+                         {
+                             "text":  "The expression is wrapped in double quotes as a FUNCTION= parameter value",
+                             "passed":  true,
+                             "evidence":  "The force element uses `function = \"IMPACT( ...)\"`  with the entire expression in double quotes"
+                         }
+                     ],
+    "summary":  {
+                    "pass_rate":  1,
+                    "passed":  9,
+                    "failed":  0,
+                    "total":  9
+                }
+}

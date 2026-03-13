@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Uses the IMPACT() function (not BISTOP or a manual IF expression)",
+      "passed": true,
+      "evidence": "Response uses IMPACT() function and correctly identifies it as the standard approach for one-sided contact"
+    },
+    {
+      "text": "First arg uses DZ or similar displacement measuring penetration below floor",
+      "passed": true,
+      "evidence": "Found: 'DZ(CM_MARKER, GROUND_MARKER)' as the first argument"
+    },
+    {
+      "text": "Second arg uses VZ or matching velocity measure",
+      "passed": true,
+      "evidence": "Found: 'VZ(CM_MARKER, GROUND_MARKER)' as the second argument"
+    },
+    {
+      "text": "Threshold value is 0.0 (or equivalent contact point)",
+      "passed": true,
+      "evidence": "Found: '0.0' as the x1 threshold value"
+    },
+    {
+      "text": "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present",
+      "passed": true,
+      "evidence": "Found: '1.0E5, 1.5, 50.0, 0.1' in the expression"
+    },
+    {
+      "text": "Expression wrapped in double quotes as required for FUNCTION= parameter",
+      "passed": false,
+      "evidence": "In the main example the expression is not wrapped in double quotes: 'FUNCTION = IMPACT(DZ(CM_MARKER, GROUND_MARKER), VZ(CM_MARKER, GROUND_MARKER), 0.0, 1.0E5, 1.5, 50.0, 0.1)' — missing double quotes around the IMPACT(...) expression"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 1,
+    "total": 6,
+    "pass_rate": 0.833
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "expectations": [
+    {
+      "text": "Script contains a model create command",
+      "passed": true,
+      "evidence": "Found: 'model create model_name = pendulum'"
+    },
+    {
+      "text": "A rigid body part is created with part create rigid_body name_and_position",
+      "passed": true,
+      "evidence": "Found: 'part create rigid_body name_and_position part_name = .pendulum.link'"
+    },
+    {
+      "text": "At least one marker is created on the link and at least one on ground",
+      "passed": true,
+      "evidence": "Ground marker: '.pendulum.ground.pivot_mkr'. Link markers: '.pendulum.link.pin_mkr', '.pendulum.link.tip_mkr'"
+    },
+    {
+      "text": "A revolute joint is created using constraint create joint revolute with i_marker_name and j_marker_name",
+      "passed": true,
+      "evidence": "Found: 'constraint create joint revolute joint_name = .pendulum.rev_pivot i_marker_name = .pendulum.link.pin_mkr j_marker_name = .pendulum.ground.pivot_mkr'"
+    },
+    {
+      "text": "Gravity is created with force create body gravitational (not force create body_force or any other variant)",
+      "passed": true,
+      "evidence": "Found: 'force create body gravitational gravity_field_name = .pendulum.gravity y_component_gravity = -9806.65'"
+    },
+    {
+      "text": "Initial orientation set to 45 degrees for the release angle",
+      "passed": true,
+      "evidence": "Found: 'part modify rigid_body name_and_position part_name = .pendulum.link orientation = 0.0D, 0.0D, 45.0D'"
+    },
+    {
+      "text": "All keywords spelled out fully (no abbreviations)",
+      "passed": true,
+      "evidence": "All commands use fully-spelled keywords: 'model create', 'defaults units', 'marker create', 'part create rigid_body name_and_position', 'part modify rigid_body mass_properties', 'constraint create joint revolute', 'force create body gravitational'"
+    },
+    {
+      "text": "No adams_id specified anywhere in the script",
+      "passed": true,
+      "evidence": "Searched entire script for 'adams_id' — not found"
+    },
+    {
+      "text": "Mass properties are set with part modify rigid_body mass_properties (not part create rigid_body mass_properties)",
+      "passed": true,
+      "evidence": "Found: 'part modify rigid_body mass_properties part_name = .pendulum.link mass = 1.0' — correctly uses part modify, not part create"
+    },
+    {
+      "text": "CMD script runs in Adams View without any ERROR: lines in aview.log (validated by scripts/run_adams_cmd.py)",
+      "passed": true,
+      "evidence": "run_adams_cmd.py exit code 0 — no ERROR: lines in aview.log. Note: initial LLM output failed with 'No Marker was found because cm does not exist beneath .pendulum.link'; fixed by explicitly creating the cm marker before part modify mass_properties. Skill was updated accordingly (Core Rule #10 added)."
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 0,
+    "total": 10,
+    "pass_rate": 1.0
+  }
+}

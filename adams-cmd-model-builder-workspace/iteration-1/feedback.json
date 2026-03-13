@@ -1,0 +1,35 @@
+{
+  "reviews": [
+    {
+      "run_id": "eval-2-with_skill",
+      "feedback": "The model said this\n\n> | Displacement Var | `DZ(.MY_MODEL.BODY.cm, .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF)` | Z-component of the vector from `FLOOR_REF` to `BODY.cm`, measured along global Z |\n> | Velocity Var | `VZ(.MY_MODEL.BODY.cm, .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF, .MY_MODEL.ground.FLOOR_REF)` | Z-velocity of `BODY.cm` relative to `FLOOR_REF` in the global frame\n\nit is not correct about these being in the global frame. he third argument to DZ is the frame, so these are in the FLOOR_REF frame\n\nSingle component force command is `force create direct single_component_force` (llm used `force create body_force ...`), \nsame mistake for vector force\n\nneither of the force commands have a `force_name` argument. It is `single_component_force_name` and `force_vector_name`\n\nAlso, the `force create direct force_vector ` is the command, not `vector_force`\n\nAlso, FLOOR_REF is not a floating marker, that is a different type. The easiest way to fix this is to use `j_part_name=.MYMODEL.ground` instead. This automatically creates the floating marker. **ONLY APPLIES FOR vector_force** see next comment for single_component_force\n\nsingle_component_force doesn't use a *floating* marker for j. Just a normal marker. So llm incorrectly passed `j_floating_marker=.MY_MODEL.ground.FLOOR_REF`  when it should have just been `j_marker=.MY_MODEL.ground.FLOOR_REF`\n\nyou said \"`single_component_force` applies the force along the **z-axis of the i_marker**.\" That is not correct. It applies the force along the line of sight between the i and j markers. This would have led to chaotic/undefined behavior when the two markers are very close. The llm was correct to recommend vector force for this application, it just got the reasoning wrong.",
+      "timestamp": "2026-03-12T16:59:45.426Z"
+    },
+    {
+      "run_id": "eval-2-without_skill",
+      "feedback": "",
+      "timestamp": "2026-03-12T16:59:45.426Z"
+    },
+    {
+      "run_id": "eval-0-with_skill",
+      "feedback": "`forces create body_force gravity_field` should be `force create body gravitational`\n\nllm ran `part create rigid_body ... part_name= .PENDULUM.LINK` twice. The second one would have caused an error. SHould have been `part modify ...`\n\nllm is manually creating adams ids with `adams_id=...`. This is unnecessary and error prone. best practice is to just leave this argument off. Adams will auto assign the ids.\n\n\nAdams automatically updates the location of the auto generated .cm marker as the geometry of the part is modified. So this block was unnecessary and would break the auto update\n```\n! Reposition the auto-created cm marker from part origin to actual CM\nmarker modify &\n    marker_name = .PENDULUM.LINK.cm &\n    location    = 0.0, -100.0, 0.0\n```\n\n",
+      "timestamp": "2026-03-12T16:59:45.426Z"
+    },
+    {
+      "run_id": "eval-0-without_skill",
+      "feedback": "This one was better **without** the skill",
+      "timestamp": "2026-03-12T16:59:45.426Z"
+    },
+    {
+      "run_id": "eval-1-with_skill",
+      "feedback": "same problems as previous eval",
+      "timestamp": "2026-03-12T16:59:45.426Z"
+    },
+    {
+      "run_id": "eval-1-without_skill",
+      "feedback": "",
+      "timestamp": "2026-03-12T16:59:45.426Z"
+    }
+  ],
+  "status": "complete"
+}

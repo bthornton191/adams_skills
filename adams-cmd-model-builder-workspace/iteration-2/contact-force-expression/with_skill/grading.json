@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Uses the IMPACT() function (not BISTOP or a manual IF expression)",
+      "passed": true,
+      "evidence": "Found: 'IMPACT(DZ(.model.part.cm, .model.ground.floor_ref, .model.ground.floor_ref), ...'"
+    },
+    {
+      "text": "First arg uses DZ or similar displacement measuring penetration below floor",
+      "passed": true,
+      "evidence": "First arg is 'DZ(.model.part.cm, .model.ground.floor_ref, .model.ground.floor_ref)' — Z-component of CM position from floor reference"
+    },
+    {
+      "text": "Second arg uses VZ or matching velocity measure",
+      "passed": true,
+      "evidence": "Second arg is 'VZ(.model.part.cm, .model.ground.floor_ref, .model.ground.floor_ref, .model.ground.floor_ref)'"
+    },
+    {
+      "text": "Threshold value is 0.0 (or equivalent contact point)",
+      "passed": true,
+      "evidence": "Third argument is '0.0' — contact activates when DZ drops below 0.0"
+    },
+    {
+      "text": "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present",
+      "passed": true,
+      "evidence": "Found: '1.0E5, 1.5, 50.0, 0.1' in correct IMPACT argument positions"
+    },
+    {
+      "text": "Expression wrapped in double quotes as required for FUNCTION= parameter",
+      "passed": true,
+      "evidence": "Expression shown as: '\"IMPACT(DZ(.model.part.cm, ...), ..., 0.0, 1.0E5, 1.5, 50.0, 0.1)\"' — properly quoted. CMD block also uses 'function = \"IMPACT(...)\"'"
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  }
+}

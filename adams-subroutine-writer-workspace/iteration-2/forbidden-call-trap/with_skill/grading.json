@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Explicitly warns that VFOSUB cannot be called from within CBKSUB",
+      "passed": true,
+      "evidence": "Title: 'Calling VFOSUB from CBKSUB — Why You Can't, and What to Do Instead'. Lists VFOSUB explicitly in the forbidden calls list."
+    },
+    {
+      "text": "Does NOT present calling VFOSUB directly from CBKSUB as a valid primary approach",
+      "passed": true,
+      "evidence": "Rejects direct call immediately; only presents the caching pattern as the solution."
+    },
+    {
+      "text": "Suggests caching pattern: compute in CBKSUB via utility functions, read from VFOSUB via shared state",
+      "passed": true,
+      "evidence": "Full code example with ForceCache struct in force_cache.h, CBKSUB populates cache at ev_ITERATION_BEG via c_sysary, VFOSUB reads cache via extern."
+    },
+    {
+      "text": "Uses ev_ITERATION_BEG enum constant (not raw integer) when showing the caching alternative",
+      "passed": true,
+      "evidence": "cbksub.c: case ev_ITERATION_BEG:"
+    },
+    {
+      "text": "Uses c_sysary or c_sysfnc (allowed utility routines) for computation inside CBKSUB",
+      "passed": true,
+      "evidence": "cbksub.c: c_sysary( \"DISP\", ipar, 3, states, &nv, &errflg );"
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  }
+}

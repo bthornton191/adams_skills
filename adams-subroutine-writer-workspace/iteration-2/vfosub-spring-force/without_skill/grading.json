@@ -1,0 +1,60 @@
+{
+  "expectations": [
+    {
+      "text": "Uses struct-based C signature (sAdamsVforce* parameter), not Fortran-style flat params with trailing underscore",
+      "passed": false,
+      "evidence": "Uses Fortran-style: void vfosub_(int *id, double *time, double *par, int *npar, int *dflag, int *iflag, double *result)"
+    },
+    {
+      "text": "Includes adams_c_Vfosub forward declaration typedef",
+      "passed": false,
+      "evidence": "No typedef. No forward declaration present."
+    },
+    {
+      "text": "Includes slv_c_utils.h as the primary SDK header",
+      "passed": true,
+      "evidence": "vfosub.c: #include \"slv_c_utils.h\""
+    },
+    {
+      "text": "Includes iflag guard that skips iflag 5, 7, 9",
+      "passed": false,
+      "evidence": "Uses if (*iflag != 0) return; — skips all non-zero iflag values instead of specifically guarding 5, 7, 9."
+    },
+    {
+      "text": "Uses c_sysary or c_sysfnc to query displacement (not a raw function call)",
+      "passed": true,
+      "evidence": "vfosub.c: c_sysfnc(func_name, ipar, nargs, &dx, &errflg); with func_name='DX'"
+    },
+    {
+      "text": "Uses c_errmes for error handling after utility function calls",
+      "passed": true,
+      "evidence": "vfosub.c: c_errmes(1, \"Error in VFOSUB: could not evaluate DX\", *id, \"VFORCE\");"
+    },
+    {
+      "text": "Parameterizes markers or constants via PAR[] instead of hardcoding marker IDs in the function body",
+      "passed": false,
+      "evidence": "Hardcoded: ipar[0] = 10; ipar[1] = 1; and -500.0 * (dx - 100.0). Notes acknowledge hardcoding."
+    },
+    {
+      "text": "Build command uses correct library name adams_util.lib (not adams_utils.lib)",
+      "passed": false,
+      "evidence": "Uses wrong library: adams_solver_c.lib (not the correct name)."
+    },
+    {
+      "text": "Build command uses mdi.bat (Windows) or mdi -c (Linux), not raw cl/gcc/ifort",
+      "passed": false,
+      "evidence": "Uses raw cl /LD on Windows; raw gcc -shared on Linux."
+    },
+    {
+      "text": "Build instructions mention setting up the Adams environment before running mdi.bat",
+      "passed": false,
+      "evidence": "Does not use mdi.bat; mentions adams_env.bat for env setup but with raw compiler commands."
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 7,
+    "total": 10,
+    "pass_rate": 0.3
+  }
+}

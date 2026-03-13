@@ -1,0 +1,55 @@
+{
+  "expectations": [
+    {
+      "text": "CBKSUB uses struct-based C signature (sAdamsCbksub* parameter), not Fortran-style flat params",
+      "passed": false,
+      "evidence": "cbksub.c uses Fortran-style flat params: void cbksub(int *id, double *time, double *par, int *npar, int *flag, int *iflag)"
+    },
+    {
+      "text": "CBKSUB includes adams_c_Callback forward declaration typedef",
+      "passed": false,
+      "evidence": "No forward declaration typedef present. Function is declared directly with lowercase name."
+    },
+    {
+      "text": "CBKSUB uses ev_ITERATION_BEG enum constant, not a raw integer like case 4",
+      "passed": false,
+      "evidence": "No event-based switch at all. The function does not receive an event parameter and has no switch/case structure."
+    },
+    {
+      "text": "CBKSUB handles ev_PRIVATE_EVENT1/2 (ignores them without reading data[])",
+      "passed": false,
+      "evidence": "No event handling of any kind. The function has no event parameter and no switch/case."
+    },
+    {
+      "text": "CBKSUB includes slv_c_utils.h as the primary SDK header",
+      "passed": true,
+      "evidence": "cbksub.c line 10: #include \"slv_c_utils.h\""
+    },
+    {
+      "text": "VFOSUB uses struct-based C signature (sAdamsVforce* parameter) or correct pointer-based signature",
+      "passed": false,
+      "evidence": "vfosub.c uses Fortran-style flat params: void vfosub(int *id, double *time, double *par, int *npar, int *dflag, int *iflag, double *result)"
+    },
+    {
+      "text": "VFOSUB includes iflag guard that skips iflag 5, 7, 9",
+      "passed": false,
+      "evidence": "No iflag guard present. The function always uses the cache without checking iflag."
+    },
+    {
+      "text": "VFOSUB is dflag-aware: uses cache when dflag==0, falls back to direct SYSARY when dflag==1",
+      "passed": false,
+      "evidence": "No dflag awareness. VFOSUB always calls get_cached_dy() regardless of dflag value."
+    },
+    {
+      "text": "Both files use c_errmes for error handling",
+      "passed": false,
+      "evidence": "Neither file uses c_errmes. cbksub.c uses *iflag = 1 for error signaling. vfosub.c sets *iflag = 0 unconditionally."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 8,
+    "total": 9,
+    "pass_rate": 0.11
+  }
+}
