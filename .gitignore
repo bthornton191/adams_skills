@@ -2,3 +2,6 @@
 !/.vscode/tasks.json
 /dist
 __pycache__
+aview.log.*
+aview.cmd.bak
+/adams-cmd-model-builder-workspace/iteration-*/*/*/outputs/aview.cmd
