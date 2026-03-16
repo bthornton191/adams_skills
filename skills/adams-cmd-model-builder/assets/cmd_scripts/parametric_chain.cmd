@@ -49,7 +49,6 @@ for variable_name = i  start_value = 1  end_value = (eval(.chain.n_links))
     part modify rigid_body mass_properties &
         part_name             = (eval(".chain.link_" // RTOI(i))) &
         mass                  = (eval(.chain.link_mass)) &
-        center_of_mass_marker = (eval(".chain.link_" // RTOI(i) // ".cm")) &
         ixx = (eval(.chain.link_mass) * eval(.chain.link_len)**2 / 12.0) &
         iyy = (eval(.chain.link_mass) * eval(.chain.link_len)**2 / 12.0) &
         izz = 0.0
@@ -105,5 +104,5 @@ force create body gravitational &
 ! End of parametric_chain.cmd
 !
 ! To change the number of links, edit N_LINKS above and re-run.
-!   simulate transient end_time = 3.0 step_size = 0.001
+!   simulation single_run transient type=auto_select end_time=3.0 number_of_steps=3000 model_name=.chain initial_static=no
 ! ============================================================

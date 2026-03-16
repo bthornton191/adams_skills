@@ -65,13 +65,27 @@ part modify rigid_body mass_properties &
 ## Create a Point Mass
 
 ```cmd
-part create point_mass &
-    part_name = .my_model.ball &
-    location  = 50.0, 0.0, 0.0 &
-    mass      = 0.5
+part create point_mass name_and_position &
+    point_mass_name = .my_model.ball &
+    location        = 50.0, 0.0, 0.0
+
+! Create the CM marker BEFORE setting mass properties
+marker create &
+    marker_name = .my_model.ball.cm &
+    location    = 0.0, 0.0, 0.0 &
+    orientation = 0.0D, 0.0D, 0.0D
+
+part modify point_mass mass_properties &
+    point_mass_name       = .my_model.ball &
+    mass                  = 0.5 &
+    center_of_mass_marker = .my_model.ball.cm
 ```
 
-A point mass has no rotational inertia — useful for simple pendulum bobs, concentrated masses.
+- A point mass has no rotational inertia — useful for pendulum bobs, concentrated masses.
+- Use `name_and_position` to create and position it.
+- Create the `.cm` marker explicitly **before** calling `mass_properties`.
+- Pass `center_of_mass_marker` to link the CM marker in the `mass_properties` call.
+- **Do NOT use `constraint create joint fixed`** with a point mass — it only supports `spherical` joints, `atpoint`, `inline`, and `inplane` joint primitives.
 
 ---
 

@@ -4,9 +4,12 @@
 
 | Use this | When … |
 |----------|--------|
-| `spring_damper` | 1-DOF spring + damper along a line of action, known K and C |
-| `bushing` | 6-DOF compliant connection (3 translational + 3 rotational stiffness/damping) |
+| `spring_damper` | 1-DOF translational spring + damper along the line of sight between two markers |
+| `rotational_spring_damper` | 1-DOF torsional spring + damper about parallel z-axes of two markers |
+| `bushing` | 6-DOF compliant connection with independent diagonal stiffness/damping per DOF |
+| `field` | 6-DOF force with a full 6×6 stiffness (and damping) matrix; captures cross-coupling between DOF |
 | `beam` | Structural flexible member where cross-section geometry drives stiffness |
+| `friction` | Friction force on an existing revolute, translational, or cylindrical joint |
 | `single_component_force` | Custom scalar force or torque defined by a FUNCTION= expression |
 | `vector_force` | Three-component force vector via FUNCTION= (no accompanying torque) |
 | `general_force` | Six-component force + torque all from a single FUNCTION= expression |
@@ -34,16 +37,17 @@ force create body gravitational &
 ## Spring-Damper
 
 ```cmd
-force create element_like spring_damper &
-    spring_damper_name = .model.spring_main &
-    i_marker_name      = .model.body.spring_i_mkr &
-    j_marker_name      = .model.ground.spring_j_mkr &
-    stiffness          = 5000.0 &
-    damping            = 100.0 &
-    length             = 250.0
+force create element_like translational_spring_damper &
+    spring_damper_name     = .model.spring_main &
+    i_marker_name          = .model.body.spring_i_mkr &
+    j_marker_name          = .model.ground.spring_j_mkr &
+    stiffness              = 5000.0 &
+    damping                = 100.0 &
+    preload                = 0.0 &
+    displacement_at_preload = 250.0
 ```
 
-- `length` = free (natural) length.
+- `displacement_at_preload` = free (natural) length (the distance at which preload = 0).
 - Force = −K × (deformation) − C × (rate of deformation). Positive = compression.
 
 ---
@@ -64,6 +68,25 @@ force create element_like bushing &
 
 ---
 
+## Rotational Spring-Damper
+
+```cmd
+force create element_like rotational_spring_damper &
+    spring_damper_name      = .model.torsion_spring &
+    i_marker_name           = .model.arm.pivot_i_mkr &
+    j_marker_name           = .model.base.pivot_j_mkr &
+    stiffness               = 200.0 &
+    damping                 = 2.0 &
+    displacement_at_preload = 0.0D
+```
+
+- The **z-axes of the I and J markers must be parallel and point in the same direction**. Misaligned z-axes produce unpredictable results.
+- `stiffness` in torque/angle units (N·mm/deg when using mm-kg-s units).
+- `displacement_at_preload` is the free (neutral) angle; set `0.0D` for zero-preload.
+- Torque on I marker: `torque = -C * dα/dt - K * (α - displacement_at_preload)`
+
+---
+
 ## Beam (Euler-Bernoulli)
 
 ```cmd
@@ -81,6 +104,56 @@ force create element_like beam &
 
 - `area` in length², moment of inertia in length⁴.
 - Both I and J markers must be at the **beam ends**; beam axis = line between them.
+
+---
+
+## Field (6×6 Stiffness+Damping Matrix)
+
+A `field` applies a 6-DOF action-reaction force+torque between two markers using a full 6×6 stiffness matrix and 6×6 damping matrix. Unlike `bushing` (which uses independent per-DOF values), a `field` can capture **cross-coupling** between translational and rotational DOF.
+
+```cmd
+force create element_like field &
+    field_name       = .model.chassis_mount &
+    i_marker_name    = .model.subframe.mount_i_mkr &
+    j_marker_name    = .model.chassis.mount_j_mkr &
+    stiffness_matrix = 1.0e4, 0, 0, 0, 0, 0, &
+                       0, 1.0e4, 0, 0, 0, 0, &
+                       0, 0, 1.2e4, 0, 0, 0, &
+                       0, 0, 0, 500, 0, 0, &
+                       0, 0, 0, 0, 500, 0, &
+                       0, 0, 0, 0, 0, 800 &
+    damping_ratio    = 0.05
+```
+
+- `stiffness_matrix` — 36 values entered **column-major** (column 1 top-to-bottom, then column 2, …). The first 6 values are the first column `[K11,K21,K31,K41,K51,K61]`.
+- The matrix order is: [Fx, Fy, Fz, Tx, Ty, Tz] vs [x, y, z, α, β, γ] of the I marker relative to J marker.
+- `damping_ratio` — scalar multiplier applied to `stiffness_matrix` to derive damping: `C = damping_ratio × K`.
+- Alternative: use `matrix_of_damping_terms` (another 36 values) to specify the damping matrix directly instead of `damping_ratio`.
+- Optional `translation_at_preload` and `rotation_at_preload` (3 values each) set the reference displacement at which preload forces apply.
+- For nonlinear behaviour, use `user_function` to pass constants to an Adams FIESUB user subroutine instead of specifying matrix parameters.
+
+---
+
+## Friction
+
+Adds Coulomb friction to an existing revolute, translational, or cylindrical joint.
+
+```cmd
+force create element_like friction &
+    friction_name  = .model.rev_pin_friction &
+    joint_name     = .model.rev_pin &
+    mu_static      = 0.12 &
+    mu_dynamic     = 0.10 &
+    reaction_arm   = 10.0 &
+    effect         = all
+```
+
+- `joint_name` — the existing joint this friction acts on. Works with `revolute`, `translational`, and `cylindrical` joints.
+- `mu_static` / `mu_dynamic` — static and kinetic friction coefficients.
+- `reaction_arm` — effective moment arm (in length units) used to compute the friction torque from the joint reaction force.
+- `effect = all` captures both stiction and sliding; use `stiction` or `sliding` to isolate phases.
+- Optional `bending_moment = on` and `torsional_moment = on` include the contributions of bending and torsional moments for revolute joints.
+- Optional `formulation = lugre` switches to the LuGre dynamic friction model (requires additional bristle stiffness / damping parameters).
 
 ---
 

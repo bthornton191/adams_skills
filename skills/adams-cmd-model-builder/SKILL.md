@@ -29,7 +29,28 @@ You are an expert MSC Adams View CMD scripter. You write correct, complete `.cmd
 7. **Use `EVAL(expr)` inside loops** to force immediate evaluation of a variable expression rather than storing a literal string.
 8. **Never specify `adams_id` manually** — Adams auto-assigns IDs. Adding them by hand is error-prone and unnecessary in CMD scripts.
 9. **`part create` only once per part** — Use `part create rigid_body name_and_position` to create the part, then `part modify rigid_body mass_properties` (not `part create`) to set mass/inertia. Calling `part create` a second time on the same part will error.
-10. **Do not pass `center_of_mass_marker` to `part modify rigid_body mass_properties` unless redirecting the CM to a non-default marker** — Adams auto-creates and places `.part.cm` when mass is set. If you explicitly pass `center_of_mass_marker = .part.cm` before that marker exists, Adams errors: `No Marker was found because 'cm' does not exist`. Only specify `center_of_mass_marker` when you want to override the default `cm` with a different, already-existing marker.
+10. **Always create a `.cm` marker explicitly and pass it as `center_of_mass_marker`**: Before calling `part modify rigid_body mass_properties`, create a `marker create` with `marker_name = .part.cm` at the center of mass location (in the part's local frame). Then pass `center_of_mass_marker = .part.cm` in the modify call. If the part's reference origin is placed at the CM (recommended), the `.cm` marker location is `0.0, 0.0, 0.0`. Do NOT rely on Adams to auto-create the CM marker — Adams 2023.2 requires the marker to be pre-created. Example:
+    ```cmd
+    part create rigid_body name_and_position &
+        part_name   = .model.link &
+        location    = 50.0, 0.0, 0.0   ! part origin placed at CM
+    marker create &
+        marker_name = .model.link.cm &
+        location    = 0.0, 0.0, 0.0 &  ! (0,0,0) in local = part origin = CM
+        orientation = 0.0D, 0.0D, 0.0D
+    part modify rigid_body mass_properties &
+        part_name             = .model.link &
+        mass                  = 1.0 &
+        ixx                   = 100.0 &
+        iyy                   = 100.0 &
+        izz                   = 100.0 &
+        center_of_mass_marker = .model.link.cm
+    ```
+11. **`part create point_mass` uses sub-commands, not inline parameters**: use `part create point_mass name_and_position & point_mass_name = ... & location = ...` to create, then create a `.cm` marker explicitly, then `part modify point_mass mass_properties & point_mass_name = ... & mass = ... & center_of_mass_marker = .model.part.cm`. Do NOT use `rigid_body` syntax for point masses.
+12. **Do not use `constraint create joint fixed` with a point mass** — Adams only allows `spherical`, `atpoint`, `inline`, and `inplane` primitives on point masses. Use `constraint create joint spherical` to fully fix a point mass (spherical removes all 3 translational DOF; since point masses have no rotational DOF, this is fully constrained).
+13. **Spring-damper keyword: `translational_spring_damper`, not `spring_damper`**: the correct command is `force create element_like translational_spring_damper`. Free length is set via `displacement_at_preload` (not `length`).
+14. **Simulation command: `simulation single_run transient`** — the keyword `simulate transient` does not exist. Use `simulation single_run transient & type = auto_select & end_time = ... & number_of_steps = ... & model_name = ... & initial_static = no`.
+15. **Always add geometry to moving parts, using correct syntax** — Adams models without geometry are very difficult to inspect visually. Add at least one `geometry create shape` command to every moving rigid part or point mass. **Geometry syntax rules (Adams 2023.2):** `sphere` and `box` are not valid shape keywords — use `ellipsoid` (with equal x/y/z scale factors for a sphere-like shape) or `cylinder` instead. Do NOT include `part_name` or `adams_id` in geometry commands (the part is inferred from the object path). Do NOT use `side_count_for_perimeter` for cylinders. For `link` shape, use `i_marker`/`j_marker` (not `i_marker_name`/`j_marker_name`). See the geometry reference for complete examples.
 
 ---
 
@@ -96,7 +117,7 @@ constraint create joint revolute &
 
 | Scenario | Command | Key Parameters |
 |----------|---------|----------------|
-| 1-DOF spring + damper along axis | `force create element_like spring_damper` | `stiffness`, `damping`, `length` |
+| 1-DOF spring + damper along axis | `force create element_like translational_spring_damper` | `stiffness`, `damping`, `displacement_at_preload` |
 | 6-DOF compliant connection (rubber mount, bushing) | `force create element_like bushing` | `stiffness` (6 values), `damping` (6 values) |
 | Structural flexible beam (Euler-Bernoulli) | `force create element_like beam` | `area`, `ixx`, `iyy`, `length`, material properties |
 | Custom scalar force defined by expression | `force create direct single_component_force` | `function`, `action_only` |
@@ -195,3 +216,23 @@ Full scripting reference: [`references/commands/scripting.md`](references/comman
 | Function expressions index | [`references/function-expressions/README.md`](references/function-expressions/README.md) |
 | Simple pendulum example | [`assets/cmd_scripts/simple_pendulum.cmd`](assets/cmd_scripts/simple_pendulum.cmd) |
 | Parametric chain example | [`assets/cmd_scripts/parametric_chain.cmd`](assets/cmd_scripts/parametric_chain.cmd) |
+
+---
+
+## Running a Simulation
+
+To run a transient dynamics simulation from within a CMD script:
+
+```cmd
+simulation single_run transient &
+    type            = auto_select &
+    end_time        = 2.0 &
+    number_of_steps = 2000 &
+    model_name      = .my_model &
+    initial_static  = no
+```
+
+- `number_of_steps` controls output frequency (end_time / number_of_steps = step_size).
+- `initial_static = no` skips the static equilibrium step before the transient run.
+- `type = auto_select` lets Adams choose the integrator automatically.
+- **Do NOT use `simulate transient`** — that is not a valid Adams View keyword.

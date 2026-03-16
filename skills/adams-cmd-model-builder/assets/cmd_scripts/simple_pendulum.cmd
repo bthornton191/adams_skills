@@ -100,5 +100,5 @@ geometry create shape cylinder &
 ! End of simple_pendulum.cmd
 !
 ! To simulate: set end time = 2.0 s, step size = 0.001 s
-!   simulate transient end_time = 2.0 step_size = 0.001
+!   simulation single_run transient type=auto_select end_time=2.0 number_of_steps=2000 model_name=.pendulum initial_static=no
 ! ============================================================

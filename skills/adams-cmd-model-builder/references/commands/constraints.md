@@ -107,16 +107,16 @@ constraint create joint universal &
 ## Coupler (Gear / Rack-and-Pinion)
 
 ```cmd
-constraint create coupler &
-    coupler_name   = .model.gear_1_2 &
-    adams_id       = 10 &
-    joint_name     = .model.rev_gear1, .model.rev_gear2 &
-    type           = rotational &
-    scales         = 1.0, -0.5
+constraint create complex_joint coupler &
+    coupler_name        = .model.gear_1_2 &
+    joint_name          = .model.rev_gear1, .model.rev_gear2 &
+    type_of_freedom     = rot_rot &
+    motion_multipliers  = 1.0, -0.5
 ```
 
-- `scales` define the gear ratio: applies the ratio `scales[1] * ω1 + scales[2] * ω2 = 0`.
-- `type` can be `rotational`, `translational`, or `mixed`.
+- **Full command**: `constraint create complex_joint coupler` — `constraint create coupler` is not valid.
+- `motion_multipliers` define the gear ratio: applies `motion_multipliers[1] * ω1 + motion_multipliers[2] * ω2 = 0`. For a 3:1 ratio with opposite directions: `motion_multipliers = 1.0, -0.333`.
+- `type_of_freedom`: `rot_rot` (both rotational), `trans_trans` (both translational), or `rot_trans` (mixed).
 
 ---
 
@@ -126,16 +126,29 @@ Prescribes a position, velocity, or acceleration profile on a joint DOF.
 
 ```cmd
 constraint create motion_generator &
-    motion_name = .model.motion_1 &
-    adams_id    = 20 &
-    joint_name  = .model.rev_actuator &
-    type        = rotational &
-    function    = "STEP(TIME, 0, 0, 2, 180D)"
+    motion_name      = .model.motion_1 &
+    joint_name       = .model.rev_actuator &
+    type_of_freedom  = rotational &
+    time_derivative  = displacement &
+    function         = "STEP(TIME, 0, 0, 2, 180D)"
 ```
 
-- `type`: `rotational` or `translational`
+- `type_of_freedom`: `rotational` or `translational`
+- `time_derivative`: `displacement` (default), `velocity`, or `acceleration`. **Always specify this explicitly** — omitting it when your function defines velocity (e.g. a HAVSIN ramp of angular velocity) will cause Adams to treat the function as displacement.
 - `function`: any valid FUNCTION= expression
 - The motion **replaces** the joint DOF with the prescribed trajectory; the joint reaction force is computed by the solver.
+
+### Example: Velocity ramp using HAVSIN
+
+```cmd
+! Ramp angular velocity 0 → 120 deg/s over 0.5 s, then hold
+constraint create motion_generator &
+    motion_name      = .model.motion_drive &
+    joint_name       = .model.rev_input &
+    type_of_freedom  = rotational &
+    time_derivative  = velocity &
+    function         = "HAVSIN(TIME, 0.0, 0.5, 0.0, 120D)"
+```
 
 ---
 
