@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Bug identified: adams_id should NOT be used — script incorrectly specifies adams_id = 1 for all parts/joints/forces",
+      "passed": false,
+      "evidence": "adams_id is never flagged as a bug. The corrected script still retains 'adams_id = 3' in the mass_properties block."
+    },
+    {
+      "text": "Bug identified: Abbreviated commands used — e.g., 'part mod' instead of 'part modify', 'sim trans' instead of 'simulation single_run transient'",
+      "passed": false,
+      "evidence": "Abbreviated commands are never identified as bugs. The corrected script still uses 'model cre' (not 'model create'), showing the abbreviation was not recognized as an error."
+    },
+    {
+      "text": "Bug identified: center_of_mass_marker argument passed in part modify rigid_body mass_properties (it should not be)",
+      "passed": false,
+      "evidence": "center_of_mass_marker is never flagged. The corrected script retains 'center_of_mass_marker = .pendulum.link.cm' in the mass_properties block."
+    },
+    {
+      "text": "Bug identified: Marker names use incorrect format — e.g. 'ground_j' instead of '.model.ground.ground_j' (missing full dot-path hierarchy)",
+      "passed": true,
+      "evidence": "Bug 3 and Bug 4 correctly flag 'pendulum.link.pin_mkr' as missing its leading dot, with the fix being '.pendulum.link.pin_mkr' for both marker_name and i_marker_name."
+    },
+    {
+      "text": "Bug identified: Wrong joint type used — fixed joint on a point mass (Adams only allows spherical or primitive joints on point masses)",
+      "passed": false,
+      "evidence": "No mention of a fixed joint on a point mass anywhere in the response."
+    },
+    {
+      "text": "Bug identified: Wrong spring-damper keyword — 'spring_damper' used instead of 'translational_spring_damper'",
+      "passed": false,
+      "evidence": "No mention of spring_damper or translational_spring_damper anywhere in the response."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 5,
+    "total": 6,
+    "pass_rate": 0.167
+  }
+}

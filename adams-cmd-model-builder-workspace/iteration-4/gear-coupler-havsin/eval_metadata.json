@@ -1,0 +1,15 @@
+{
+  "eval_id": "gear-coupler-havsin",
+  "eval_name": "gear-coupler-havsin",
+  "prompt": "Show me the Adams CMD commands to create a gear constraint linking two existing revolute joints \u2014 .model.rev_input and .model.rev_output \u2014 with a 3:1 speed ratio (the input shaft runs 3 times faster than the output shaft, and they rotate in opposite directions). Then add a motion generator on the input joint that smoothly ramps the input angular velocity from 0 to 120 degrees per second over the first 0.5 seconds and holds at 120 deg/s afterward. Use the haversine step function for the ramp.",
+  "assertions": [
+    {"text": "constraint create coupler command is used (not a motion generator ratio or expression trick)"},
+    {"text": "scales parameter is 1.0, -0.333 (or equivalent 1:3 ratio with opposite sign for opposite direction)"},
+    {"text": "joint_name includes both .model.rev_input and .model.rev_output"},
+    {"text": "constraint create motion_generator is used on the input joint"},
+    {"text": "motion generator specifies type_of_freedom = rotational"},
+    {"text": "HAVSIN function is used for the ramp (not STEP or STEP5)"},
+    {"text": "HAVSIN argument order is (x, begin_at, end_at, initial_value, final_value) \u2014 NOT the STEP order"},
+    {"text": "No adams_id specified anywhere"}
+  ]
+}

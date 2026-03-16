@@ -1,0 +1,65 @@
+{
+  "expectations": [
+    {
+      "text": "Script creates a model with model create command",
+      "passed": true,
+      "evidence": "model create & model_name = four_bar present at top of script"
+    },
+    {
+      "text": "Three distinct rigid body parts are created (crank, coupler, rocker)",
+      "passed": true,
+      "evidence": "part create rigid_body name_and_position for .four_bar.crank, .four_bar.coupler, .four_bar.rocker all present"
+    },
+    {
+      "text": "Four revolute joints are created (crank-ground, crank-coupler, coupler-rocker, rocker-ground)",
+      "passed": true,
+      "evidence": "constraint create joint revolute for rev_a (crank-ground), rev_b (crank-coupler), rev_c (coupler-rocker), rev_d (rocker-ground)"
+    },
+    {
+      "text": "A motion generator drives the crank joint at a constant 360 degrees per second",
+      "passed": true,
+      "evidence": "constraint create motion_generator on .four_bar.rev_a with type_of_freedom = rotational and function = \"360D * TIME\""
+    },
+    {
+      "text": "Script includes simulate transient command (or notes the command to run)",
+      "passed": true,
+      "evidence": "simulation single_run transient & type = auto_select & end_time = 2.0 & number_of_steps = 2000"
+    },
+    {
+      "text": "All keywords spelled out fully — no abbreviated commands anywhere",
+      "passed": true,
+      "evidence": "All commands fully spelled: model create, defaults units, force create body gravitational, marker create, part create rigid_body, constraint create joint revolute, constraint create motion_generator, simulation single_run transient"
+    },
+    {
+      "text": "All object names use full dot-path hierarchy (.model.part.marker)",
+      "passed": true,
+      "evidence": "All names use full paths: .four_bar.crank.pin_a, .four_bar.ground.mkr_a, .four_bar.rev_a, etc."
+    },
+    {
+      "text": "No adams_id specified anywhere in the script",
+      "passed": true,
+      "evidence": "No adams_id keyword found anywhere in the script"
+    },
+    {
+      "text": "Mass/inertia set with part modify rigid_body mass_properties, not part create",
+      "passed": false,
+      "evidence": "Uses 'part create rigid_body mass_properties' for all three parts instead of 'part modify rigid_body mass_properties'"
+    },
+    {
+      "text": "center_of_mass_marker argument is NOT passed in any part modify mass_properties call",
+      "passed": true,
+      "evidence": "No 'part modify rigid_body mass_properties' calls exist at all; center_of_mass_marker only appears in 'part create' calls which are not in scope of this assertion"
+    },
+    {
+      "text": "CMD script runs in Adams View without any ERROR: lines in aview.log (adams_view_validation)",
+      "passed": true,
+      "evidence": "Adams View validation PASSED — no ERROR: lines in aview.log"
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 1,
+    "total": 11,
+    "pass_rate": 0.91
+  }
+}

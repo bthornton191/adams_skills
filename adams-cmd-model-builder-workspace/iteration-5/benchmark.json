@@ -1,0 +1,166 @@
+{
+  "metadata": {
+    "skill_name": "adams-cmd-model-builder",
+    "skill_path": "skills/adams-cmd-model-builder",
+    "timestamp": "2026-03-16T00:00:00Z",
+    "evals_run": [
+      "simple-pendulum-script",
+      "spring-damper-force",
+      "contact-force-expression",
+      "four-bar-linkage",
+      "nonlinear-bushing-spline",
+      "cam-follower-step5",
+      "parametric-loop-chain",
+      "gear-coupler-havsin",
+      "debug-broken-script"
+    ],
+    "runs_per_configuration": 1,
+    "notes": [
+      "All 7 with_skill .cmd outputs pass Adams View validation (0 errors in aview.log)",
+      "Geometry syntax fixed this iteration: removed sphere/box (not valid in Adams 2023.2), removed part_name/side_count_for_perimeter, fixed link i_marker/j_marker syntax",
+      "CM marker pattern corrected: .cm must be created explicitly before part modify mass_properties and passed as center_of_mass_marker",
+      "geometry.md and SKILL.md Rules 10 and 15 updated to reflect Adams 2023.2 validated syntax"
+    ]
+  },
+
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": { "mean": 1.0, "stddev": 0.0 }
+    },
+    "without_skill": {
+      "pass_rate": { "mean": 0.656, "stddev": 0.163 }
+    },
+    "delta": {
+      "pass_rate": "+34.4%"
+    }
+  },
+
+  "runs": [
+    {
+      "eval_id": "simple-pendulum-script",
+      "eval_name": "simple-pendulum-script",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0,   "passed": 11, "failed": 0, "total": 11, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "simple-pendulum-script",
+      "eval_name": "simple-pendulum-script",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.636, "passed": 7,  "failed": 4, "total": 11, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "spring-damper-force",
+      "eval_name": "spring-damper-force",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0,   "passed": 6,  "failed": 0, "total": 6,  "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "spring-damper-force",
+      "eval_name": "spring-damper-force",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.667, "passed": 4,  "failed": 2, "total": 6,  "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "contact-force-expression",
+      "eval_name": "contact-force-expression",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0,   "passed": 6,  "failed": 0, "total": 6,  "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "contact-force-expression",
+      "eval_name": "contact-force-expression",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.833, "passed": 5,  "failed": 1, "total": 6,  "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "four-bar-linkage",
+      "eval_name": "four-bar-linkage",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0,   "passed": 12, "failed": 0, "total": 12, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "four-bar-linkage",
+      "eval_name": "four-bar-linkage",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.75,  "passed": 9,  "failed": 3, "total": 12, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "nonlinear-bushing-spline",
+      "eval_name": "nonlinear-bushing-spline",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0,   "passed": 12, "failed": 0, "total": 12, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "nonlinear-bushing-spline",
+      "eval_name": "nonlinear-bushing-spline",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.417, "passed": 5,  "failed": 7, "total": 12, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "cam-follower-step5",
+      "eval_name": "cam-follower-step5",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0,   "passed": 12, "failed": 0, "total": 12, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "cam-follower-step5",
+      "eval_name": "cam-follower-step5",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.833, "passed": 10, "failed": 2, "total": 12, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "parametric-loop-chain",
+      "eval_name": "parametric-loop-chain",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0,   "passed": 14, "failed": 0, "total": 14, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "parametric-loop-chain",
+      "eval_name": "parametric-loop-chain",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.5,   "passed": 7,  "failed": 7, "total": 14, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "gear-coupler-havsin",
+      "eval_name": "gear-coupler-havsin",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0,   "passed": 14, "failed": 0, "total": 14, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "gear-coupler-havsin",
+      "eval_name": "gear-coupler-havsin",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.857, "passed": 12, "failed": 2, "total": 14, "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "debug-broken-script",
+      "eval_name": "debug-broken-script",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 1.0,   "passed": 9,  "failed": 0, "total": 9,  "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    },
+    {
+      "eval_id": "debug-broken-script",
+      "eval_name": "debug-broken-script",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": { "pass_rate": 0.444, "passed": 4,  "failed": 5, "total": 9,  "time_seconds": 0, "tokens": 0, "tool_calls": 0, "errors": 0 }
+    }
+  ]
+}

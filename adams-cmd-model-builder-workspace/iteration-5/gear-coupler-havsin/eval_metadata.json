@@ -1,0 +1,21 @@
+{
+  "eval_id": "gear-coupler-havsin",
+  "eval_name": "gear-coupler-havsin",
+  "prompt": "Write a complete Adams CMD script for a two-shaft gear system. Create two shaft parts (each 0.5 kg, Ixx=Iyy=1000 kg·mm², Izz=50 kg·mm²) connected to ground via revolute joints on the Z axis — the input shaft joint at the origin, the output shaft joint at 0, 150, 0 mm. Link the two revolute joints (.model.rev_input and .model.rev_output) with a gear coupler at a 3:1 speed ratio where the input rotates 3× faster than the output and they rotate in opposite directions. Add a motion generator on the input joint that smoothly ramps the input shaft angular velocity from 0 to 120 degrees per second over the first 0.5 seconds using the haversine step function (HAVSIN), then holds at 120 deg/s afterward. Add cylinder geometry to both shafts. Simulate for 2 seconds.",
+  "assertions": [
+    {"text": "Script creates a model with at least two shaft parts connected to ground via revolute joints"},
+    {"text": "constraint create complex_joint coupler is used (NOT 'constraint create coupler')"},
+    {"text": "motion_multipliers = 1.0, -0.333 (or equivalent 3:1 ratio with opposite sign)"},
+    {"text": "joint_name lists both .model.rev_input and .model.rev_output in the coupler"},
+    {"text": "constraint create motion_generator is used on the input joint"},
+    {"text": "motion generator specifies type_of_freedom = rotational"},
+    {"text": "motion generator specifies time_derivative = velocity"},
+    {"text": "HAVSIN function is used for the ramp (not STEP or STEP5)"},
+    {"text": "HAVSIN argument order is (x, x0, x1, h0, h1) = (TIME, 0.0, 0.5, 0.0, 120D)"},
+    {"text": "At least one geometry shape (cylinder) is added to each shaft part"},
+    {"text": "All object names use full dot-path hierarchy"},
+    {"text": "No adams_id specified anywhere"},
+    {"text": "Script uses simulation single_run transient command"},
+    {"text": "CMD script runs in Adams View without any ERROR: lines in aview.log"}
+  ]
+}

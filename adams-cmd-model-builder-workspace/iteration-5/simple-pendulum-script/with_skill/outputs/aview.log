@@ -1,0 +1,3201 @@
+! Adams View Adams 2023.2 (built Jun 30 2023)
+
+! >> 
+! needed to be sure ADrill runs at optimum speed in batch mode
+! >> ! needed to be sure ADrill runs at optimum speed in batch mode
+defaults solver compatibility_checking = off
+! >> defaults solver compatibility_checking = off
+
+! >> 
+colors modify color_name = Background red=(.43*.57) green=(.84*.57) blue=(.97*.57)
+! >> colors modify color_name = Background red=(.43*.57) green=(.84*.57) blue=(.97*.57)
+defaults icon_naming show_as = partial_name
+! >> defaults icon_naming show_as = partial_name
+
+! >> 
+! Load Custom Menu
+! >> ! Load Custom Menu
+interface menubar read menubar=.gui.main.mmenu_menu.mbar_refresh file="C:\Program Files\MSC.Software\Adams\aview_mods_gen\menu.mnu"
+! >> interface menubar read menubar=.gui.main.mmenu_menu.mbar_refresh file="C:\Program Files\MSC.Software\Adams\aview_mods_gen\menu.mnu"
+
+! >> 
+! Create Library
+! >> ! Create Library
+if condition=1
+! >> if condition=1
+ library create library_name = .athorn
+! +1>>  library create library_name = .athorn
+end
+! +1>> end
+
+! >> 
+! Load Macros
+! >> ! Load Macros
+macro read &
+! >> macro read &
+    macro_name = .MDI.delete_macro &
+! &>     macro_name = .MDI.delete_macro &
+    file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\delete_macro.mac"
+! &>     file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\delete_macro.mac"
+macro read &
+! >> macro read &
+    macro_name = .athorn.mid_marker &
+! &>     macro_name = .athorn.mid_marker &
+    file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\mid_marker.mac" &
+! &>     file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\mid_marker.mac" &
+    user="athorn mid_marker"
+! &>     user="athorn mid_marker"
+macro read &
+! >> macro read &
+    macro_name = .athorn.hide_others &
+! &>     macro_name = .athorn.hide_others &
+    file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\hide_others.mac" &
+! &>     file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\hide_others.mac" &
+    user="athorn hide_others"
+! &>     user="athorn hide_others"
+macro read &
+! >> macro read &
+    macro_name = .athorn.ppt_winmax &
+! &>     macro_name = .athorn.ppt_winmax &
+    file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\ppt_winmax.mac" &
+! &>     file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\ppt_winmax.mac" &
+    user="athorn ppt_winmax"
+! &>     user="athorn ppt_winmax"
+macro read &
+! >> macro read &
+    macro_name = .athorn.pick_from_screen &
+! &>     macro_name = .athorn.pick_from_screen &
+    file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\pick_from_screen.mac" &
+! &>     file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\pick_from_screen.mac" &
+    user="athorn pick_from_screen"
+! &>     user="athorn pick_from_screen"
+macro read &
+! >> macro read &
+    macro_name = .athorn.fbd &
+! &>     macro_name = .athorn.fbd &
+    file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\fbd.mac" &
+! &>     file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\fbd.mac" &
+    user="athorn fbd" &
+! &>     user="athorn fbd" &
+    create_panel=yes
+! &>     create_panel=yes
+macro read &
+! >> macro read &
+    macro_name = .athorn.all_force_graphics &
+! &>     macro_name = .athorn.all_force_graphics &
+    file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\all_force_graphics.mac" &
+! &>     file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\all_force_graphics.mac" &
+    user="athorn all_force_graphics" &
+! &>     user="athorn all_force_graphics" &
+    create_panel=no
+! &>     create_panel=no
+
+! >> 
+! Set Environment Variables
+! >> ! Set Environment Variables
+var set var=.mdi.tmp_int int=0
+! >> var set var=.mdi.tmp_int int=0
+var set var=.mdi.tmp_int int=0
+! >> var set var=.mdi.tmp_int int=0
+
+! >> 
+! Random Customizations
+! >> ! Random Customizations
+interface field    display field_name=.gui.sim_int_panel.c_interactive.step_size
+! >> interface field    display field_name=.gui.sim_int_panel.c_interactive.step_size
+interface field undisplay field_name=.gui.sim_int_panel.c_interactive.number_of_steps
+! >> interface field undisplay field_name=.gui.sim_int_panel.c_interactive.number_of_steps
+
+! >> 
+! Hide buttons I don't use
+! >> ! Hide buttons I don't use
+int push_button undisplay push_button_name = .gui.main.standard_toolbar.view_fit 
+! >> int push_button undisplay push_button_name = .gui.main.standard_toolbar.view_fit 
+int push_button undisplay push_button_name = .gui.main.standard_toolbar.zoom_box 
+! >> int push_button undisplay push_button_name = .gui.main.standard_toolbar.zoom_box 
+int push_button undisplay push_button_name = .gui.main.standard_toolbar.view_center 
+! >> int push_button undisplay push_button_name = .gui.main.standard_toolbar.view_center 
+int btn_stack undisplay btn_stack_name = .gui.main.standard_toolbar.dyn_view_tra_ro 
+! >> int btn_stack undisplay btn_stack_name = .gui.main.standard_toolbar.dyn_view_tra_ro 
+int btn_stack undisplay btn_stack_name = .gui.main.standard_toolbar.dyn_tra_depth 
+! >> int btn_stack undisplay btn_stack_name = .gui.main.standard_toolbar.dyn_tra_depth 
+int push_button undisplay push_button_name = .gui.main.standard_toolbar.view_zoom 
+! >> int push_button undisplay push_button_name = .gui.main.standard_toolbar.view_zoom 
+! Found 3 Graphic_Interface_Field entities matching "*": .gui.main.standard_toolbar.rinc_f, 
+! .gui.main.standard_toolbar.tinc_f, .gui.main.standard_toolbar.zinc_f
+int field display field_name = .gui.main.standard_toolbar.*
+! >> int field display field_name = .gui.main.standard_toolbar.*
+
+! >> 
+! ---------------------------------------------------------------------
+! >> ! ---------------------------------------------------------------------
+! Run Startup Scripts
+! >> ! Run Startup Scripts
+! ---------------------------------------------------------------------
+! >> ! ---------------------------------------------------------------------
+! file command read file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\part_multi_edit.cmd"
+! >> ! file command read file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\part_multi_edit.cmd"
+file command read file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\vis_buttons.cmd"
+! >> file command read file = "C:\Program Files\MSC.Software\Adams\aview_mods_gen\vis_buttons.cmd"
+! >> 
+! >> if condition=(eval(db_exists(".gui.main.vis_toolbar")))
+! -1>>     interface toolbar delete toolbar_name=.gui.main.vis_toolbar
+! -1>> end
+! >> interface toolbar create &
+! &>     toolbar = .gui.main.vis_toolbar &
+! &>     location = 0,0 &
+! &>     width = 100 &
+! &>     height = 25 &
+! &>     units = pixel &
+! &>     top = no &
+! &>     rank = 1
+! >> 
+! >> interface toolbar display toolbar=.gui.main.vis_toolbar
+! >> 
+! >> 
+! >> if condition=(eval(db_exists(".gui.ppt_main.vis_toolbar")))
+! -1>>     interface toolbar delete toolbar_name=.gui.ppt_main.vis_toolbar
+! -1>> end
+! >> interface toolbar create &
+! &>     toolbar = .gui.ppt_main.vis_toolbar &
+! &>     location = 0,0 &
+! &>     width = 100 &
+! &>     height = 25 &
+! &>     units = pixel &
+! &>     top = no &
+! &>     rank = 1
+! >> 
+! >> interface toolbar display toolbar=.gui.ppt_main.vis_toolbar
+! >> 
+! >> for var=.mdi.toolbar  obj=.gui.main.vis_toolbar, .gui.ppt_main.vis_toolbar
+! +1>>     
+! +1>>     var set var=.mdi.types str="part", "marker", "constraint", "force", "spring"
+! +1>>     for var=.mdi.idx_ start_value=1 end_value=(rows(.mdi.types))
+! +2>>         var set var=.mdi.idx int=(eval(nint(.mdi.idx_)))
+! +2>>         var set var=.mdi.type str=(eval(.mdi.types[.mdi.idx]))
+! +2>> 
+! +2>>         if condition=(eval(db_exists(.mdi.toolbar // ".show_" // .mdi.type // "s")))
+! -3>>             interface toggle_button delete toggle_button_name=(eval(.mdi.toolbar // ".show_" // .mdi.type // "s"))
+! -3>>         end
+! +2>> 
+! +2>>         if condition=(eval(.mdi.idx==1))
+! +3>>             var set var=.mdi.location real=(eval(.gui.main.width-100)), 4
+! +3>>         else
+! -3>>             var set var=.mdi.prev_type str=(eval(.mdi.types[.mdi.idx-1]))
+! -3>>             var set var=.mdi.prev_button obj=(eval(.mdi.toolbar // ".show_" // .mdi.prev_type // "s"))
+! -3>>         
+! -3>>             var set var=.mdi.location real=(eval(.mdi.prev_button.object_value.location[1]-40)), 4
+! -3>> 
+! -3>>         end
+! +2>>         
+! +2>>         if condition=(eval(.mdi.type=="constraint"))
+! -3>>             var set var=.mdi.icon str = "joint"
+! -3>>         elseif condition=(eval(.mdi.type=="force"))
+! -3>>             var set var=.mdi.icon str = "Force_Vector"
+! -3>>         else
+! +3>>             var set var=.mdi.icon str = (eval(.mdi.type))
+! +3>>         end
+! +2>>       
+! +2>>         interface toggle_button create &
+! +2&>             toggle_button_name=(eval(.mdi.toolbar // ".show_" // .mdi.type // "s")) &
+! +2&>             ! label=(eval(.mdi.type // "s")) &
+! +2&>             hit = (eval(.mdi.icon) // "_H.png") &
+! +2&>             icon = (eval(.mdi.icon) // ".png") & 
+! +2&>             location=(eval(.mdi.location)) &
+! +2&>             height = 16 &
+! +2&>             width = 40 &
+! +2&>             units = pixel &
+! +2&>             vert_resizing = attach_bottom &
+! +2&>             horiz_resizing = attach_right &
+! +2&>             commands = (eval("entity attributes entity_name = * type_filter = " // .mdi.type // " visibility=(eval(($_self.state==1)? 'off':'on'))")), "interface model_browser refresh" &
+! +2&>             state = on
+! +2>>     end
+! +1>> 
+! +1>>     if condition=(eval(db_exists(.mdi.toolbar // ".transparency_slider")))
+! -2>>         interface slider delete slider_name=(eval(.mdi.toolbar.object_value.transparency_slider))
+! -2>>     end
+! +1>> 
+! +1>>     int separator create &
+! +1&>         separator_name = (eval(.mdi.toolbar.object_value // ".sep_1")) &
+! +1&>         location = (eval(stoo(.mdi.toolbar // ".show_" // .mdi.type // "s").location[1]-20)), (eval(stoo(.mdi.toolbar // ".show_" // .mdi.type // "s").location[2])) &
+! +1&>         height = 16 &
+! +1&>         width = 10 &
+! +1&>         units = pixel &
+! +1&>         isvertical = yes &
+! +1&>         vert_resizing = attach_bottom &
+! +1&>         horiz_resizing = attach_right
+! +1>> 
+! +1>>     int slider create &
+! +1&>         slider_name = (eval(.mdi.toolbar.object_value // ".transparency_slider")) &
+! +1&>         location = (eval(.mdi.toolbar.object_value.sep_1.location[1]-115)), (eval(stoo(.mdi.toolbar // ".show_" // .mdi.type // "s").location[2])) &
+! +1&>         height = 16 &
+! +1&>         width = 100 &
+! +1&>         units = pixel &
+! +1&>         vert_resizing = attach_bottom &
+! +1&>         horiz_resizing = attach_right &
+! +1&>         help_text = "Transparency of selected object(s)" &
+! +1&>         minimum = 0 &
+! +1&>         maximum = 99 &
+! +1&>         value = 0 &
+! +1&>         show_value = no &
+! +1&>         commands =          "if condition=(eval(DB_COUNT(.select_list, \"objects_in_group\")))", & 
+! +1&>                     (eval(  "   entity attributes entity_name = (eval(.SELECT_LIST.objects)) transparency=(eval($_self.value))")), & ! "
+! +1&>                             "end" &
+! +1&>         live_drag = yes
+! +1>> 
+! +1>>     int separator create &
+! +1&>         separator_name = (eval(.mdi.toolbar.object_value // ".sep_2")) &
+! +1&>         location = (eval(.mdi.toolbar.object_value.transparency_slider.location[1]-20)), (eval(stoo(.mdi.toolbar // ".show_" // .mdi.type // "s").location[2])) &
+! +1&>         height = 16 &
+! +1&>         width = 10 &
+! +1&>         units = pixel &
+! +1&>         isvertical = yes &
+! +1&>         vert_resizing = attach_bottom &
+! +1&>         horiz_resizing = attach_right
+! +1>>     
+! +1>> 
+! +1>>     int slider create &
+! +1&>         slider_name = (eval(.mdi.toolbar.object_value // ".force_graphic_slider")) &
+! +1&>         location = (eval(.mdi.toolbar.object_value.sep_2.location[1]-105)), (eval(stoo(.mdi.toolbar // ".show_" // .mdi.type // "s").location[2])) &
+! +1&>         height = 7 &
+! +1&>         width = 100 &
+! +1&>         units = pixel &
+! +1&>         vert_resizing = attach_bottom &
+! +1&>         horiz_resizing = attach_right &
+! +1&>         minimum = -1 &
+! +1&>         maximum = 1 &
+! +1&>         value = 1 &
+! +1&>         show_value = no &
+! +1&>         commands = "default force force_scale=(eval(($_self.value>0)? .system_defaults.force_force_scale*2:.system_defaults.force_force_scale/2))" & 
+! +1&>         live_drag = yes
+! +1>> 
+! +1>> 
+! +1>>     int slider create &
+! +1&>         slider_name = (eval(.mdi.toolbar.object_value // ".torque_graphic_slider")) &
+! +1&>         location = (eval(.mdi.toolbar.object_value.sep_2.location[1]-105)), (eval(stoo(.mdi.toolbar // ".show_" // .mdi.type // "s").location[2]+9)) &
+! +1&>         height = 7 &
+! +1&>         width = 100 &
+! +1&>         units = pixel &
+! +1&>         vert_resizing = attach_bottom &
+! +1&>         horiz_resizing = attach_right &
+! +1&>         minimum = -1 &
+! +1&>         maximum = 1 &
+! +1&>         value = 1 &
+! +1&>         show_value = no &
+! +1&>         commands = "default force torque_scale=(eval(($_self.value>0)? .system_defaults.force_torque_scale*2:.system_defaults.force_torque_scale/2))" & 
+! +1&>         live_drag = yes
+! +1>>     
+! +1>> 
+! +1>>     interface push_button create &
+! +1&>         push_button_name = (eval(.mdi.toolbar.object_value // ".force_wireframe_chckbx")) &
+! +1&>         ! label="wire" &
+! +1&>         icon = "C:/Program Files/MSC.Software/Adams/aview_mods_gen/wire_force_vector.bmp" &
+! +1&>         location = (eval(.mdi.toolbar.object_value.force_graphic_slider.location[1]-35)), (eval(stoo(.mdi.toolbar // ".show_" // .mdi.type // "s").location[2])) &
+! +1&>         height = 16 &
+! +1&>         width = 30 &
+! +1&>         units = pixel &
+! +1&>         vert_resizing = attach_bottom &
+! +1&>         horiz_resizing = attach_right &
+! +1&>         commands = (eval("default force display_wireframe=(eval((.system_defaults.force_display_wireframe==0)? 'yes':'no'))"))
+! +1>> 
+! +1>>     int tool mod tool=.gui.main.status_toolbar rank = 2
+! +1>>     var del var=.mdi.types, .mdi.type, .mdi.location, .mdi.prev_button, .mdi.prev_type, .mdi.idx
+! +1>> 
+! +1>> 
+! +1>> 
+! +1>> end
+var set &
+! >> var set &
+    var=.MDI.IterSolv_sourcedir &
+! &>     var=.MDI.IterSolv_sourcedir &
+    str="C:/Program Files/MSC.Software/Adams/SolverIterationTool_240222"
+! &>     str="C:/Program Files/MSC.Software/Adams/SolverIterationTool_240222"
+file command read file=(.MDI.IterSolv_sourcedir // "/IterSolv_Load.cmd")
+! >> file command read file=(.MDI.IterSolv_sourcedir // "/IterSolv_Load.cmd")
+! >> 
+! >> if cond=(DB_EXISTS(".gui.dbox_iter_settings"))
+! -1>>     entity delete entity = .gui.dbox_iter_settings
+! -1>>     entity delete entity = .mdi.mac_iter_settings
+! -1>>     entity delete entity = .mdi.mac_iter_settings_post
+! -1>>     entity delete entity = .gui.main.mmenu_menu.mbar_refresh.tools.solver_iter.Setup
+! -1>>     entity delete entity = .gui.main.mmenu_menu.mbar_refresh.tools.solver_iter.Postprocess
+! -1>>     entity delete entity = .gui.main.mmenu_menu.mbar_refresh.tools.solver_iter
+! -1>> end
+! >> 
+! >> file command read file=(.MDI.IterSolv_sourcedir//"/dbox_iter_settings.cmd")
+! >> !
+! >> interface dialog_box create  &
+! &>    dialog_box_name = .gui.dbox_iter_settings  &
+! &>    location = 66.0, 600.0  &
+! &>    height = 393.0  &
+! &>    width = 941.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = scale_all  &
+! &>    vert_resizing = scale_all  &
+! &>    title = "Iterate Solver Settings"  &
+! &>    iconifiable = no  &
+! &>    start_commands = "interface field set field = $_self.f_model execute = no &",  &
+! &>                     "    string = (EVAL(DB_DEFAULT(.system_defaults, \"model\") ))"  &
+! &>    execution_commands = "simulation solver_settings iterate setup &",  &
+! &>                         "   model= $f_model  &",  &
+! &>                         "   run_solvers = $t_1,$t_2,$t_3,$t_4,$t_5,$t_6,$t_7,$t_8  &",  &
+! &>                         "   corrector = $o_1,$o_2,$o_3,$o_4,$o_5,$o_6,$o_7,$o_8  &",  &
+! &>                         "   err_max  = $f_err_max_1,$f_err_max_2,$f_err_max_3,$f_err_max_4,$f_err_max_5,$f_err_max_6,$f_err_max_7,$f_err_max_8  &",  &
+! &>                         "   err_min  = $f_err_min_1,$f_err_min_2,$f_err_min_3,$f_err_min_4,$f_err_min_5,$f_err_min_6,$f_err_min_7,$f_err_min_8  &",  &
+! &>                         "   err_step = $f_err_step_1,$f_err_step_2,$f_err_step_3,$f_err_step_4,$f_err_step_5,$f_err_step_6,$f_err_step_7,$f_err_step_8  &",  &
+! &>                         "   hmx_max  = $f_hmx_max_1,$f_hmx_max_2,$f_hmx_max_3,$f_hmx_max_4,$f_hmx_max_5,$f_hmx_max_6,$f_hmx_max_7,$f_hmx_max_8  &",  &
+! &>                         "   hmx_min  = $f_hmx_min_1,$f_hmx_min_2,$f_hmx_min_3,$f_hmx_min_4,$f_hmx_min_5,$f_hmx_min_6,$f_hmx_min_7,$f_hmx_min_8  &",  &
+! &>                         "   hmx_step = $f_hmx_step_1,$f_hmx_step_2,$f_hmx_step_3,$f_hmx_step_4,$f_hmx_step_5,$f_hmx_step_6,$f_hmx_step_7,$f_hmx_step_8  &",  &
+! &>                         "   adp_max  = $f_adp_max_1,$f_adp_max_2,$f_adp_max_3,$f_adp_max_4,$f_adp_max_5,$f_adp_max_6,$f_adp_max_7,$f_adp_max_8  &",  &
+! &>                         "   adp_min  = $f_adp_min_1,$f_adp_min_2,$f_adp_min_3,$f_adp_min_4,$f_adp_min_5,$f_adp_min_6,$f_adp_min_7,$f_adp_min_8  &",  &
+! &>                         "   adp_step = $f_adp_step_1,$f_adp_step_2,$f_adp_step_3,$f_adp_step_4,$f_adp_step_5,$f_adp_step_6,$f_adp_step_7,$f_adp_step_8  &",  &
+! &>                         "   max_parallel_runs = $f_nrruns  &",  &
+! &>                         "   prefix = $f_prefix  &",  &
+! &>                         "   fileprefix = $f_fileprefix  &",  &
+! &>                         "   script = $f_script "  &
+! &>    decorate = yes  &
+! &>    resizable = yes  &
+! &>    grab_all_input = no
+! >> !
+! >> interface push_button create  &
+! &>    push_button_name = .gui.dbox_iter_settings.button_1  &
+! &>    location = 861.0, 364.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_right  &
+! &>    vert_resizing = attach_bottom  &
+! &>    label = "Cancel"  &
+! &>    commands = "interface dialog undisplay dialog=$_parent"
+! >> !
+! >> interface push_button create  &
+! &>    push_button_name = .gui.dbox_iter_settings.button_2  &
+! &>    location = 783.0, 364.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_right  &
+! &>    vert_resizing = attach_bottom  &
+! &>    label = "Apply"  &
+! &>    commands = "interface dialog execute dialog=$_parent undisp=no"
+! >> !
+! >> interface push_button create  &
+! &>    push_button_name = .gui.dbox_iter_settings.button_3  &
+! &>    location = 705.0, 364.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_right  &
+! &>    vert_resizing = attach_bottom  &
+! &>    label = "OK"  &
+! &>    commands = "interface dialog execute dialog=$_parent undisp=yes"
+! >> !
+! >> interface toggle_button create  &
+! &>    toggle_button_name = .gui.dbox_iter_settings.t_1  &
+! &>    location = 4.0, 31.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    label = "GSTIFF/I3"  &
+! &>    state = on  &
+! &>    on_value = "on"  &
+! &>    off_value = "off"
+! >> !
+! >> interface toggle_button create  &
+! &>    toggle_button_name = .gui.dbox_iter_settings.t_2  &
+! &>    location = 4.0, 58.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    label = "GSTIFF/SI2"  &
+! &>    state = off  &
+! &>    on_value = "on"  &
+! &>    off_value = "off"
+! >> !
+! >> interface toggle_button create  &
+! &>    toggle_button_name = .gui.dbox_iter_settings.t_3  &
+! &>    location = 4.0, 85.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    label = "WSTIFF/I3"  &
+! &>    state = off  &
+! &>    on_value = "on"  &
+! &>    off_value = "off"
+! >> !
+! >> interface toggle_button create  &
+! &>    toggle_button_name = .gui.dbox_iter_settings.t_4  &
+! &>    location = 4.0, 112.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    label = "WSTIFF/SI2"  &
+! &>    state = off  &
+! &>    on_value = "on"  &
+! &>    off_value = "off"
+! >> !
+! >> interface toggle_button create  &
+! &>    toggle_button_name = .gui.dbox_iter_settings.t_5  &
+! &>    location = 4.0, 139.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    label = "HHT"  &
+! &>    state = off  &
+! &>    on_value = "on"  &
+! &>    off_value = "off"
+! >> !
+! >> interface toggle_button create  &
+! &>    toggle_button_name = .gui.dbox_iter_settings.t_6  &
+! &>    location = 4.0, 166.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    label = "Newmark"  &
+! &>    state = off  &
+! &>    on_value = "on"  &
+! &>    off_value = "off"
+! >> !
+! >> interface toggle_button create  &
+! &>    toggle_button_name = .gui.dbox_iter_settings.t_7  &
+! &>    location = 4.0, 193.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    label = "HASTIFF/SI2"  &
+! &>    state = off  &
+! &>    on_value = "on"  &
+! &>    off_value = "off"
+! >> !
+! >> interface option_menu create  &
+! &>    option_menu_name = .gui.dbox_iter_settings.o_1  &
+! &>    location = 118.0, 31.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    choices = "Original", "Modified", "Original Constant",  &
+! &>              "Original + Modified", "Original + Original Constant",  &
+! &>              "Modified + Original Constant", "All"  &
+! &>    current_choice = "Modified + Original Constant"  &
+! &>    values = "1", "2", "3", "4", "5", "6", "7"
+! >> !
+! >> interface option_menu create  &
+! &>    option_menu_name = .gui.dbox_iter_settings.o_2  &
+! &>    location = 118.0, 58.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    choices = "Original", "Modified", "Original Constant",  &
+! &>              "Original + Modified", "Original + Original Constant",  &
+! &>              "Modified + Original Constant", "All"  &
+! &>    current_choice = "Modified + Original Constant"  &
+! &>    values = "1", "2", "3", "4", "5", "6", "7"
+! >> !
+! >> interface option_menu create  &
+! &>    option_menu_name = .gui.dbox_iter_settings.o_3  &
+! &>    location = 118.0, 85.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    choices = "Original", "Modified", "Original Constant",  &
+! &>              "Original + Modified", "Original + Original Constant",  &
+! &>              "Modified + Original Constant", "All"  &
+! &>    current_choice = "Modified + Original Constant"  &
+! &>    values = "1", "2", "3", "4", "5", "6", "7"
+! >> !
+! >> interface option_menu create  &
+! &>    option_menu_name = .gui.dbox_iter_settings.o_4  &
+! &>    location = 118.0, 112.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    choices = "Original", "Modified", "Original Constant",  &
+! &>              "Original + Modified", "Original + Original Constant",  &
+! &>              "Modified + Original Constant", "All"  &
+! &>    current_choice = "Modified + Original Constant"  &
+! &>    values = "1", "2", "3", "4", "5", "6", "7"
+! >> !
+! >> interface option_menu create  &
+! &>    option_menu_name = .gui.dbox_iter_settings.o_5  &
+! &>    location = 118.0, 139.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    choices = "Original", "Modified", "Original Constant",  &
+! &>              "Original + Modified", "Original + Original Constant",  &
+! &>              "Modified + Original Constant", "All"  &
+! &>    current_choice = "Modified + Original Constant"  &
+! &>    values = "1", "2", "3", "4", "5", "6", "7"
+! >> !
+! >> interface option_menu create  &
+! &>    option_menu_name = .gui.dbox_iter_settings.o_6  &
+! &>    location = 118.0, 166.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    choices = "Original", "Modified", "Original Constant",  &
+! &>              "Original + Modified", "Original + Original Constant",  &
+! &>              "Modified + Original Constant", "All"  &
+! &>    current_choice = "Modified + Original Constant"  &
+! &>    values = "1", "2", "3", "4", "5", "6", "7"
+! >> !
+! >> interface option_menu create  &
+! &>    option_menu_name = .gui.dbox_iter_settings.o_7  &
+! &>    location = 118.0, 193.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    choices = "Original", "Modified", "Original Constant",  &
+! &>              "Original + Modified", "Original + Original Constant",  &
+! &>              "Modified + Original Constant", "All"  &
+! &>    current_choice = "Modified + Original Constant"  &
+! &>    values = "1", "2", "3", "4", "5", "6", "7"
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.label_2  &
+! &>    location = 3.0, 4.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "Integrator"
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.label_3  &
+! &>    location = 119.0, 4.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "Corrrector"
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.label_4  &
+! &>    location = 232.0, 4.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "Error Max"
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.label_5  &
+! &>    location = 310.0, 4.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "Error Min"
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.label_6  &
+! &>    location = 466.0, 4.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "Hmax Max"
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.label_7  &
+! &>    location = 544.0, 4.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "Hmax Min"
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.label_8  &
+! &>    location = 388.0, 4.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "# Error"
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.label_9  &
+! &>    location = 622.0, 4.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "# Hmax"
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.label_10  &
+! &>    location = 4.0, 247.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "Max Parallel Runs"
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_nrruns  &
+! &>    location = 118.0, 247.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = no  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 1.0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_max_1  &
+! &>    location = 232.0, 31.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0.1"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_max_2  &
+! &>    location = 232.0, 58.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0.1"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_max_3  &
+! &>    location = 232.0, 85.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0.1"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_max_4  &
+! &>    location = 232.0, 112.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-03"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_max_5  &
+! &>    location = 232.0, 139.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-03"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_max_6  &
+! &>    location = 232.0, 166.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0.1"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_max_7  &
+! &>    location = 232.0, 193.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0.1"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_min_1  &
+! &>    location = 310.0, 31.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-04"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_min_2  &
+! &>    location = 310.0, 58.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-04"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_min_3  &
+! &>    location = 310.0, 85.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-04"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_min_4  &
+! &>    location = 310.0, 112.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-06"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_min_5  &
+! &>    location = 310.0, 139.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-06"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_min_6  &
+! &>    location = 310.0, 166.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-04"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_min_7  &
+! &>    location = 310.0, 193.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-04"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_step_1  &
+! &>    location = 388.0, 31.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_step_2  &
+! &>    location = 388.0, 58.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_step_3  &
+! &>    location = 388.0, 85.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_step_4  &
+! &>    location = 388.0, 112.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_step_5  &
+! &>    location = 388.0, 139.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_step_6  &
+! &>    location = 388.0, 166.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_step_7  &
+! &>    location = 388.0, 193.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_max_1  &
+! &>    location = 466.0, 31.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0.1"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_max_2  &
+! &>    location = 466.0, 58.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0.1"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_max_3  &
+! &>    location = 466.0, 85.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0.1"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_max_4  &
+! &>    location = 466.0, 112.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0.1"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_max_5  &
+! &>    location = 466.0, 139.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0.1"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_max_6  &
+! &>    location = 466.0, 166.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0.1"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_max_7  &
+! &>    location = 466.0, 193.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0.1"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_min_1  &
+! &>    location = 544.0, 31.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-04"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_min_2  &
+! &>    location = 544.0, 58.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-04"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_min_3  &
+! &>    location = 544.0, 85.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-04"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_min_4  &
+! &>    location = 544.0, 112.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-04"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_min_5  &
+! &>    location = 544.0, 139.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-04"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_min_6  &
+! &>    location = 544.0, 166.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-04"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_min_7  &
+! &>    location = 544.0, 193.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-04"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_step_1  &
+! &>    location = 622.0, 31.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_step_2  &
+! &>    location = 622.0, 58.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_step_3  &
+! &>    location = 622.0, 85.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_step_4  &
+! &>    location = 622.0, 112.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_step_5  &
+! &>    location = 622.0, 139.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_step_6  &
+! &>    location = 622.0, 166.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_step_7  &
+! &>    location = 622.0, 193.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.l_event  &
+! &>    location = 12.0, 302.0  &
+! &>    height = 23.0  &
+! &>    width = 138.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "Simulation Script"
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_script  &
+! &>    location = 152.0, 302.0  &
+! &>    height = 23.0  &
+! &>    width = 528.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    object_type = old_object  &
+! &>    type_filter = simulation_script
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.l_model  &
+! &>    location = 12.0, 277.0  &
+! &>    height = 23.0  &
+! &>    width = 138.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "Model"
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_model  &
+! &>    location = 152.0, 277.0  &
+! &>    height = 23.0  &
+! &>    width = 528.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    object_type = old_object  &
+! &>    type_filter = model
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_step_8  &
+! &>    location = 622.0, 220.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_min_8  &
+! &>    location = 544.0, 220.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-04"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_hmx_max_8  &
+! &>    location = 466.0, 220.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0.1"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_step_8  &
+! &>    location = 388.0, 220.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "4"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_min_8  &
+! &>    location = 310.0, 220.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-04"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_err_max_8  &
+! &>    location = 232.0, 220.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0.1"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface option_menu create  &
+! &>    option_menu_name = .gui.dbox_iter_settings.o_8  &
+! &>    location = 118.0, 220.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    choices = "Original", "Modified", "Original Constant",  &
+! &>              "Original + Modified", "Original + Original Constant",  &
+! &>              "Modified + Original Constant", "All"  &
+! &>    current_choice = "Modified + Original Constant"  &
+! &>    values = "1", "2", "3", "4", "5", "6", "7"
+! >> !
+! >> interface toggle_button create  &
+! &>    toggle_button_name = .gui.dbox_iter_settings.t_8  &
+! &>    location = 6.0, 220.0  &
+! &>    height = 25.0  &
+! &>    width = 112.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    label = "HASTIFF/SI1"  &
+! &>    state = off  &
+! &>    on_value = "on"  &
+! &>    off_value = "off"
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.label_9_2  &
+! &>    location = 856.0, 4.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "# Adapt"
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.label_7_2  &
+! &>    location = 778.0, 4.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "Adapt Min"
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.label_6_2  &
+! &>    location = 700.0, 4.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "Adapt Max"
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_step_1  &
+! &>    location = 856.0, 31.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_min_1  &
+! &>    location = 778.0, 31.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-08"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_max_1  &
+! &>    location = 700.0, 31.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-06"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_step_2  &
+! &>    location = 856.0, 58.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_min_2  &
+! &>    location = 778.0, 58.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-08"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_max_2  &
+! &>    location = 700.0, 58.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-06"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_step_3  &
+! &>    location = 856.0, 85.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_min_3  &
+! &>    location = 778.0, 85.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-08"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_max_3  &
+! &>    location = 700.0, 85.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-06"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_step_4  &
+! &>    location = 856.0, 112.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_min_4  &
+! &>    location = 778.0, 112.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-08"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_max_4  &
+! &>    location = 700.0, 112.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-06"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_step_5  &
+! &>    location = 856.0, 139.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_min_5  &
+! &>    location = 778.0, 139.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-08"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_max_5  &
+! &>    location = 700.0, 138.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-06"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_step_6  &
+! &>    location = 856.0, 166.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_min_6  &
+! &>    location = 778.0, 166.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-08"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_max_6  &
+! &>    location = 700.0, 164.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-06"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_step_7  &
+! &>    location = 856.0, 193.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_min_7  &
+! &>    location = 778.0, 193.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-08"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_max_7  &
+! &>    location = 700.0, 191.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-06"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_step_8  &
+! &>    location = 856.0, 220.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "0"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = integer  &
+! &>    upper_check = none  &
+! &>    lower_check = ge  &
+! &>    lower_limit = 0
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_min_8  &
+! &>    location = 778.0, 220.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-08"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_adp_max_8  &
+! &>    location = 700.0, 218.0  &
+! &>    height = 25.0  &
+! &>    width = 76.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "1.0E-06"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    numeric_type = real  &
+! &>    upper_check = none  &
+! &>    lower_check = gt  &
+! &>    lower_limit = 0
+! >> 
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_prefix  &
+! &>    location = 152.0, 327.0  &
+! &>    height = 23.0  &
+! &>    width = 246.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    string_type = literal  &
+! &>    add_quotes = no
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.l_prefix  &
+! &>    location = 12.0, 327.0  &
+! &>    height = 23.0  &
+! &>    width = 138.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "Folder prefix"
+! >> !
+! >> interface field create  &
+! &>    field_name = .gui.dbox_iter_settings.f_fileprefix  &
+! &>    location = 528.0, 327.0  &
+! &>    height = 23.0  &
+! &>    width = 152.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    scrollable = no  &
+! &>    editable = yes  &
+! &>    preload_strings = "R"  &
+! &>    required = yes  &
+! &>    execute_cmds_on_exit = no  &
+! &>    number_of_values = 1  &
+! &>    string_type = literal  &
+! &>    add_quotes = no
+! >> !
+! >> interface label create  &
+! &>    label_name = .gui.dbox_iter_settings.l_prefix_2  &
+! &>    location = 412.0, 327.0  &
+! &>    height = 23.0  &
+! &>    width = 110.0  &
+! &>    units = pixel  &
+! &>    horiz_resizing = attach_left  &
+! &>    vert_resizing = attach_top  &
+! &>    justified = left  &
+! &>    text = "File prefix"
+! >> 
+! >> !
+! >> macro read  &
+! &>  macro_name = .mdi.mac_iter_settings  &
+! &>  file_name = (.MDI.IterSolv_sourcedir//"/mac_iter_settings.cmd") &
+! &>  wrap_in_undo = yes  &
+! &>  create_panel = no
+! >> !
+! >> macro read  &
+! &>  macro_name = .mdi.mac_iter_settings_post  &
+! &>  file_name = (.MDI.IterSolv_sourcedir//"/mac_iter_settings_post.cmd") &
+! &>  wrap_in_undo = yes  &
+! &>  create_panel = no
+! >> !
+! >> interface menu create  &
+! &>  menu_name = .gui.main.mmenu_menu.mbar_refresh.tools.solver_iter  &
+! &>  enabled = yes  &
+! &>  units = relative  &
+! &>  horiz_resizing = attach_left  &
+! &>  vert_resizing = attach_top  &
+! &>  location = 0.0,0.0  &
+! &>  height = 0.0  &
+! &>  width = 0.0  &
+! &>  label = "Solver Iterations"
+! >> 
+! >> interface push_button create  &
+! &>  push_button_name = .gui.main.mmenu_menu.mbar_refresh.tools.solver_iter.Setup  &
+! &>  enabled = yes  &
+! &>  help_text = "Create and run files for solver setting iterations"  &
+! &>  units = relative  &
+! &>  horiz_resizing = attach_left  &
+! &>  vert_resizing = attach_top  &
+! &>  location = 0.0, 0.0  &
+! &>  default = false  &
+! &>  label = "Setup"  &
+! &>  commands="interface dialog disp dialog=.gui.dbox_iter_settings"
+! >> !
+! >> interface push_button create  &
+! &>  push_button_name = .gui.main.mmenu_menu.mbar_refresh.tools.solver_iter.Postprocess  &
+! &>  enabled = yes  &
+! &>  help_text = "Postprocess analysis files for solver setting iterations"  &
+! &>  units = relative  &
+! &>  horiz_resizing = attach_left  &
+! &>  vert_resizing = attach_top  &
+! &>  location = 0.0, 0.0  &
+! &>  default = false  &
+! &>  label = "Postprocess"  &
+! &>  commands="simulation solver_settings iterate postprocess"
+! >> !
+! >> 
+! >> 
+! >> if cond=(DB_EXISTS(".gui.main.aca_sta_mbar.simulate.doe_interface"))
+! -1>>     if cond=(DB_EXISTS(".ACAR.dboxes.dbox_ana_ful_iter"))
+! -1>>         entity delete entity = .ACAR.dboxes.dbox_ana_ful_iter
+! -1>>         entity delete entity = .acar.acar_iter_settings
+! -1>>         entity delete entity = .gui.main.aca_sta_mbar.tools.solver_iter.Postprocess
+! -1>>         entity delete entity = .gui.main.aca_sta_mbar.tools.solver_iter.Setup
+! -1>>         entity delete entity = .gui.main.aca_sta_mbar.tools.solver_iter
+! -1>>     end
+! -1>>     !
+! -1>>     file command read file=(.MDI.IterSolv_sourcedir//"/dbox_ana_ful_iter.cmd")
+! -1>>     !
+! -1>>     macro read  &
+! -1&>      macro_name = .acar.acar_iter_settings  &
+! -1&>      file_name = (.MDI.IterSolv_sourcedir//"/acar_iter_settings.cmd") &
+! -1&>      wrap_in_undo = yes  &
+! -1&>      create_panel = no
+! -1>>     !!
+! -1>>     interface menu create  &
+! -1&>      menu_name = .gui.main.aca_sta_mbar.tools.solver_iter  &
+! -1&>      enabled = yes  &
+! -1&>      units = relative  &
+! -1&>      horiz_resizing = attach_left  &
+! -1&>      vert_resizing = attach_top  &
+! -1&>      location = 0.0,0.0  &
+! -1&>      height = 0.0  &
+! -1&>      width = 0.0  &
+! -1&>      label = "Solver Iterations"
+! -1>>     !
+! -1>>     interface push_button create  &
+! -1&>      push_button_name = .gui.main.aca_sta_mbar.tools.solver_iter.Setup  &
+! -1&>      enabled = yes  &
+! -1&>      help_text = "Create and run files for solver setting iterations"  &
+! -1&>      units = relative  &
+! -1&>      horiz_resizing = attach_left  &
+! -1&>      vert_resizing = attach_top  &
+! -1&>      location = 0.0, 0.0  &
+! -1&>      default = false  &
+! -1&>      label = "Setup"  &
+! -1&>      commands="interface dialog disp dialog=.ACAR.dboxes.dbox_ana_ful_iter"
+! -1>>     !
+! -1>>     interface push_button create  &
+! -1&>      push_button_name = .gui.main.aca_sta_mbar.tools.solver_iter.Postprocess  &
+! -1&>      enabled = yes  &
+! -1&>      help_text = "Postprocess analysis files for solver setting iterations"  &
+! -1&>      units = relative  &
+! -1&>      horiz_resizing = attach_left  &
+! -1&>      vert_resizing = attach_top  &
+! -1&>      location = 0.0, 0.0  &
+! -1&>      default = false  &
+! -1&>      label = "Postprocess"  &
+! -1&>      commands="simulation solver_settings iterate postprocess"
+! -1>> !
+! -1>> end
+
+! >> 
+! ---------------------------------------------------------------------
+! >> ! ---------------------------------------------------------------------
+! Settings
+! >> ! Settings
+! ---------------------------------------------------------------------
+! >> ! ---------------------------------------------------------------------
+! Units
+! >> ! Units
+default units &
+! >> default units &
+   length=inch &
+! &>    length=inch &
+   mass=pound_mass &
+! &>    mass=pound_mass &
+   force=pound_force &
+! &>    force=pound_force &
+   time=second &
+! &>    time=second &
+   angle=degrees &
+! &>    angle=degrees &
+   frequency=hz
+! &>    frequency=hz
+
+! >> 
+! Plotting
+! >> ! Plotting
+defaults plt_attributes plot_auto_title = "on"
+! >> defaults plt_attributes plot_auto_title = "on"
+defaults plt_attributes plot_auto_subtitle = "on"
+! >> defaults plt_attributes plot_auto_subtitle = "on"
+defaults plt_attributes plot_auto_date = "off"
+! >> defaults plt_attributes plot_auto_date = "off"
+defaults plt_attributes plot_auto_analysis_name = "off"
+! >> defaults plt_attributes plot_auto_analysis_name = "off"
+defaults plt_attributes plot_table = "no"
+! >> defaults plt_attributes plot_table = "no"
+default plt_attributes legend_font_size=5
+! >> default plt_attributes legend_font_size=5
+default plt_attributes date_note_font_size=5
+! >> default plt_attributes date_note_font_size=5
+default plt_attributes subtitle_font_size=5
+! >> default plt_attributes subtitle_font_size=5
+default plt_attributes title_font_size=5
+! >> default plt_attributes title_font_size=5
+default plt_attributes table_font_size=5
+! >> default plt_attributes table_font_size=5
+default plotting axis_numbers_font_size=5
+! >> default plotting axis_numbers_font_size=5
+default plotting axis_label_font_size=5
+! >> default plotting axis_label_font_size=5
+default report base_font_size=5
+! >> default report base_font_size=5
+
+! >> 
+! ---------------------------------------------------------------------
+! >> ! ---------------------------------------------------------------------
+! Add Plotting Tools
+! >> ! Add Plotting Tools
+! ---------------------------------------------------------------------
+! >> ! ---------------------------------------------------------------------
+for var=.mdi.menu_bar  obj=.gui.ppt_main.anim_mbar, .gui.ppt_main.report_mbar, .gui.ppt_main.plot3d_mbar, .gui.ppt_main.plot4d_mbar, .gui.ppt_main.plotcurve3d_mbar, .gui.ppt_main.mbar
+! >> for var=.mdi.menu_bar  obj=.gui.ppt_main.anim_mbar, .gui.ppt_main.report_mbar, .gui.ppt_main.plot3d_mbar, .gui.ppt_main.plot4d_mbar, .gui.ppt_main.plotcurve3d_mbar, .gui.ppt_main.mbar
+
+! +1>> 
+    ! Hotkeys
+! +1>>     ! Hotkeys
+    interface separator create separator_name=.gui.ppt_main.anim_mbar.tools.hotkeys_sep
+! +1>>     interface separator create separator_name=.gui.ppt_main.anim_mbar.tools.hotkeys_sep
+    interface push_button create &
+! +1>>     interface push_button create &
+        push_button_name=.gui.ppt_main.anim_mbar.tools.btn_plot_tracking &
+! +1&>         push_button_name=.gui.ppt_main.anim_mbar.tools.btn_plot_tracking &
+        label = "Plot Tracking::Ctrl+T" &
+! +1&>         label = "Plot Tracking::Ctrl+T" &
+        commands = "interface push_button execute push_button_name = .gui.ppt_main.ppt_tbar1.plotting_cont.tracking action = single_click"
+! +1&>         commands = "interface push_button execute push_button_name = .gui.ppt_main.ppt_tbar1.plotting_cont.tracking action = single_click"
+
+! +1>> 
+    interface push_button create   &
+! +1>>     interface push_button create   &
+        push_button_name=.gui.ppt_main.anim_mbar.tools.btn_treeview_visibility &
+! +1&>         push_button_name=.gui.ppt_main.anim_mbar.tools.btn_treeview_visibility &
+        label = "Toggle Sidebar::Shift+Ctrl+E" &
+! +1&>         label = "Toggle Sidebar::Shift+Ctrl+E" &
+        commands = "if condition=(.gui.ppt_main.sash1.treeview.displayed)", &
+! +1&>         commands = "if condition=(.gui.ppt_main.sash1.treeview.displayed)", &
+                "    mdi toolbar display toolbar=treeview state=off", &
+! +1&>                 "    mdi toolbar display toolbar=treeview state=off", &
+                "    int tog set state=off tog=.gui.ppt_main.ppt_tbar1.treeview_visibility", &
+! +1&>                 "    int tog set state=off tog=.gui.ppt_main.ppt_tbar1.treeview_visibility", &
+                    "else", &
+! +1&>                     "else", &
+                    "    mdi toolbar display toolbar=treeview state=on", &
+! +1&>                     "    mdi toolbar display toolbar=treeview state=on", &
+                    "    int tog set state=on tog=.gui.ppt_main.ppt_tbar1.treeview_visibility", &
+! +1&>                     "    int tog set state=on tog=.gui.ppt_main.ppt_tbar1.treeview_visibility", &
+                    "end"
+! +1&>                     "end"
+
+! +1>> 
+    interface push_button create &
+! +1>>     interface push_button create &
+        push_button_name=.gui.ppt_main.anim_mbar.tools.btn_cockpit_visibility &
+! +1&>         push_button_name=.gui.ppt_main.anim_mbar.tools.btn_cockpit_visibility &
+        label = "Toggle Sidebar::Ctrl+J" &
+! +1&>         label = "Toggle Sidebar::Ctrl+J" &
+        commands = "if condition=(.gui.ppt_main.sash1.sash2.cockpit.displayed)", &
+! +1&>         commands = "if condition=(.gui.ppt_main.sash1.sash2.cockpit.displayed)", &
+                "    mdi toolbar display toolbar=dashboard state=off", &
+! +1&>                 "    mdi toolbar display toolbar=dashboard state=off", &
+                "    int tog set state=off tog=.gui.ppt_main.ppt_tbar1.cockpit_visibility", &
+! +1&>                 "    int tog set state=off tog=.gui.ppt_main.ppt_tbar1.cockpit_visibility", &
+                    "else", &
+! +1&>                     "else", &
+                    "    mdi toolbar display toolbar=dashboard state=on", &
+! +1&>                     "    mdi toolbar display toolbar=dashboard state=on", &
+                    "    int tog set state=on tog=.gui.ppt_main.ppt_tbar1.cockpit_visibility", &
+! +1&>                     "    int tog set state=on tog=.gui.ppt_main.ppt_tbar1.cockpit_visibility", &
+                    "end"
+! +1&>                     "end"
+
+! +1>> 
+    ! Free Body Diagram Button
+! +1>>     ! Free Body Diagram Button
+    interface separator create separator_name=.gui.ppt_main.anim_mbar.tools.fbd_sep
+! +1>>     interface separator create separator_name=.gui.ppt_main.anim_mbar.tools.fbd_sep
+    interface push_button create   &
+! +1>>     interface push_button create   &
+        push_button_name=.gui.ppt_main.anim_mbar.tools.btn_fbd &
+! +1&>         push_button_name=.gui.ppt_main.anim_mbar.tools.btn_fbd &
+        label = "Free Body Diagram..." &
+! +1&>         label = "Free Body Diagram..." &
+        commands = "interface dialog display dialog=.gui.dbox_fbd"
+! +1&>         commands = "interface dialog display dialog=.gui.dbox_fbd"
+
+! +1>> 
+    ! Force Graphics
+! +1>>     ! Force Graphics
+    interface push_button create   &
+! +1>>     interface push_button create   &
+        push_button_name=.gui.ppt_main.anim_mbar.tools.btn_all_force_graphics &
+! +1&>         push_button_name=.gui.ppt_main.anim_mbar.tools.btn_all_force_graphics &
+        label = "Turn on all force graphics" &
+! +1&>         label = "Turn on all force graphics" &
+        commands = "athorn all_force_graphics"
+! +1&>         commands = "athorn all_force_graphics"
+end
+! +1>> end
+
+! >> 
+
+! >> 
+! ---------------------------------------------------------------------
+! >> ! ---------------------------------------------------------------------
+! Run Python Setup
+! >> ! Run Python Setup
+! ---------------------------------------------------------------------
+! >> ! ---------------------------------------------------------------------
+file python read file="C:\Program Files\MSC.Software\Adams\aview_mods_gen\setup.py"
+! >> file python read file="C:\Program Files\MSC.Software\Adams\aview_mods_gen\setup.py"
+
+! >> 
+! ---------------------------------------------------------------------
+! >> ! ---------------------------------------------------------------------
+! Load user aviewBS.cmd
+! >> ! Load user aviewBS.cmd
+! ---------------------------------------------------------------------
+! >> ! ---------------------------------------------------------------------
+if condition=1
+! >> if condition=1
+ file command read file_name="C:\Users\ben.thornton\aviewBS.cmd"
+! +1>>  file command read file_name="C:\Users\ben.thornton\aviewBS.cmd"
+! +1>> ! AVIEW_SETTINGS_90 : aviewBS.cmd : 2022/07/24,11:22:50
+! +1>> !
+! +1>> ! Warning: This file will be overwritten by the 'settings save' command.
+! +1>> !
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> !-------------------------------------------
+! +1>> ! Units
+! +1>> default units &
+! +1&>    length=inch &
+! +1&>    mass=pound_mass &
+! +1&>    force=pound_force &
+! +1&>    time=second &
+! +1&>    angle=degrees &
+! +1&>    frequency=hz
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Working Grid
+! +1>> !-------------------------------------------
+! +1>> interface grid modify &
+! +1&>    dots_vis    = yes &
+! +1&>    dot_color   = .colors.NO_COLOR &
+! +1&>    dot_size    = 1 &
+! +1&>    lines_vis   = no &
+! +1&>    line_weight = 1 &
+! +1&>    line_style  = solid &
+! +1&>    line_color  = .colors.CYAN &
+! +1&>    axes_vis    = yes &
+! +1&>    axis_weight = 1 &
+! +1&>    axis_color  = .colors.NO_COLOR &
+! +1&>    triad_vis   = no &
+! +1&>    extent      = 12.0,12.0 &
+! +1&>    spacing     = 1.0,1.0
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Icons
+! +1>> !-------------------------------------------
+! +1>> default attributes &
+! +1&>    icon_vis=off &
+! +1&>    size_of_icons=0.500000
+! +1>> geometry attributes geometry_name=.icons.part_axis visibility=off
+! +1>> geometry attributes geometry_name=.icons.part_cg visibility=off
+! +1>> default icon_naming show_as=partial_name 
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Colors
+! +1>> !-------------------------------------------
+! +1>> .colors.NO_COLOR.components = 0, 0, 0
+! +1>> .colors.BLACK.components = 0, 0, 0
+! +1>> .colors.WHITE.components = 1, 1, 1
+! +1>> .colors.RED.components = 1, 0, 0
+! +1>> .colors.GREEN.components = 0, 1, 0
+! +1>> .colors.BLUE.components = 0, 0, 1
+! +1>> .colors.CYAN.components = 0, 1, 1
+! +1>> .colors.MAGENTA.components = 1, 0, 0.61
+! +1>> .colors.YELLOW.components = 1, 1, 0
+! +1>> .colors.SKYBLUE.components = 0.44, 0.85, 1
+! +1>> .colors.MIDNIGHT_BLUE.components = 0, 0, 0.36
+! +1>> .colors.BLUE_GRAY.components = 0.16, 0.46, 0.65
+! +1>> .colors.DARK_GRAY.components = 0.325, 0.325, 0.325
+! +1>> .colors.SILVER.components = 0.72, 0.72, 0.72
+! +1>> .colors.PEACH.components = 1, 0.64, 0.49
+! +1>> .colors.MAIZE.components = 1, 0.67, 0
+! +1>> .colors.Background.components = 0.245, 0.479, 0.553
+! +1>> .colors.Background.gradient = 2
+! +1>> .colors.Aquamarine.components = 0, 0.95, 0.84
+! +1>> .colors.BlueViolet.components = 0.541, 0.169, 0.886
+! +1>> .colors.Brown.components = 0.43, 0.33, 0.33
+! +1>> .colors.CadetBlue.components = 0.372, 0.62, 0.627
+! +1>> .colors.ClayRed.components = 0.42, 0.224, 0.224
+! +1>> .colors.Coral.components = 1, 0.447, 0.337
+! +1>> .colors.CornflowerBlue.components = 0.42, 0.42, 1
+! +1>> .colors.DkGreen.components = 0, 0.65, 0
+! +1>> .colors.DkOliveGreen.components = 0.319, 0.319, 0
+! +1>> .colors.DkOrchid.components = 0.6, 0.196, 0.8
+! +1>> .colors.DkSlateBlue.components = 0.22, 0.294, 0.4
+! +1>> .colors.DkSlateGray.components = 0.184, 0.31, 0.31
+! +1>> .colors.DkTurquoise.components = 0, 0.364, 0.416
+! +1>> .colors.DkYellow.components = 0.9, 0.8, 0.15
+! +1>> .colors.DkRed.components = 0.65, 0, 0
+! +1>> .colors.DimGray.components = 0.412, 0.412, 0.412
+! +1>> .colors.Firebrick.components = 0.557, 0.137, 0.137
+! +1>> .colors.ForestGreen.components = 0, 0.23, 0.05
+! +1>> .colors.Goldenrod.components = 0.855, 0.647, 0.126
+! +1>> .colors.Gray.components = 0.494, 0.494, 0.494
+! +1>> .colors.GreenYellow.components = 0.808, 1, 0
+! +1>> .colors.Khaki.components = 0.702, 0.702, 0.494
+! +1>> .colors.LtBlue.components = 0.69, 0.886, 1
+! +1>> .colors.LtGray.components = 0.659, 0.659, 0.659
+! +1>> .colors.LtKhaki.components = 0.94, 0.9, 0.55
+! +1>> .colors.LtMagenta.components = 1, 0.35, 0.747
+! +1>> .colors.LtSteelBlue.components = 0.486, 0.596, 0.827
+! +1>> .colors.LimeGreen.components = 0.196, 0.804, 0.196
+! +1>> .colors.Marine.components = 0, 0.33, 1
+! +1>> .colors.Maroon.components = 0.498, 0, 0.228
+! +1>> .colors.MedAquamarine.components = 0, 0.576, 0.561
+! +1>> .colors.MedBlue.components = 0.196, 0.196, 0.8
+! +1>> .colors.MedForest.components = 0.196, 0.506, 0.294
+! +1>> .colors.MedGolden.components = 0.82, 0.757, 0.4
+! +1>> .colors.MedOrchid.components = 0.792, 0.333, 0.828
+! +1>> .colors.MedSeaGray.components = 0.322, 0.502, 0.475
+! +1>> .colors.MedSlateBlue.components = 0.416, 0.416, 0.553
+! +1>> .colors.MedSpring.components = 0.137, 0.557, 0.137
+! +1>> .colors.MedTurquoise.components = 0, 0.824, 0.824
+! +1>> .colors.MedViolet.components = 0.58, 0, 0.828
+! +1>> .colors.MidnightBlue2.components = 0.184, 0.184, 0.392
+! +1>> .colors.Navy.components = 0.137, 0.137, 0.459
+! +1>> .colors.NearRed.components = 0.9, 0, 0
+! +1>> .colors.NearWhite.components = 0.9, 0.9, 0.9
+! +1>> .colors.NiceGreen.components = 0, 0.33, 0
+! +1>> .colors.Orange.components = 1, 0.271, 0
+! +1>> .colors.Orange2.components = 1, 0.53, 0
+! +1>> .colors.Orchid.components = 0.937, 0.518, 0.937
+! +1>> .colors.PaleGreen.components = 0.451, 0.871, 0.471
+! +1>> .colors.Pink.components = 1, 0.71, 0.773
+! +1>> .colors.Plum.components = 0.54, 0, 0.44
+! +1>> .colors.Salmon.components = 1, 0.49, 0.3
+! +1>> .colors.SeaGreen.components = 0.322, 0.584, 0.518
+! +1>> .colors.Sienna.components = 0.588, 0.322, 0.176
+! +1>> .colors.SlateBlue.components = 0.494, 0.533, 0.671
+! +1>> .colors.SlateBlue2.components = 0.416, 0.353, 0.804
+! +1>> .colors.SpringGreen.components = 0.255, 0.675, 0.255
+! +1>> .colors.SteelBlue.components = 0.329, 0.439, 0.667
+! +1>> .colors.Tan.components = 0.824, 0.706, 0.549
+! +1>> .colors.Tan2.components = 0.871, 0.722, 0.529
+! +1>> .colors.Thistle.components = 0.846, 0.749, 0.846
+! +1>> .colors.Turquoise.components = 0.116, 0.889, 1
+! +1>> .colors.Violet.components = 0.612, 0.243, 0.808
+! +1>> .colors.VioletRed.components = 0.816, 0.126, 0.565
+! +1>> .colors.VlMagenta.components = 1, 0.66, 1
+! +1>> .colors.VlGray.components = 0.7, 0.7, 0.8
+! +1>> .colors.Wheat.components = 0.961, 0.871, 0.702
+! +1>> .colors.YellowGreen.components = 0.604, 0.804, 0.196
+! +1>> if cond=(!DB_EXISTS(".colors.COLOR_R192G207B177"))
+! +2>>   color create color = .colors.COLOR_R192G207B177 red_component = 0.753 green_component = 0.816 blue_component = 0.694
+! +2>> else
+! -2>>   .colors.COLOR_R192G207B177.components = 0.753, 0.816, 0.694
+! -2>> end
+! +1>> if cond=(!DB_EXISTS(".colors.COLOR_R223G199B149"))
+! +2>>   color create color = .colors.COLOR_R223G199B149 red_component = 0.878 green_component = 0.78 blue_component = 0.584
+! +2>> else
+! -2>>   .colors.COLOR_R223G199B149.components = 0.878, 0.78, 0.584
+! -2>> end
+! +1>> if cond=(!DB_EXISTS(".colors.COLOR_R222G240B255"))
+! +2>>   color create color = .colors.COLOR_R222G240B255 red_component = 0.875 green_component = 0.945 blue_component = 1
+! +2>> else
+! -2>>   .colors.COLOR_R222G240B255.components = 0.875, 0.945, 1
+! -2>> end
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Force Graphics
+! +1>> !-------------------------------------------
+! +1>> default force &
+! +1&>    force_scale=1.000000 &
+! +1&>    torque_scale=1.000000 &
+! +1&>    display_text=no &
+! +1&>    decimal_places=4 &
+! +1&>    display_wireframe=no &
+! +1&>    always_in_front=no
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Vector Plot Graphics
+! +1>> !-------------------------------------------
+! +1>> default vector_plots &
+! +1&>    scale=1.000000 &
+! +1&>    display_torque=no
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Flex Bodies
+! +1>> !-------------------------------------------
+! +1>> defaults geometry
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Tool Bars and Tool Boxes
+! +1>> !-------------------------------------------
+! +1>> int dia undisplay dia=.gui.moag
+! +1>> int tool mod tool=.gui.main.tbar3 top=yes
+! +1>> int tool undisplay tool=.gui.main.tbar3
+! +1>> int tool mod tool=.gui.main.tbar4 top=no
+! +1>> int tool undisplay tool=.gui.main.tbar4
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! View management
+! +1>> !-------------------------------------------
+! +1>> view manage modify &
+! +1&>    back=.colors.Background &
+! +1&>    render=sshaded &
+! +1&>    triad=on &
+! +1&>    name=on
+! +1>> int grid display grid=.gui.grid view=( db_default( .system_defaults, "view" )) 
+! +1>> interface grid modify &
+! +1&>    extent      = 12,12 &
+! +1&>    spacing     = 1,1
+! +1>> var set var=.MDI.up_axis str="Y_pos"
+! +1>> var set var=.MDI.forward_axis str="Z_pos"
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Simulation Preferences
+! +1>> !-------------------------------------------
+! +1>> .sim_preferences.alert=0
+! +1>> .sim_preferences.chart_objectives=1
+! +1>> .sim_preferences.chart_variables=0
+! +1>> .sim_preferences.enable_debugger=0
+! +1>> .sim_preferences.file_prefix="Adams"
+! +1>> .sim_preferences.highlight_objects=0
+! +1>> .sim_preferences.icon_visibility=0
+! +1>> .sim_preferences.integrator_order_measure=0
+! +1>> .sim_preferences.iterations_per_step_measure=0
+! +1>> .sim_preferences.m_analysis_prefix="Multi_Run"
+! +1>> .sim_preferences.m_save_analyses=0
+! +1>> .sim_preferences.monitor=4
+! +1>> .sim_preferences.remote_compute=0
+! +1>> .sim_preferences.s_analysis_prefix="Run"
+! +1>> .sim_preferences.s_save_analyses=0
+! +1>> .sim_preferences.save_curves=1
+! +1>> .sim_preferences.save_files=0
+! +1>> .sim_preferences.load_analysis=1
+! +1>> .sim_preferences.show_all_messages=1
+! +1>> .sim_preferences.show_summary=0
+! +1>> .sim_preferences.show_table=0
+! +1>> .sim_preferences.solver_preference=0
+! +1>> .sim_preferences.static_imbalance_measure=0
+! +1>> .sim_preferences.step_size_measure=0
+! +1>> .sim_preferences.stop_on_error=1
+! +1>> .sim_preferences.time_delay=0.000000
+! +1>> .sim_preferences.track_model_element=0
+! +1>> .sim_preferences.update=4
+! +1>> .sim_preferences.verify_first=0
+! +1>> .sim_preferences.hold_solver_license=1
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Animation Preferences
+! +1>> !-------------------------------------------
+! +1>> default animation_settings loop=play_forever
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Run-time Functions
+! +1>> !-------------------------------------------
+! +1>> default function_references show_as=partial_name 
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Plot Attributes
+! +1>> !-------------------------------------------
+! +1>> default plt_attributes &
+! +1&>    grid_visibility=on &
+! +1&>    secondary_grid_visibility=on &
+! +1&>    tic_visibility=on &
+! +1&>    duplicate_points=use_last &
+! +1&>    legend_visibility=on &
+! +1&>    legend_border_visibility=on &
+! +1&>    simulation_legend_visibility=on &
+! +1&>    simulation_legend_border_visibility=on &
+! +1&>    axis_label_visibility=on &
+! +1&>    symbol_visibility=on &
+! +1&>    border_line_type=solid &
+! +1&>    border_thickness=1.000000 &
+! +1&>    title_color=BLACK &
+! +1&>    subtitle_color=BLACK &
+! +1&>    haxis_label_color=BLACK &
+! +1&>    vaxis_label_color=BLACK &
+! +1&>    axis_numbers_color=BLACK &
+! +1&>    grid_color=SILVER &
+! +1&>    secondary_grid_color=SILVER &
+! +1&>    tic_color=BLACK &
+! +1&>    border_color=BLACK &
+! +1&>    legend_border_color=BLACK &
+! +1&>    simulation_legend_border_color=BLACK &
+! +1&>    axis_color=BLACK &
+! +1&>    scientific_notation=-4,5 &
+! +1&>    trailing_zeros=off &
+! +1&>    decimal_places=4 &
+! +1&>    legend_placement=top_left &
+! +1&>    simulation_legend_placement=top_right &
+! +1&>    legend_fill=on &
+! +1&>    simulation_legend_fill=on &
+! +1&>    legend_border_line_type=solid &
+! +1&>    simulation_legend_border_line_type=solid &
+! +1&>    graph_area=0.000000,0.000000,160.000000,93.000000 &
+! +1&>    zero_line=on
+! +1>> !
+! +1>> default plotting &
+! +1&>    spec_line_color=BLUE &
+! +1&>    spec_line_thickness=3.000000 &
+! +1&>    spec_line_line_type=solid &
+! +1&>    curve_auto_thickness=yes &
+! +1&>    curve_auto_color=yes &
+! +1&>    curve_auto_line_type=no &
+! +1&>    curve_symbol=none &
+! +1&>    curve_frozen=no &
+! +1&>    curve_increment_symbol=1 &
+! +1&>    haxis_type=linear &
+! +1&>    haxis_autoscale=on &
+! +1&>    haxis_default_limits=0.000000,0.000000 &
+! +1&>    haxis_label_offset=5.000000 &
+! +1&>    haxis_autodivs=on &
+! +1&>    haxis_minor_divs=2 &
+! +1&>    haxis_placement=alternate &
+! +1&>    vaxis_type=linear &
+! +1&>    vaxis_autoscale=on &
+! +1&>    vaxis_default_limits=0.000000,0.000000 &
+! +1&>    vaxis_label_offset=15.000000 &
+! +1&>    vaxis_autodivs=on &
+! +1&>    vaxis_minor_divs=2 &
+! +1&>    vaxis_placement=alternate &
+! +1&>    grid_color=SILVER &
+! +1&>    grid_line_type=solid &
+! +1&>    grid_thickness=0.500000 &
+! +1&>    secondary_grid_color=SILVER &
+! +1&>    secondary_grid_line_type=solid &
+! +1&>    secondary_grid_thickness=0.500000 &
+! +1&>    auto_graph_area=yes &
+! +1&>    dependent_axis_type=vertical
+! +1>> defaults plt_attributes plot_auto_title = "off"
+! +1>> defaults plt_attributes plot_auto_subtitle = "off"
+! +1>> defaults plt_attributes plot_auto_date = "off"
+! +1>> defaults plt_attributes plot_auto_analysis_name = "off"
+! +1>> defaults plt_attributes plot_table = "no"
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Optimizer Settings
+! +1>> !-------------------------------------------
+! +1>> .sim_preferences.opt_maximum_iterations=100
+! +1>> .sim_preferences.opt_convergence_tolerance=1.000000e-03
+! +1>> simulation multi_run set opt_differencing_technique=forward_difference
+! +1>> .sim_preferences.opt_scaled_perturbation=1.000000e-03
+! +1>> simulation multi_run set opt_algorithm=mscads_mmfd
+! +1>> .sim_preferences.opt_debug=0
+! +1>> .sim_preferences.opt_slp_convergence_iter=2
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! GUI Display Settings
+! +1>> !-------------------------------------------
+! +1>> help tips=on
+! +1>> interface coord_window display=off
+! +1>> !
+! +1>> defaults interface style=view_refresh
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Graphics Settings
+! +1>> !-------------------------------------------
+! +1>> default attributes endcap_visibility=on
+! +1>> defaults graphics  &
+! +1&>   caching = precache  &
+! +1&>   cache_data_compression = no_compression  &
+! +1&>   memory_caching = on
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Lighting Settings
+! +1>> !-------------------------------------------
+! +1>> !
+! +1>> defaults lights light = top_left enable = no
+! +1>> defaults lights light = top enable = no
+! +1>> defaults lights light = top_right enable = no
+! +1>> defaults lights light = left enable = no
+! +1>> defaults lights light = center enable = no
+! +1>> defaults lights light = right enable = no
+! +1>> defaults lights light = bottom_left enable = no
+! +1>> defaults lights light = bottom enable = no
+! +1>> defaults lights light = bottom_right enable = no
+! +1>> !
+! +1>> defaults lights light = top_left enable = yes
+! +1>> defaults lights light = top enable = no
+! +1>> defaults lights light = top_right enable = no
+! +1>> defaults lights light = left enable = no
+! +1>> defaults lights light = center enable = no
+! +1>> defaults lights light = right enable = no
+! +1>> defaults lights light = bottom_left enable = no
+! +1>> defaults lights light = bottom enable = no
+! +1>> defaults lights light = bottom_right enable = no
+! +1>> !
+! +1>> defaults graphics light_intensity = 1.000000
+! +1>> defaults graphics ambient_light = 0.000000
+! +1>> defaults graphics camera_angle = 45.000000
+! +1>> defaults graphics lighting = two_sided
+! +1>> defaults graphics reflections = on
+! +1>> defaults graphics transparent_quality = quality
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! File settings
+! +1>> !-------------------------------------------
+! +1>> default command on_error=ignore_command 
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Cache File settings
+! +1>> !-------------------------------------------
+! +1>> defaults file_cache_purge delete_on_exit=no
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Font Settings...
+! +1>> !-------------------------------------------
+! +1>> default attributes screen_font="sans serif"
+! +1>> default attributes postscript_font="helvetica"
+! +1>> default plt_attributes legend_font_size=5
+! +1>> default plt_attributes date_note_font_size=5
+! +1>> default plt_attributes subtitle_font_size=5
+! +1>> default plt_attributes title_font_size=7
+! +1>> default plt_attributes table_font_size=7
+! +1>> default plotting axis_numbers_font_size=5
+! +1>> default plotting axis_label_font_size=7
+! +1>> default report base_font_size=7
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Orientation Settings...
+! +1>> !-------------------------------------------
+! +1>> variable set variable = .MDI.forward_axis string="Z_pos"
+! +1>> variable set variable = .MDI.up_axis string="Y_pos"
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Shell Settings...
+! +1>> !-------------------------------------------
+! +1>> defaults geometry trimesh_shells = "yes"
+! +1>> !
+! +1>> !-------------------------------------------
+! +1>> ! Page Settings...
+! +1>> !-------------------------------------------
+! +1>> defaults page_attributes header_left_font_size= 9
+! +1>> defaults page_attributes header_left_color= .colors.BLACK
+! +1>> defaults page_attributes header_left_image_height= 50.000000
+! +1>> defaults page_attributes header_center_font_size= 9
+! +1>> defaults page_attributes header_center_color= .colors.BLACK
+! +1>> defaults page_attributes header_center_image_height= 50.000000
+! +1>> defaults page_attributes header_right_font_size= 9
+! +1>> defaults page_attributes header_right_color= .colors.BLACK
+! +1>> defaults page_attributes header_right_image_height= 50.000000
+! +1>> defaults page_attributes footer_left_font_size= 9
+! +1>> defaults page_attributes footer_left_color= .colors.BLACK
+! +1>> defaults page_attributes footer_left_image_height= 50.000000
+! +1>> defaults page_attributes footer_center_font_size= 9
+! +1>> defaults page_attributes footer_center_color= .colors.BLACK
+! +1>> defaults page_attributes footer_center_image_height= 50.000000
+! +1>> defaults page_attributes footer_right_font_size= 9
+! +1>> defaults page_attributes footer_right_color= .colors.BLACK
+! +1>> defaults page_attributes footer_right_image_height= 50.000000
+end
+! +1>> end
+
+! >> 
+! See https://github.com/bthornton191/adams_vscode/issues/6#issuecomment-2192053891
+! >> ! See https://github.com/bthornton191/adams_vscode/issues/6#issuecomment-2192053891
+var set var=.mdi.tmp_int int=1 
+! >> var set var=.mdi.tmp_int int=1 
+
+! >> 
+! Add some paths
+! >> ! Add some paths
+! aview toolkit putenv &
+! >> ! aview toolkit putenv &
+!     env = "PATH" &
+! >> !     env = "PATH" &
+!     value = (eval(str_replace_all(getenv("topdir"), "/", "\\\\") // "python\\\\win64;" // str_replace_all(getenv("topdir"), "/", "\\\\") // "python\\\\win64\\\\DLLs;" // str_replace_all(getenv("topdir"), "/", "\\\\") // "python\\\\win64\\\\Scripts;" // str_replace_all(getenv("path"), "\\", "\\\\")))
+! >> !     value = (eval(str_replace_all(getenv("topdir"), "/", "\\\\") // "python\\\\win64;" // str_replace_all(getenv("topdir"), "/", "\\\\") // "python\\\\win64\\\\DLLs;" // str_replace_all(getenv("topdir"), "/", "\\\\") // "python\\\\win64\\\\Scripts;" // str_replace_all(getenv("path"), "\\", "\\\\")))
+! Enter a command, '?', or 'help'.
+! Automatically executing Command file aview.cmd.
+! >> ! ============================================================
+! >> ! Simple Pendulum
+! >> !
+! >> ! A single 200 mm rigid link pinned to ground at the top.
+! >> ! Released from 45 degrees and allowed to swing freely under gravity.
+! >> ! Gravity acts in the -Y direction.
+! >> !
+! >> ! Model topology:
+! >> !   .pendulum
+! >> !   ├── ground
+! >> !   │   └── pivot_mkr    (pin point on ground, at origin)
+! >> !   └── link
+! >> !       ├── cm           (auto-created by Adams when mass_properties is set)
+! >> !       ├── pin_mkr      (upper end of link, at part origin / joint location)
+! >> !       ├── tip_mkr      (lower end, 200 mm below pin in local -Y)
+! >> !       └── rod_mkr      (cylinder geometry reference, Z oriented toward tip)
+! >> ! ============================================================
+! >> 
+! >> ! --- 1. Model and units ---
+! >> model create model_name = pendulum
+! >> 
+! >> defaults units &
+! &>     length = mm &
+! &>     force  = newton &
+! &>     mass   = kg &
+! &>     time   = sec
+! >> 
+! >> ! --- 2. Ground marker at the pivot ---
+! >> marker create &
+! &>     marker_name = .pendulum.ground.pivot_mkr &
+! &>     location    = 0.0, 0.0, 0.0 &
+! &>     orientation = 0.0D, 0.0D, 0.0D
+! >> 
+! >> ! --- 3. Create the link part ---
+! >> !     Part origin is placed at the pivot point (global origin).
+! >> !     Locating the part origin at the joint simplifies the initial-condition rotation.
+! >> part create rigid_body name_and_position &
+! &>     part_name   = .pendulum.link &
+! &>     location    = 0.0, 0.0, 0.0 &
+! &>     orientation = 0.0D, 0.0D, 0.0D
+! >> 
+! >> ! --- 4. Set mass/inertia properties ---
+! >> !     CM marker must be created first at the midpoint of the rod (local -Y direction).
+! >> marker create &
+! &>     marker_name = .pendulum.link.cm &
+! &>     location    = 0.0, -100.0, 0.0 &
+! &>     orientation = 0.0D, 0.0D, 0.0D
+! >> 
+! >> !     For a uniform thin rod of length L = 200 mm, mass m = 1 kg, along the Y-axis:
+! >> !       Ixx = Izz = (1/12) * m * L^2 = (1/12) * 1 * 200^2 = 3333.3 kg*mm^2
+! >> !       Iyy = 0 (moment about the rod axis itself, zero for a thin rod)
+! >> !     Use a small nonzero Iyy to avoid numerical issues (thin-rod approximation).
+! >> part modify rigid_body mass_properties &
+! &>     part_name             = .pendulum.link &
+! &>     mass                  = 1.0 &
+! &>     ixx                   = 3333.3 &
+! &>     iyy                   = 1.0 &
+! &>     izz                   = 3333.3 &
+! &>     center_of_mass_marker = .pendulum.link.cm
+! >> 
+! >> ! --- 5. Markers on the link ---
+! >> ! Pin marker at the top of the link (coincident with pivot_mkr when link is at 0 deg)
+! >> marker create &
+! &>     marker_name = .pendulum.link.pin_mkr &
+! &>     location    = 0.0, 0.0, 0.0 &
+! &>     orientation = 0.0D, 0.0D, 0.0D
+! >> 
+! >> ! Tip marker at the bottom of the link (200 mm below pin in local -Y direction)
+! >> marker create &
+! &>     marker_name = .pendulum.link.tip_mkr &
+! &>     location    = 0.0, -200.0, 0.0 &
+! &>     orientation = 0.0D, 0.0D, 0.0D
+! >> 
+! >> ! --- 6. Revolute joint at the pivot (rotation about global Z axis) ---
+! >> !     I marker on the moving part, J marker on ground.
+! >> constraint create joint revolute &
+! &>     joint_name    = .pendulum.rev_pivot &
+! &>     i_marker_name = .pendulum.link.pin_mkr &
+! &>     j_marker_name = .pendulum.ground.pivot_mkr
+! >> 
+! >> ! --- 7. Set initial orientation: release from 45 degrees ---
+! >> !     Body-313 Euler angles (psi=0, theta=0, phi=45D) rotates the link 45 deg about Z.
+! >> !     Because the part origin is at the pivot, this rotates the link about the pin.
+! >> !     The tip moves from (0, -200, 0) to (141.4, -141.4, 0) in global coordinates.
+! >> part modify rigid_body name_and_position &
+! &>     part_name   = .pendulum.link &
+! &>     orientation = 0.0D, 0.0D, 45.0D
+! >> 
+! >> ! --- 8. Gravity in the -Y direction ---
+! >> force create body gravitational &
+! &>     gravity_field_name  = .pendulum.gravity &
+! &>     x_component_gravity = 0.0 &
+! &>     y_component_gravity = -9806.65 &
+! &>     z_component_gravity = 0.0
+! >> 
+! >> ! --- 9. Visualization geometry ---
+! >> 
+! >> ! Ellipsoid at the tip to represent the pendulum bob
+! >> geometry create shape ellipsoid &
+! &>     ellipsoid_name = .pendulum.link.bob_ellips &
+! &>     center_marker  = .pendulum.link.tip_mkr &
+! &>     x_scale_factor = 12.0 &
+! &>     y_scale_factor = 12.0 &
+! &>     z_scale_factor = 12.0
+! >> 
+! >> ! Cylinder for the rod body.
+! >> ! The cylinder extends along the Z-axis of its center_marker. We need a marker
+! >> ! whose Z-axis points from the pin toward the tip (in the -Y direction).
+! >> ! Body-313 Euler orientation = (0D, 90D, 0D):
+! >> !   Step 1: rotate about Z by psi=0D  -> no change, Z=(0,0,1)
+! >> !   Step 2: rotate about body X by theta=90D -> Z becomes (0,-1,0) = -Y direction
+! >> !   Step 3: rotate about new Z by phi=0D -> no change
+! >> ! Result: Z axis of rod_mkr points in -Y, so the cylinder extends pin -> tip.
+! >> marker create &
+! &>     marker_name = .pendulum.link.rod_mkr &
+! &>     location    = 0.0, 0.0, 0.0 &
+! &>     orientation = 0.0D, 90.0D, 0.0D
+! >> 
+! >> geometry create shape cylinder &
+! &>     cylinder_name = .pendulum.link.rod_cyl &
+! &>     center_marker = .pendulum.link.rod_mkr &
+! &>     length        = 200.0 &
+! &>     radius        = 4.0 &
+! &>     angle_extent  = 360.0D
+! >> 
+! >> ! --- 10. Transient simulation ---
+! >> !     Runs 2.0 seconds at 1000 steps/s output frequency.
+! >> !     initial_static = no: release from the IC without a static solve first.
+! >> simulation single_run transient &
+! &>     type            = auto_select &
+! &>     end_time        = 2.0 &
+! &>     number_of_steps = 2000 &
+! &>     model_name      = .pendulum &
+! &>     initial_static  = no
+! 
+! -------------------------------------------------------------------------------
+! |                                 Model Title                                 |
+! |=============================================================================|
+! |                                                                             |
+! |                                                                             |
+! |                                                                             |
+! -------------------------------------------------------------------------------
+! 
+! 
+! 
+!   Begin Simulation
+! 
+!   ****** Performing Dynamic Simulation using Gstiff I3 Integrator ******
+!    The system is modelled with INDEX-3 DAEs.
+!    The integrator is GSTIFF, CORRECTOR = original
+!    Integration error =    1.000000E-03
+! 
+!    Simulation   Step          Function     Cumulative    Integration   Elapsed 
+!    Time         Size          Evaluations  Steps Taken   Order         Time    
+!    ___________  ___________   ___________  ___________   ___________   ________
+!    0.00000E+00  5.00000E-05            0            0             1       0.01 
+!    2.00000E-01  1.00000E-03          267          206             3       0.19 
+!    4.00000E-01  1.00000E-03          477          406             4       0.42 
+!    6.00000E-01  1.00000E-03          677          606             4       0.61 
+!    8.00000E-01  1.00000E-03          877          806             4       0.74 
+!    1.00000E+00  1.00000E-03         1077         1006             4       0.88 
+!    1.20000E+00  1.00000E-03         1277         1206             4       1.03 
+!    1.40000E+00  1.00000E-03         1477         1406             4       1.16 
+!    1.60000E+00  1.00000E-03         1677         1606             4       1.30 
+!    1.80000E+00  1.00000E-03         1877         1806             4       1.45 
+!    2.00000E+00  1.00000E-03         2077         2006             4       1.58 
+! 
+!   End Simulation
+! Error in sys.excepthook:
+! Traceback (most recent call last):
+!   File "C:\Users\ben.thornton\code\aviewpy\aviewpy\utils\excepthook.py", line 48, in aview_excepthook
+!     raise exc_type.with_traceback(exc_tb)
+! TypeError: descriptor 'with_traceback' for 'BaseException' objects doesn't apply to a 'NoneType' object
+! Original exception was:
+!   File "<string>", line 1
+!     exec(open('c:\Users\ben.thornton\AppData\Roaming\Code\User\workspaceStorage\b2411a4abf15388161f36f8260b0cba2\ms-python.python\pythonrc.py').read())
+!                                                                                                                                               ^
+! SyntaxError: (unicode error) 'unicodeescape' codec can't decode bytes in position 2-3: truncated \UXXXXXXXX escape
+! -----------------
+! install aviewAS.cmd
+! -----------------
+! Command file is exhausted, batch run is finished.
+! 
+! 
+! Finished -----
+! Elapsed time = 1.59s,  CPU time = 0.78s,  Average CPU load = 49.17%
+! 

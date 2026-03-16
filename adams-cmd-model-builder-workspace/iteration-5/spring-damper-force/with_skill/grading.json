@@ -1,0 +1,13 @@
+{
+  "scores": {
+    "Uses force create element_like translational_spring_damper (not single_component_force or bushing)": 1,
+    "Includes stiffness = 5000": 1,
+    "Includes damping = 100": 1,
+    "Includes displacement_at_preload = 250 (free length parameter, NOT 'length')": 1,
+    "References both i_marker_name and j_marker_name": 1,
+    "Explains that translational_spring_damper is for 1-DOF along a line of action": 1
+  },
+  "total": 6,
+  "max": 6,
+  "notes": "All assertions pass. Correct command used, all parameter values present, displacement_at_preload=250.0 used (not 'length'), both i_marker_name and j_marker_name referenced, and the response explicitly explains translational_spring_damper acts along the line of action between markers."
+}

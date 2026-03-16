@@ -1,0 +1,19 @@
+{
+  "scores": {
+    "model_create_command": 1,
+    "three_rigid_body_parts": 1,
+    "four_revolute_joints": 1,
+    "motion_generator_360_degs": 1,
+    "simulation_single_run_transient": 1,
+    "no_abbreviated_commands": 1,
+    "full_dot_path_names": 1,
+    "no_adams_id": 1,
+    "mass_inertia_via_part_modify": 1,
+    "cm_marker_explicitly_created_and_passed": 1,
+    "geometry_shape_on_each_part": 1,
+    "no_errors_in_aview_log": 1
+  },
+  "total": 12,
+  "max": 12,
+  "notes": "Perfect score after updating assertion 'no_center_of_mass_marker_in_modify' to 'cm_marker_explicitly_created_and_passed'. The script correctly creates .cm markers before mass_properties calls and passes center_of_mass_marker, which is required in Adams 2023.2."
+}

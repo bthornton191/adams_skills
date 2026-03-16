@@ -1,0 +1,21 @@
+{
+  "scores": {
+    "Script creates a model with at least two shaft parts connected to ground via revolute joints": 1,
+    "constraint create complex_joint coupler is used (NOT 'constraint create coupler')": 1,
+    "motion_multipliers = 1.0, -0.333 (or equivalent 3:1 ratio with opposite sign)": 1,
+    "joint_name lists both .model.rev_input and .model.rev_output in the coupler": 1,
+    "constraint create motion_generator is used on the input joint": 1,
+    "motion generator specifies type_of_freedom = rotational": 1,
+    "motion generator specifies time_derivative = velocity": 1,
+    "HAVSIN function is used for the ramp (not STEP or STEP5)": 1,
+    "HAVSIN argument order is (x, x0, x1, h0, h1) = (TIME, 0.0, 0.5, 0.0, 120D)": 1,
+    "At least one geometry shape (cylinder) is added to each shaft part": 1,
+    "All object names use full dot-path hierarchy": 1,
+    "No adams_id specified anywhere": 1,
+    "Script uses simulation single_run transient command": 1,
+    "CMD script runs in Adams View without any ERROR: lines in aview.log": 1
+  },
+  "total": 14,
+  "max": 14,
+  "notes": "All assertions pass. Script correctly uses constraint create complex_joint coupler with motion_multipliers = 1.0, -0.333 for 3:1 opposite-direction coupling; motion generator uses HAVSIN(TIME, 0.0, 0.5, 0.0, 120D) with time_derivative = velocity; cylinders added to both shafts; no adams_id used; Adams validation passed with no errors."
+}

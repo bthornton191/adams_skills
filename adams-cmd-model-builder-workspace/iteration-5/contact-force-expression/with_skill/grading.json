@@ -1,0 +1,13 @@
+{
+  "scores": {
+    "Uses the IMPACT() function (not BISTOP or a manual IF expression)": 1,
+    "First arg uses DZ or similar displacement measuring penetration below floor": 1,
+    "Second arg uses VZ or matching velocity measure": 1,
+    "Threshold value is 0.0 (or equivalent contact point)": 1,
+    "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present": 1,
+    "Expression wrapped in double quotes as required for FUNCTION= parameter": 1
+  },
+  "total": 6,
+  "max": 6,
+  "notes": "All assertions pass. IMPACT() is used correctly with DZ as the first arg, VZ as the second, threshold 0.0, and all four parameters (1.0E5, 1.5, 50.0, 0.1) present in the correct positions. The expression is wrapped in double quotes in the CMD function_z field."
+}

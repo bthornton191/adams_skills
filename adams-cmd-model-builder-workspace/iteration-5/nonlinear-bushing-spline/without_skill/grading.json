@@ -1,0 +1,19 @@
+{
+  "scores": {
+    "Script creates spline data element with data_element create spline": 0,
+    "AKISPL function is used for the nonlinear X-direction force": 1,
+    "force create direct general_force is used (NOT force create element_like bushing as the sole implementation)": 1,
+    "Spline table covers -10mm to 10mm with (-10,-8000), (-5,-3000), (0,0), (5,3000), (10,8000) data points": 1,
+    "Y and Z translational stiffness of 5000 N/mm implemented (via GFORCE functions or separate bushing)": 1,
+    "Rotational stiffness of 200 N·mm/deg implemented — preferred: separate bushing with stiffness ≈ 3.491 N·mm/rad per axis. Do NOT use invalid 'rotational_stiffness' bushing parameter.": 1,
+    "All object names use full dot-path hierarchy": 0,
+    "No adams_id specified anywhere in the script": 0,
+    "Mass/inertia set with part modify rigid_body mass_properties, not part create": 0,
+    "center_of_mass_marker NOT passed in any part modify mass_properties call": 0,
+    "At least one geometry shape is added to each moving part": 0,
+    "CMD script runs in Adams View without any ERROR: lines in aview.log": 0
+  },
+  "total": 5,
+  "max": 12,
+  "notes": "Script uses old Adams deck/block format (PART/id, MARKER/id, SPLINE/id, GFORCE/id) throughout instead of the Adams/View command language. As a result: (1) spline is declared as SPLINE/1 block instead of data_element create spline; (7) no dot-path names used — objects referenced by numeric IDs; (8) numeric IDs (/1, /2, /3 etc.) are used everywhere, violating the no-adams_id rule; (9) mass/inertia set inline in PART/2 and PART/3 declarations rather than via part modify rigid_body mass_properties; (10) CM=20 is specified in the PART block, equivalent to passing center_of_mass_marker; (11) no geometry shapes added to the subframe or chassis; (12) not validated. The physics and force expressions are correct — AKISPL for nonlinear X, linear 5000 N/mm for Y/Z, -200*RTOD*AX/AY/AZ for the rotational DOFs with correct unit conversion, and the spline data matches the specification exactly."
+}

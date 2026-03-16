@@ -1,0 +1,19 @@
+{
+  "eval_id": "nonlinear-bushing-spline",
+  "eval_name": "nonlinear-bushing-spline",
+  "prompt": "I need to model a rubber mount between a chassis and a subframe. The X-direction (translational) stiffness is nonlinear and follows this force-displacement table: at −10 mm displacement, −8000 N; at −5 mm, −3000 N; at 0 mm, 0 N; at 5 mm, 3000 N; at 10 mm, 8000 N. The Y and Z translational stiffness is linear at 5000 N/mm. Rotational stiffness is 200 N·mm/deg about all three axes. Write an Adams CMD script that creates both the chassis (fixed to ground) and subframe as rigid parts (10 kg each, Ixx=Iyy=Izz=1000 kg·mm² each), adds appropriate markers, and implements this elastic joint correctly.",
+  "assertions": [
+    {"text": "Script creates spline data element with data_element create spline"},
+    {"text": "AKISPL function is used for the nonlinear X-direction force"},
+    {"text": "force create direct general_force is used (NOT force create element_like bushing as the sole implementation)"},
+    {"text": "Spline table covers -10mm to 10mm with (-10,-8000), (-5,-3000), (0,0), (5,3000), (10,8000) data points"},
+    {"text": "Y and Z translational stiffness of 5000 N/mm implemented (via GFORCE functions or separate bushing)"},
+    {"text": "Rotational stiffness of 200 N·mm/deg implemented — preferred: separate bushing with stiffness ≈ 3.491 N·mm/rad per axis. Do NOT use invalid 'rotational_stiffness' bushing parameter."},
+    {"text": "All object names use full dot-path hierarchy"},
+    {"text": "No adams_id specified anywhere in the script"},
+    {"text": "Mass/inertia set with part modify rigid_body mass_properties, not part create"},
+    {"text": ".cm marker explicitly created with 'marker create' before each 'part modify mass_properties' call, and passed as center_of_mass_marker"},
+    {"text": "At least one geometry shape is added to each moving part"},
+    {"text": "CMD script runs in Adams View without any ERROR: lines in aview.log"}
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "reviews": [
+    {
+      "run_id": "cam-follower-step5-with_skill",
+      "feedback": "",
+      "timestamp": "2026-03-16T15:30:10.546Z"
+    },
+    {
+      "run_id": "cam-follower-step5-without_skill",
+      "feedback": "",
+      "timestamp": "2026-03-16T15:30:10.546Z"
+    },
+    {
+      "run_id": "debug-broken-script-with_skill",
+      "feedback": "abbreviations actually *are* allowed here. THey are allowed anywhere in adams. They are just bad practice. The LLM should still fix them, but should be clear that it's following best practices, not fixing true errors. `model cre ...` would execute just the same as `model create ...`\n\nSame goes for the adams_ids rule. You can use them, it's just unnecessary and error prone.",
+      "timestamp": "2026-03-16T15:30:10.546Z"
+    },
+    {
+      "run_id": "debug-broken-script-without_skill",
+      "feedback": "",
+      "timestamp": "2026-03-16T15:30:10.546Z"
+    },
+    {
+      "run_id": "four-bar-linkage-with_skill",
+      "feedback": "the repeated `part create` needs to get fixed. Apparently it works, but it may not always.\n\nAlso, in the formal grades, it passed \"center_of_mass_marker argument is NOT passed in any part modify mass_properties call\". But probably only because that eval is ignoreing `part create...` calls. Because the LLM *did* pass the `center_of_mass_marker` to that.",
+      "timestamp": "2026-03-16T15:30:10.546Z"
+    },
+    {
+      "run_id": "four-bar-linkage-without_skill",
+      "feedback": "",
+      "timestamp": "2026-03-16T15:30:10.546Z"
+    },
+    {
+      "run_id": "gear-coupler-havsin-with_skill",
+      "feedback": "the command should actually be `constraint create complex_joint coupler` not `constraint create coupler`\n\nthe \"Expression uses DX ...\" eval doesn't make sense to me i think the LLM was correct to use TIME. Double check this and tell me if i'm wrong. \n\nThe llm doesn't specify a `time_derivative`, so this command will likely error. If not, we don't know if it's ramping disp, vel, or acc.\n\nThis test should have a full model to run through adams.",
+      "timestamp": "2026-03-16T15:30:10.546Z"
+    },
+    {
+      "run_id": "gear-coupler-havsin-without_skill",
+      "feedback": "",
+      "timestamp": "2026-03-16T15:30:10.546Z"
+    },
+    {
+      "run_id": "nonlinear-bushing-spline-with_skill",
+      "feedback": "The torque functions won't work well here. The `AX`, `AY`, `AZ`, functions can be unpredictable when there is rotation about all three axes and the angles wrap at 180 or 360. \nA better method is to use *two* forces. one general force to implement the nonlinear translational stiffness, and one bushing for the linear angular stiffness.",
+      "timestamp": "2026-03-16T15:30:10.546Z"
+    },
+    {
+      "run_id": "nonlinear-bushing-spline-without_skill",
+      "feedback": "",
+      "timestamp": "2026-03-16T15:30:10.546Z"
+    },
+    {
+      "run_id": "parametric-loop-chain-with_skill",
+      "feedback": "",
+      "timestamp": "2026-03-16T15:30:10.546Z"
+    },
+    {
+      "run_id": "parametric-loop-chain-without_skill",
+      "feedback": "",
+      "timestamp": "2026-03-16T15:30:10.546Z"
+    }
+  ],
+  "status": "complete"
+}

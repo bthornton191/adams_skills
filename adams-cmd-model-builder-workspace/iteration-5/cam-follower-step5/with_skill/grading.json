@@ -1,0 +1,19 @@
+{
+  "scores": {
+    "Script creates a model with at least two parts: a cam (fixed to ground) and a follower": 1,
+    "A translational joint constrains the follower to translate along one axis": 1,
+    "STEP5 is used for the cam force (not plain STEP)": 1,
+    "STEP5 x-range spans 0 to 20 (follower displacement from 0 to 20 mm)": 1,
+    "STEP5 output range spans 0 to 500 (force from 0 to 500 N)": 1,
+    "Damping term + 2.0 * VX(...) added to the force expression": 1,
+    "Full FUNCTION= expression wrapped in double quotes": 1,
+    "At least one geometry shape is added to each part (cam and follower)": 1,
+    "All object names use full dot-path hierarchy": 1,
+    "No adams_id specified anywhere": 1,
+    "Script uses simulation single_run transient command": 1,
+    "CMD script runs in Adams View without any ERROR: lines in aview.log": 1
+  },
+  "total": 12,
+  "max": 12,
+  "notes": "All assertions passed. STEP5 correctly uses x-range [0, 20] and output range [0, 500]. Damping term 2.0*VX is present. Both cam and follower have cylinder geometry. No adams_id used anywhere. Adams validation confirmed no errors."
+}

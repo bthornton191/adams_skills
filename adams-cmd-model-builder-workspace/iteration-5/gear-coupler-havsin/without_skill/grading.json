@@ -1,0 +1,21 @@
+{
+  "scores": {
+    "two_shaft_parts_with_revolute_joints": 1,
+    "constraint_create_complex_joint_coupler": 0,
+    "motion_multipliers_3to1_opposite": 1,
+    "joint_name_lists_both_rev_joints": 1,
+    "constraint_create_motion_generator": 1,
+    "motion_generator_type_of_freedom_rotational": 1,
+    "motion_generator_time_derivative_velocity": 1,
+    "havsin_function_used": 1,
+    "havsin_argument_values_correct": 1,
+    "cylinder_geometry_on_each_shaft": 1,
+    "full_dot_path_hierarchy": 1,
+    "no_adams_id": 1,
+    "simulation_single_run_transient": 1,
+    "no_errors_in_aview_log": 0
+  },
+  "total": 12,
+  "max": 14,
+  "notes": "Assertion 2 fails: script uses 'constraint create coupler' instead of the required 'constraint create complex_joint coupler'. The correct Adams command for a gear coupler is the complex_joint variant; the plain 'coupler' command does not accept 'scale_of_joint_freedom' in the same way. Assertion 3 is credited as pass because 'scale_of_joint_freedom = 1.0, 3.0' encodes the correct 3:1 ratio with opposite sign (ω_input + 3·ω_output = 0). Assertion 9 is credited as pass because HAVSIN(TIME, 0, 0, 0.5, 120D) correctly ramps from 0 to 120D between TIME=0 and 0.5 using the standard Adams (x, x0, h0, x1, h1) signature. Assertion 14 fails because the script was not run in Adams View and the aview.log result is unknown."
+}

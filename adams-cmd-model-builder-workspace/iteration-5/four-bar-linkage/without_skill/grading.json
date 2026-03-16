@@ -1,0 +1,19 @@
+{
+  "scores": {
+    "Script creates a model with model create command": 1,
+    "Three distinct rigid body parts are created (crank, coupler, rocker)": 1,
+    "Four revolute joints are created (crank-ground, crank-coupler, coupler-rocker, rocker-ground)": 1,
+    "A motion generator drives the crank joint at a constant 360 degrees per second": 1,
+    "Script uses simulation single_run transient command": 1,
+    "All keywords spelled out fully — no abbreviated commands anywhere": 1,
+    "All object names use full dot-path hierarchy (.model.part.marker)": 1,
+    "No adams_id specified anywhere in the script": 1,
+    "Mass/inertia set with part modify rigid_body mass_properties, not part create": 0,
+    "center_of_mass_marker argument is NOT passed in any part modify mass_properties call": 1,
+    "At least one geometry shape is added to each of the three moving parts": 0,
+    "CMD script runs in Adams View without any ERROR: lines in aview.log": 0
+  },
+  "total": 9,
+  "max": 12,
+  "notes": "Two code-quality failures: (1) mass/inertia is set via 'part create rigid_body mass_properties' instead of the required 'part modify rigid_body mass_properties'; (2) no geometry shapes are created for any of the three moving parts — no geometry create commands appear anywhere in the script. The script was not run in Adams View so the log-validation assertion is also marked failed."
+}

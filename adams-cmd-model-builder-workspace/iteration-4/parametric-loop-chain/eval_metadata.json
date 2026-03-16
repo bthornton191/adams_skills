@@ -1,0 +1,19 @@
+{
+  "eval_id": "parametric-loop-chain",
+  "eval_name": "parametric-loop-chain",
+  "prompt": "Write an Adams CMD script that creates a chain of 8 point masses in a straight line along the X axis, spaced 50 mm apart, starting at the origin. The first mass is fixed to ground with a fixed joint. Each adjacent pair of masses is connected by a spring-damper with stiffness 100 N/mm, damping coefficient 1.0 N\u00b7s/mm, and free length 50 mm. Each mass is 0.25 kg. Use a FOR loop with parametric string construction (EVAL, RTOI, //) to create the masses and spring-dampers rather than writing them out individually. Simulate for 2 seconds.",
+  "assertions": [
+    {"text": "A for / end loop drives mass and/or spring-damper creation"},
+    {"text": "EVAL() is used to dereference a variable inside a command string"},
+    {"text": "RTOI() is used to convert the loop counter to a string for name construction"},
+    {"text": "// string concatenation operator is used to build part/marker names"},
+    {"text": "Masses created with part create point_mass (not rigid_body)"},
+    {"text": "Spring-dampers created with force create element_like spring_damper with stiffness=100, damping=1.0, length=50"},
+    {"text": "First mass (mass_1 or equivalent) is fixed to ground with a fixed joint"},
+    {"text": "Exactly 8 masses are created"},
+    {"text": "Masses are spaced 50 mm apart along the X axis"},
+    {"text": "Script includes simulate transient (or notes the command to run)"},
+    {"text": "All object names use full dot-path hierarchy"},
+    {"text": "No adams_id specified anywhere in the script"}
+  ]
+}

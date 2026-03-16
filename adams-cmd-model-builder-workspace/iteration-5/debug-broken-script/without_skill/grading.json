@@ -1,0 +1,16 @@
+{
+  "scores": {
+    "Identifies and fixes 'model cre' → 'model create' (abbreviated command)": 1,
+    "Identifies and fixes 'part cre rig nam' → 'part create rigid_body name_and_position'": 0,
+    "Changes 'part create rigid_body mass_properties' to 'part modify rigid_body mass_properties'": 0,
+    "Removes 'adams_id = 3'": 1,
+    "Removes 'center_of_mass_marker = .pendulum.link.cm' from the mass_properties call": 0,
+    "Corrects 'pendulum.link.pin_mkr' to '.pendulum.link.pin_mkr' (missing leading dot)": 1,
+    "Changes 'force create element_like spring_damper' to 'force create element_like translational_spring_damper' and 'length = 200.0' to 'displacement_at_preload = 200.0'": 0,
+    "Corrects 'sim trans end_time = 2.0 step_size = 0.001' to 'simulation single_run transient ...'": 1,
+    "The corrected CMD script runs in Adams View without any ERROR: lines in aview.log": 0
+  },
+  "total": 4,
+  "max": 9,
+  "notes": "Fixed: model create, adams_id removal, leading dot on pin_mkr, simulation single_run transient. Failed: (1) 'part cre rig nam' was changed to 'part create rigid_body name = ...' instead of the correct 'name_and_position' subcategory. (2) 'part create rigid_body mass_properties' was not changed to 'part modify'. (3) center_of_mass_marker was retained in the mass_properties block instead of removed. (4) The spring_damper force element was deleted entirely rather than corrected to 'translational_spring_damper' with 'displacement_at_preload'. (5) Script was not validated in Adams View."
+}

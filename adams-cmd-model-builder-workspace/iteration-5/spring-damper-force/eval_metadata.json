@@ -1,0 +1,13 @@
+{
+  "eval_id": "spring-damper-force",
+  "eval_name": "spring-damper-force",
+  "prompt": "How do I create a spring-damper force between two parts in Adams CMD? The spring should have stiffness 5000 N/mm and damping 100 N·s/mm, with a free length of 250 mm.",
+  "assertions": [
+    {"text": "Uses force create element_like translational_spring_damper (not single_component_force or bushing)"},
+    {"text": "Includes stiffness = 5000"},
+    {"text": "Includes damping = 100"},
+    {"text": "Includes displacement_at_preload = 250 (free length parameter, NOT 'length')"},
+    {"text": "References both i_marker_name and j_marker_name"},
+    {"text": "Explains that translational_spring_damper is for 1-DOF along a line of action"}
+  ]
+}

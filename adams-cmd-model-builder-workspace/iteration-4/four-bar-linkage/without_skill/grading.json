@@ -1,0 +1,65 @@
+{
+  "expectations": [
+    {
+      "text": "Script creates a model with model create command",
+      "passed": true,
+      "evidence": "model create & model_name = four_bar present at top of script"
+    },
+    {
+      "text": "Three distinct rigid body parts are created (crank, coupler, rocker)",
+      "passed": true,
+      "evidence": "part create rigid_body name_and_position for .four_bar.crank, .four_bar.coupler, .four_bar.rocker all present"
+    },
+    {
+      "text": "Four revolute joints are created (crank-ground, crank-coupler, coupler-rocker, rocker-ground)",
+      "passed": true,
+      "evidence": "constraint create joint revolute for JNT_A (crank-ground), JNT_B (crank-coupler), JNT_C (coupler-rocker), JNT_D (rocker-ground)"
+    },
+    {
+      "text": "A motion generator drives the crank joint at a constant 360 degrees per second",
+      "passed": true,
+      "evidence": "motion create on .four_bar.JNT_A (crank-ground joint) with type_of_freedom = rotational and function = \"360.0d * time\""
+    },
+    {
+      "text": "Script includes simulate transient command (or notes the command to run)",
+      "passed": false,
+      "evidence": "Uses 'simulation single' with 'type = dynamic' instead of the required 'simulation single_run transient' command"
+    },
+    {
+      "text": "All keywords spelled out fully — no abbreviated commands anywhere",
+      "passed": false,
+      "evidence": "'simulation single' is an abbreviated form of 'simulation single_run'; correct full command is 'simulation single_run transient'"
+    },
+    {
+      "text": "All object names use full dot-path hierarchy (.model.part.marker)",
+      "passed": true,
+      "evidence": "All names use full paths: .four_bar.ground.MAR_A, .four_bar.crank.MAR_A, .four_bar.JNT_A, etc."
+    },
+    {
+      "text": "No adams_id specified anywhere in the script",
+      "passed": true,
+      "evidence": "No adams_id keyword found anywhere in the script"
+    },
+    {
+      "text": "Mass/inertia set with part modify rigid_body mass_properties, not part create",
+      "passed": true,
+      "evidence": "All three parts use 'part modify rigid_body mass_properties' to set mass and inertia values"
+    },
+    {
+      "text": "center_of_mass_marker argument is NOT passed in any part modify mass_properties call",
+      "passed": false,
+      "evidence": "center_of_mass_marker is passed in all three 'part modify rigid_body mass_properties' calls (crank, coupler, rocker)"
+    },
+    {
+      "text": "CMD script runs in Adams View without any ERROR: lines in aview.log (adams_view_validation)",
+      "passed": false,
+      "evidence": "Adams View validation FAILED — ERROR: 'field_name' is not a valid parameter for force create body gravitational; correct parameter is 'gravity_field_name'"
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 5,
+    "total": 11,
+    "pass_rate": 0.55
+  }
+}

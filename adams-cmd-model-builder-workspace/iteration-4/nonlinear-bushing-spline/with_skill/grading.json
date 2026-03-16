@@ -1,0 +1,70 @@
+{
+  "expectations": [
+    {
+      "text": "Script creates spline data element with data_element create spline",
+      "passed": true,
+      "evidence": "data_element create spline & spline_name = .rubber_mount_model.x_stiffness"
+    },
+    {
+      "text": "AKISPL function is used for the nonlinear X-direction force",
+      "passed": true,
+      "evidence": "x_force_function = \"AKISPL(DX(.rubber_mount_model.subframe.mount_i_mkr, .rubber_mount_model.chassis.mount_j_mkr), 0, .rubber_mount_model.x_stiffness, 0)\""
+    },
+    {
+      "text": "force create direct general_force is used (NOT force create element_like bushing)",
+      "passed": true,
+      "evidence": "Uses force create direct general_force exclusively; no force create element_like bushing anywhere in the script"
+    },
+    {
+      "text": "Spline table covers -10mm to 10mm with (-10,-8000), (-5,-3000), (0,0), (5,3000), (10,8000) data points",
+      "passed": true,
+      "evidence": "x = -10.0, -5.0, 0.0, 5.0, 10.0 and y = -8000.0, -3000.0, 0.0, 3000.0, 8000.0"
+    },
+    {
+      "text": "Y and Z force functions are linear (5000 * DY or 5000 * DZ, or equivalent)",
+      "passed": true,
+      "evidence": "y_force_function = \"-5000.0 * DY(...)\" and z_force_function = \"-5000.0 * DZ(...)\""
+    },
+    {
+      "text": "Rotational torque functions implement 200 N\u00b7mm/deg stiffness (using AX/AY/AZ with /1D conversion, or equivalent)",
+      "passed": true,
+      "evidence": "x_torque_function = \"(-200.0 / 1D) * AX(...)\", same pattern for y_torque_function and z_torque_function"
+    },
+    {
+      "text": "All keywords spelled out fully — no abbreviated commands",
+      "passed": true,
+      "evidence": "All commands fully spelled: part create rigid_body name_and_position, part modify rigid_body mass_properties, marker create, data_element create spline, constraint create joint fixed, force create direct general_force"
+    },
+    {
+      "text": "All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "All names use full .rubber_mount_model. prefix, e.g. .rubber_mount_model.subframe.mount_i_mkr, .rubber_mount_model.chassis.mount_j_mkr"
+    },
+    {
+      "text": "No adams_id specified anywhere in the script",
+      "passed": true,
+      "evidence": "No adams_id keyword appears in the CMD file; response.md explicitly states 'adams_id is never specified'"
+    },
+    {
+      "text": "Mass/inertia set with part modify rigid_body mass_properties, not part create",
+      "passed": true,
+      "evidence": "part create rigid_body name_and_position used for location/orientation only; part modify rigid_body mass_properties used for mass=10.0, ixx/iyy/izz=1000.0"
+    },
+    {
+      "text": "center_of_mass_marker NOT passed in any part modify mass_properties call",
+      "passed": true,
+      "evidence": "part modify rigid_body mass_properties only specifies mass, ixx, iyy, izz — no center_of_mass_marker parameter"
+    },
+    {
+      "text": "CMD script runs in Adams View without any ERROR: lines in aview.log (adams_view_validation)",
+      "passed": true,
+      "evidence": "Adams View validation PASSED — no ERROR: lines in aview.log"
+    }
+  ],
+  "summary": {
+    "passed": 12,
+    "failed": 0,
+    "total": 12,
+    "pass_rate": 1.0
+  }
+}

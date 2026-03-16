@@ -1,0 +1,18 @@
+{
+  "eval_id": "simple-pendulum-script",
+  "eval_name": "simple-pendulum-script",
+  "prompt": "Write an Adams CMD script to create a simple pendulum. It should have a single rigid link of length 200 mm and mass 1 kg, pinned to the ground at its top end by a revolute joint, with gravity acting in the -Y direction. Release it from 45 degrees.",
+  "assertions": [
+    {"text": "Script creates a model with model create command"},
+    {"text": "A rigid body part is created with part create rigid_body name_and_position"},
+    {"text": "At least one marker is created on the link and at least one on ground"},
+    {"text": "A revolute joint is created using constraint create joint revolute with i_marker_name and j_marker_name"},
+    {"text": "Gravity is created with force create body gravitational (not force create body_force or any other variant)"},
+    {"text": "Initial orientation set to 45 degrees for the release angle"},
+    {"text": "All keywords spelled out fully (no abbreviations)"},
+    {"text": "No adams_id specified anywhere in the script"},
+    {"text": "Mass properties are set with part modify rigid_body mass_properties (not part create rigid_body mass_properties)"},
+    {"text": "At least one geometry shape (sphere, cylinder, or box) is added to the moving link part"},
+    {"text": "CMD script runs in Adams View without any ERROR: lines in aview.log (validated by scripts/run_adams_cmd.py)"}
+  ]
+}

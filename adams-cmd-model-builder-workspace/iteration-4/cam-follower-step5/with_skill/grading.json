@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "STEP5 function is used (not STEP or IF)",
+      "passed": true,
+      "evidence": "Expression uses STEP5(DX(...), 0.0, 0.0, 20.0, 500.0) explicitly"
+    },
+    {
+      "text": "DX is used to measure the cam displacement",
+      "passed": true,
+      "evidence": "DX(.model.follower.tip_mkr, .model.cam.ref_mkr) is the first argument to STEP5"
+    },
+    {
+      "text": "The DX range is 0 to 20 mm (STEP5 arguments x0=0, x1=20)",
+      "passed": true,
+      "evidence": "STEP5 arguments show x0=0.0 and x1=20.0"
+    },
+    {
+      "text": "STEP5 output range spans 0 to 500 (force from 0 to 500 N)",
+      "passed": true,
+      "evidence": "STEP5 arguments show h0=0.0 and h1=500.0"
+    },
+    {
+      "text": "Force correctly holds at 500 N for DX > 20 mm (STEP5 naturally holds at final value)",
+      "passed": true,
+      "evidence": "Explanation states: 'When x >= x1 (i.e., DX >= 20 mm): the function saturates and returns h1 = 500.0 N'"
+    },
+    {
+      "text": "Damping term 2.0 * VX(...) added to the expression",
+      "passed": true,
+      "evidence": "Expression ends with '+ 2.0 * VX(.model.follower.tip_mkr, .model.cam.ref_mkr)'"
+    },
+    {
+      "text": "Full FUNCTION= expression wrapped in double quotes",
+      "passed": true,
+      "evidence": "function = \"STEP5(DX(...), 0.0, 0.0, 20.0, 500.0) + 2.0 * VX(...)\" — quotes present"
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  }
+}

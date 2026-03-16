@@ -1,0 +1,21 @@
+{
+  "scores": {
+    "for_end_loop_creation": 1,
+    "eval_used": 1,
+    "rtoi_used": 1,
+    "string_concatenation_operator": 1,
+    "part_create_point_mass": 0,
+    "spring_damper_command": 0,
+    "first_mass_ground_joint": 0,
+    "exactly_8_masses": 1,
+    "masses_50mm_spacing": 1,
+    "simulation_transient": 1,
+    "dot_path_hierarchy": 0,
+    "no_adams_id": 0,
+    "geometry_added": 0,
+    "no_errors_in_log": 0
+  },
+  "total": 7,
+  "max": 14,
+  "notes": "FOR loop, EVAL, RTOI, and // are all used correctly for parametric construction. However: (1) masses are created with PART/ short-form using near-zero IP rather than 'part create point_mass'; (2) spring-dampers use SPRING/ legacy syntax instead of 'force create element_like translational_spring_damper'; (3) the first mass ground constraint uses a FIXED joint, which Adams rejects on point masses — should be a spherical joint or atpoint primitive; (4) no geometry (sphere/cylinder) is added to any mass; (5) all object references use numeric adams_ids via the /id notation rather than dot-path names; (6) not validated in Adams View."
+}

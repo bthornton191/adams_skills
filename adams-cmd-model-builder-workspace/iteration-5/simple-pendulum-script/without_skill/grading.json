@@ -1,0 +1,18 @@
+{
+  "scores": {
+    "Script creates a model with model create command": 1,
+    "A rigid body part is created with part create rigid_body name_and_position": 1,
+    "At least one marker is created on the link and at least one on ground": 1,
+    "A revolute joint is created using constraint create joint revolute with i_marker_name and j_marker_name": 1,
+    "Gravity is created with force create body gravitational (not force create body_force or any other variant)": 0,
+    "Initial orientation set to 45 degrees for the release angle": 1,
+    "All keywords spelled out fully (no abbreviations)": 1,
+    "No adams_id specified anywhere in the script": 1,
+    "Mass properties are set with part modify rigid_body mass_properties (not part create rigid_body mass_properties)": 0,
+    "At least one geometry shape (sphere, cylinder, or box) is added to the moving link part": 0,
+    "CMD script runs in Adams View without any ERROR: lines in aview.log (validated by scripts/run_adams_cmd.py)": 0
+  },
+  "total": 7,
+  "max": 11,
+  "notes": "Three failures: (1) Gravity uses 'force gravity' instead of the required 'force create body gravitational'. (2) Mass properties use 'part create rigid_body mass_properties' instead of the required 'part modify rigid_body mass_properties'. (3) No geometry shape (cylinder, sphere, or box) is created for the link part. Not validated in Adams View so the run assertion also fails."
+}

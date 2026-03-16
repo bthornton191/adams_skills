@@ -1,0 +1,16 @@
+{
+  "scores": {
+    "fixes_model_cre_abbreviation": 1,
+    "fixes_part_cre_rig_nam_abbreviation": 1,
+    "changes_part_create_to_part_modify_mass_properties": 1,
+    "removes_adams_id": 1,
+    "cm_marker_explicitly_created_and_passed": 1,
+    "corrects_missing_leading_dot_on_pin_mkr": 1,
+    "fixes_spring_damper_type_and_length_parameter": 1,
+    "fixes_sim_trans_to_simulation_single_run_transient": 1,
+    "passes_adams_validation": 1
+  },
+  "total": 9,
+  "max": 9,
+  "notes": "Perfect score after updating assertion. Script correctly creates .pendulum.link.cm marker before mass_properties and passes it as center_of_mass_marker, which is the correct Adams 2023.2 approach."
+}

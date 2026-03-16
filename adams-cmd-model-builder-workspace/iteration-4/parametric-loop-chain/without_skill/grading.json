@@ -1,0 +1,80 @@
+{
+  "expectations": [
+    {
+      "text": "Script uses a for/end loop to parametrically create the masses",
+      "passed": true,
+      "evidence": "for variable_name=ii start_value=1 end_value=8 increment=1 ... end for — loop structure present (note: uses 'end for' terminator)"
+    },
+    {
+      "text": "EVAL() function is used to generate dynamic names inside the loop",
+      "passed": true,
+      "evidence": "(EVAL(\"mass_\" // RTOI(ii))) used for part_name and marker names inside both loops"
+    },
+    {
+      "text": "RTOI() used to convert loop integer variable to string for name construction",
+      "passed": true,
+      "evidence": "RTOI(ii) and RTOI(ii + 1) used in name expressions, e.g. \"mass_\" // RTOI(ii)"
+    },
+    {
+      "text": "String concatenation operator // is used in name construction",
+      "passed": true,
+      "evidence": "\"mass_\" // RTOI(ii) // \".cm\" and \"spring_\" // RTOI(ii) patterns used in both loops"
+    },
+    {
+      "text": "part create point_mass is used (NOT rigid body or generic body)",
+      "passed": false,
+      "evidence": "part create rigid_body mass_only used instead of part create point_mass — this is explicitly forbidden by the assertion"
+    },
+    {
+      "text": "force create element_like translational_spring_damper is used for inter-mass springs (NOT bushing, NOT spring_damper alone)",
+      "passed": false,
+      "evidence": "force create element_like spring_damper used — missing the required 'translational_spring_damper' keyword; bare spring_damper is a different element type"
+    },
+    {
+      "text": "First mass is fixed to ground using spherical joint or atpoint primitive (NOT fixed joint — Adams rejects fixed joint on point masses)",
+      "passed": false,
+      "evidence": "constraint create joint fixed used to anchor mass_1 — Adams rejects fixed joints on point masses; should use spherical or atpoint"
+    },
+    {
+      "text": "8 masses are created (loop runs 8 times or explicitly creates 8)",
+      "passed": true,
+      "evidence": "First loop runs from start_value=1 to end_value=8 — 8 iterations, one mass per iteration"
+    },
+    {
+      "text": "Mass spacing is 50mm (0.05m) in some axis",
+      "passed": true,
+      "evidence": "variable xpos = (EVAL((ii - 1) * 50.0)) used for X position — spacing is 50 mm along X axis"
+    },
+    {
+      "text": "Script includes simulation single_run transient command (or notes the command to run simulation)",
+      "passed": true,
+      "evidence": "simulation single_run present with sim_type=transient parameter; response.md explicitly describes the transient simulation"
+    },
+    {
+      "text": "All keywords spelled out fully — no abbreviated commands",
+      "passed": true,
+      "evidence": "model create, defaults units, marker create, variable create, part create rigid_body mass_only, constraint create joint fixed, force create element_like spring_damper, simulation single_run — all appear fully spelled out"
+    },
+    {
+      "text": "All object names use full dot-path hierarchy",
+      "passed": false,
+      "evidence": "Names like ground.GROUND_REF, mass_1.cm, mass_N.cm, spring_N lack the model prefix; should be .chain_model.ground.GROUND_REF etc. — no full dot-path hierarchy used"
+    },
+    {
+      "text": "No adams_id specified anywhere in the script",
+      "passed": true,
+      "evidence": "No adams_id keyword appears anywhere in the script"
+    },
+    {
+      "text": "CMD script runs in Adams View without any ERROR: lines in aview.log (adams_view_validation)",
+      "passed": false,
+      "evidence": "Adams View validation result: FAILED — errors: invalid marker syntax, wrong mass syntax, incorrect spring type, fixed joint on point mass"
+    }
+  ],
+  "summary": {
+    "passed": 9,
+    "failed": 5,
+    "total": 14,
+    "pass_rate": 0.643
+  }
+}

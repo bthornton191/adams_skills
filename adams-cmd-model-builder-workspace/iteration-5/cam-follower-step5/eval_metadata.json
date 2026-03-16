@@ -1,0 +1,19 @@
+{
+  "eval_id": "cam-follower-step5",
+  "eval_name": "cam-follower-step5",
+  "prompt": "Write a complete Adams CMD script for a cam-follower mechanism. Create a cam body (1 kg, Ixx=Iyy=Izz=100 kg·mm²) fixed to ground at the origin and a follower (0.5 kg rigid body, Ixx=Iyy=50 kg·mm², Izz=10 kg·mm²) that can only translate along the global X axis via a translational joint. Apply a single-component force using STEP5 that pushes the follower in the +X direction: the force should ramp smoothly from 0 N to 500 N as the follower's DX displacement (from .model.follower.tip_mkr relative to .model.cam.ref_mkr) goes from 0 mm to 20 mm, then hold at 500 N beyond 20 mm. Add a velocity-dependent damping of 2.0 × VX. Add simple geometry shapes (cylinder or box) to both the cam and follower parts. Simulate for 1 second.",
+  "assertions": [
+    {"text": "Script creates a model with at least two parts: a cam (fixed to ground) and a follower"},
+    {"text": "A translational joint constrains the follower to translate along one axis"},
+    {"text": "STEP5 is used for the cam force (not plain STEP)"},
+    {"text": "STEP5 x-range spans 0 to 20 (follower displacement from 0 to 20 mm)"},
+    {"text": "STEP5 output range spans 0 to 500 (force from 0 to 500 N)"},
+    {"text": "Damping term + 2.0 * VX(...) added to the force expression"},
+    {"text": "Full FUNCTION= expression wrapped in double quotes"},
+    {"text": "At least one geometry shape is added to each part (cam and follower)"},
+    {"text": "All object names use full dot-path hierarchy"},
+    {"text": "No adams_id specified anywhere"},
+    {"text": "Script uses simulation single_run transient command"},
+    {"text": "CMD script runs in Adams View without any ERROR: lines in aview.log"}
+  ]
+}

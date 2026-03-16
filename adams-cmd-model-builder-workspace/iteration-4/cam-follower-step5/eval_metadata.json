@@ -1,0 +1,13 @@
+{
+  "eval_id": "cam-follower-step5",
+  "eval_name": "cam-follower-step5",
+  "prompt": "Write a FUNCTION= expression for a cam-follower return spring force. The spring force should ramp smoothly from 0 N up to 500 N as the follower's X-displacement (DX from marker .model.follower.tip_mkr relative to .model.cam.ref_mkr) goes from 0 mm to 20 mm, then hold at 500 N for any displacement beyond 20 mm. Add a velocity-dependent damping term of 2.0 times the follower's X-velocity (VX). Use the smoothest available Adams step function (not STEP).",
+  "assertions": [
+    {"text": "Expression uses STEP5, not STEP (STEP has discontinuous 2nd derivative; STEP5 is smoother)"},
+    {"text": "STEP5 x-range spans 0 to 20 (displacement from 0 to 20 mm)"},
+    {"text": "STEP5 output range spans 0 to 500 (force from 0 to 500 N)"},
+    {"text": "Force holds at 500 N for DX > 20 mm (STEP5 naturally does this)"},
+    {"text": "Damping term 2.0 * VX(...) is added to the expression"},
+    {"text": "Full FUNCTION= expression is wrapped in double quotes"}
+  ]
+}

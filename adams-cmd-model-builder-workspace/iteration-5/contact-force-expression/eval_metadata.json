@@ -1,0 +1,13 @@
+{
+  "eval_id": "contact-force-expression",
+  "eval_name": "contact-force-expression",
+  "prompt": "Write a FUNCTION= expression for a one-sided contact force that activates when a part's CM falls below Z = 0 (i.e., hits a floor at Z=0). The contact should have stiffness 1e5, exponent 1.5, damping 50, and penetration depth 0.1 mm.",
+  "assertions": [
+    {"text": "Uses the IMPACT() function (not BISTOP or a manual IF expression)"},
+    {"text": "First arg uses DZ or similar displacement measuring penetration below floor"},
+    {"text": "Second arg uses VZ or matching velocity measure"},
+    {"text": "Threshold value is 0.0 (or equivalent contact point)"},
+    {"text": "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present"},
+    {"text": "Expression wrapped in double quotes as required for FUNCTION= parameter"}
+  ]
+}

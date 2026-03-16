@@ -1,0 +1,13 @@
+{
+  "eval_id": "debug-broken-script",
+  "eval_name": "debug-broken-script",
+  "prompt": "This Adams CMD script has several bugs. Find and fix all of them.\n\n```\nmodel cre model_name = .pendulum\n\ndefaults units length = mm mass = kg\n\npart cre rig nam &\n    part_name = .pendulum.link &\n    location  = 0.0, 0.0, 0.0\n\npart create rigid_body mass_properties &\n    part_name             = .pendulum.link &\n    adams_id              = 3 &\n    mass                  = 1.0 &\n    center_of_mass_marker = .pendulum.link.cm &\n    ixx                   = 3333.0 &\n    iyy                   = 3333.0 &\n    izz                   = 100.0\n\nmarker create &\n    marker_name = pendulum.link.pin_mkr &\n    location    = 0.0, 0.0, 0.0\n\nconstraint create joint revolute &\n    joint_name    = .pendulum.rev_pin &\n    i_marker_name = pendulum.link.pin_mkr &\n    j_marker_name = .pendulum.ground.pin_j_mkr\n```",
+  "assertions": [
+    {"text": "Identifies and corrects 'model cre' to 'model create' (abbreviated keyword)"},
+    {"text": "Identifies and corrects 'part cre rig nam' to 'part create rigid_body name_and_position'"},
+    {"text": "Identifies that 'part create rigid_body mass_properties' should be 'part modify rigid_body mass_properties'"},
+    {"text": "Identifies and removes 'adams_id = 3' — manually assigning adams_id is never correct"},
+    {"text": "Identifies and removes 'center_of_mass_marker = .pendulum.link.cm' — the cm marker does not exist yet; Adams creates it automatically"},
+    {"text": "Identifies that 'pendulum.link.pin_mkr' is missing the leading dot and corrects to '.pendulum.link.pin_mkr' (appears in both marker create and constraint create)"}
+  ]
+}

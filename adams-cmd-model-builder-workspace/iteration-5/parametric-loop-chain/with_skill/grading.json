@@ -1,0 +1,21 @@
+{
+  "scores": {
+    "A for / end loop drives mass and/or spring-damper creation": 1,
+    "EVAL() used to dereference a variable inside a command string": 1,
+    "RTOI() used to convert the loop counter to a string for name construction": 1,
+    "// string concatenation operator used to build part/marker names": 1,
+    "Masses created with part create point_mass (not rigid_body)": 1,
+    "Spring-dampers created with force create element_like translational_spring_damper with stiffness=100, damping=1.0, displacement_at_preload=50": 1,
+    "First mass is fixed to ground with a spherical joint or atpoint primitive (NOT fixed joint — Adams rejects fixed joints on point masses)": 1,
+    "Exactly 8 masses are created": 1,
+    "Masses are spaced 50 mm apart along the X axis": 1,
+    "Script uses simulation single_run transient command": 1,
+    "All object names use full dot-path hierarchy": 1,
+    "No adams_id specified anywhere in the script": 1,
+    "At least one geometry shape (sphere or cylinder) is added to each mass": 1,
+    "CMD script runs in Adams View without any ERROR: lines in aview.log": 1
+  },
+  "total": 14,
+  "max": 14,
+  "notes": "All assertions passed. Geometry uses 'ellipsoid' with equal scale factors (5,5,5) rather than an explicit sphere command, but is visually and geometrically equivalent to a sphere and is created for every mass inside the parametric loop. Script correctly uses spherical joint (not fixed) on the first mass, as required by Adams point-mass constraints."
+}

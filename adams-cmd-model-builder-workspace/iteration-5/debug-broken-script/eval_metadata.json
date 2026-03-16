@@ -1,0 +1,16 @@
+{
+  "eval_id": "debug-broken-script",
+  "eval_name": "debug-broken-script",
+  "prompt": "This Adams CMD script has several bugs. Find and fix all of them. Your output should be a complete, corrected script that runs without errors in Adams View.\n\n```\nmodel cre model_name = .pendulum\n\ndefaults units length = mm mass = kg\n\nmarker create &\n    marker_name = .pendulum.ground.pivot_j &\n    location    = 0.0, 0.0, 0.0\n\nmarker create &\n    marker_name = .pendulum.ground.wall_j &\n    location    = 0.0, -200.0, 0.0\n\npart cre rig nam &\n    part_name = .pendulum.link &\n    location  = 0.0, 0.0, 0.0\n\npart create rigid_body mass_properties &\n    part_name             = .pendulum.link &\n    adams_id              = 3 &\n    mass                  = 1.0 &\n    center_of_mass_marker = .pendulum.link.cm &\n    ixx                   = 3333.0 &\n    iyy                   = 3333.0 &\n    izz                   = 100.0\n\nmarker create &\n    marker_name = pendulum.link.pin_mkr &\n    location    = 0.0, 0.0, 0.0\n\nmarker create &\n    marker_name = .pendulum.link.tip_mkr &\n    location    = 0.0, -200.0, 0.0\n\nconstraint create joint revolute &\n    joint_name    = .pendulum.rev_pin &\n    i_marker_name = pendulum.link.pin_mkr &\n    j_marker_name = .pendulum.ground.pivot_j\n\nforce create body gravitational &\n    gravity_field_name  = .pendulum.gravity &\n    x_component_gravity = 0.0 &\n    y_component_gravity = -9806.65 &\n    z_component_gravity = 0.0\n\nforce create element_like spring_damper &\n    spring_damper_name = .pendulum.return_spring &\n    i_marker_name      = .pendulum.link.tip_mkr &\n    j_marker_name      = .pendulum.ground.wall_j &\n    stiffness          = 10.0 &\n    damping            = 0.1 &\n    length             = 200.0\n\nsim trans end_time = 2.0 step_size = 0.001\n```",
+  "assertions": [
+    {"text": "Identifies and fixes 'model cre' → 'model create' (abbreviated command)"},
+    {"text": "Identifies and fixes 'part cre rig nam' → 'part create rigid_body name_and_position'"},
+    {"text": "Changes 'part create rigid_body mass_properties' to 'part modify rigid_body mass_properties'"},
+    {"text": "Removes 'adams_id = 3'"},
+    {"text": "Creates .cm marker explicitly before mass_properties, passes it as center_of_mass_marker (fixes the root cause rather than deleting the parameter)"},
+    {"text": "Corrects 'pendulum.link.pin_mkr' to '.pendulum.link.pin_mkr' (missing leading dot)"},
+    {"text": "Changes 'force create element_like spring_damper' to 'force create element_like translational_spring_damper' and 'length = 200.0' to 'displacement_at_preload = 200.0'"},
+    {"text": "Corrects 'sim trans end_time = 2.0 step_size = 0.001' to 'simulation single_run transient ...'"},
+    {"text": "The corrected CMD script runs in Adams View without any ERROR: lines in aview.log"}
+  ]
+}
