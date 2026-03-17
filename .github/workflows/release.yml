@@ -24,13 +24,18 @@ jobs:
       - name: Stamp version from tag
         run: |
           VERSION=${GITHUB_REF_NAME#v}
-          sed -i "/^---$/,/^---$/s/^  version: .*/  version: $VERSION/" skills/adams-subroutine-writer/SKILL.md
+          for skill_dir in skills/*/; do
+            sed -i "/^---$/,/^---$/s/^  version: .*/  version: $VERSION/" "${skill_dir}SKILL.md"
+          done
 
-      - name: Package adams-subroutine-writer
+      - name: Package all skills
         working-directory: .agents/skills/skill-creator
-        run: python -m scripts.package_skill ../../../skills/adams-subroutine-writer ../../../dist
+        run: |
+          for skill_dir in ../../../skills/*/; do
+            python -m scripts.package_skill "$skill_dir" ../../../dist
+          done
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2.5.0
         with:
-          files: dist/adams-subroutine-writer.zip
+          files: dist/*.zip
