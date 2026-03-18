@@ -41,3 +41,21 @@ jobs:
         uses: softprops/action-gh-release@v2.5.0
         with:
           files: dist/*.zip
+          generate_release_notes: true
+          body: |
+            ## Install
+
+            Open a **PowerShell** terminal in your project directory and run:
+
+            ```powershell
+            iwr https://raw.githubusercontent.com/bthornton191/adams_skills/main/install.ps1 -OutFile install.ps1; .\install.ps1
+            ```
+
+            This installs all skills into your project's skills folder (auto-detected, or `.agents\skills\` if none exists).
+
+            **Linux / macOS:**
+            ```bash
+            curl -fsSL https://raw.githubusercontent.com/bthornton191/adams_skills/main/install.sh | bash
+            ```
+
+            **Manual:** download the `.zip` for the skill(s) you want from the assets below and extract into `.agents/skills/` in your project.
