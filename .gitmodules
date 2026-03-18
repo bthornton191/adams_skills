@@ -1,0 +1,3 @@
+[submodule "skills/adams-python-model-builder/references/adamspy-stubs"]
+	path = skills/adams-python-model-builder/references/adamspy-stubs
+	url = https://github.com/bthornton191/adams-python-stubs

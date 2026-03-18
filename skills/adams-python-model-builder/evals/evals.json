@@ -1,0 +1,178 @@
+{
+  "grading_scripts": {
+    "adams_view_validation": {
+      "description": "For any eval that produces a .py file, run it through Adams View Python batch mode to check for errors. This is a programmatic check — do not rely on the LLM to perform this check.",
+      "command": "python scripts/run_adams_python.py <py_file> --timeout 120 --log-output <output_dir>/aview.log",
+      "pass_condition": "Exit code 0 (no ERROR: lines in aview.log and no Python tracebacks)",
+      "notes": [
+        "The script locates mdi.bat automatically (VS Code setting → ADAMS_LAUNCH_COMMAND → ADAMS_INSTALL_DIR → default path)",
+        "Adams View runs in the .py file's parent directory and produces aview.log there",
+        "The --log-output flag copies aview.log to the eval output directory for review",
+        "The aview.log should also be saved as an output file alongside the .py script for the reviewer to inspect"
+      ]
+    }
+  },
+  "evals": [
+    {
+      "id": "simple-pendulum-script",
+      "prompt": "Write an Adams Python script to create a simple pendulum. It should have a single rigid link of length 200 mm and mass 1 kg, pinned to the ground at its top end by a revolute joint, with gravity acting in the -Y direction. Release it from 45 degrees and simulate for 2 seconds.",
+      "expected_outputs": [
+        "Adams.models.create",
+        "Adams.DefaultUnits",
+        "Parts.createRigidBody",
+        "Markers.create",
+        "Constraints.createRevolute",
+        "Forces.createGravity",
+        "orientation",
+        "45",
+        "Simulations.create",
+        "simulate()"
+      ],
+      "rubric": {
+        "model_created": "Script calls Adams.models.create() to create and name the model",
+        "units_set": "Adams.DefaultUnits is set (length mm, force newton, mass kg, time sec or equivalent)",
+        "part_created": "m.Parts.createRigidBody() (or equivalent) is called to create a rigid body",
+        "mass_properties_set_directly": "mass, ixx, iyy, izz assigned directly on the part object — not via execute_cmd or string commands",
+        "markers_created_on_parts": "Markers.create() used on the part and/or ground — correct local locations",
+        "revolute_joint_created": "m.Constraints.createRevolute() with i= and j= marker arguments",
+        "gravity_created": "m.Forces.createGravity() called; y-component set to negative value (−9806.65 or −9806.65 for mm units, or −9.80665 for m units)",
+        "initial_angle_set": "Part orientation set to 45° for the initial release",
+        "geometry_present": "At least one geometry (sphere, cylinder, or block) added to the moving part",
+        "simulation_run": "m.Simulations.create() and .simulate() called — end_time=2.0 (or equivalent)",
+        "no_execute_cmd_for_setup": "execute_cmd() is NOT used for part creation, mass properties, or joint creation — direct Python API is used throughout",
+        "dot_path_names_or_object_refs": "Objects are referenced by Python variable (preferred) or full dot-path string — no abbreviated names",
+        "adams_view_no_errors": "Python script runs in Adams View without ERROR: lines or Python tracebacks in aview.log (validated by scripts/run_adams_python.py)"
+      },
+      "adams_view_validation": true
+    },
+    {
+      "id": "spring-damper-force",
+      "prompt": "How do I create a translational spring-damper force between two parts in Adams Python? The spring should have stiffness 5000 N/mm and damping 100 N·s/mm, with a free length of 250 mm.",
+      "expected_outputs": [
+        "TranslationalSpringDamper",
+        "stiffness",
+        "damping",
+        "free_length",
+        "i=",
+        "j="
+      ],
+      "rubric": {
+        "correct_method": "Uses m.Forces.createTranslationalSpringDamper() (not SingleComponentForce or Bushing)",
+        "stiffness_5000": "stiffness=5000 (or equivalent parameter name) is present",
+        "damping_100": "damping=100 (or equivalent) is present",
+        "free_length_250": "free_length=250 (or equivalent) is present",
+        "marker_args": "Both i= and j= marker references are provided",
+        "explains_when_to_use": "Explains that TranslationalSpringDamper is the appropriate type for a 1-DOF spring along a line of action"
+      }
+    },
+    {
+      "id": "four-bar-linkage",
+      "prompt": "Write an Adams Python script to build a four-bar linkage mechanism. It has three moving rigid links: a crank (100 mm long, 0.5 kg), a coupler (250 mm long, 0.5 kg), and a rocker (200 mm long, 0.5 kg). The crank is pinned to the ground at the origin; the rocker is pinned to the ground 300 mm along X. Connect the free ends of the crank and rocker with the coupler via revolute joints. Drive the crank at a constant 360 degrees per second. Include gravity in -Y and simulate for 2 seconds.",
+      "expected_outputs": [
+        "Adams.models.create",
+        "Parts.createRigidBody",
+        "Constraints.createRevolute",
+        "JointMotions.create",
+        "360",
+        "Forces.createGravity",
+        "Simulations.create",
+        "simulate()"
+      ],
+      "rubric": {
+        "model_created": "Script creates a model with Adams.models.create()",
+        "three_moving_parts": "Three distinct rigid bodies are created (crank, coupler, rocker)",
+        "four_revolute_joints": "Four revolute joints: crank-to-ground, crank-to-coupler, coupler-to-rocker, rocker-to-ground",
+        "motion_on_crank_joint": "A JointMotion is created on the crank revolute joint",
+        "constant_360_deg_per_sec": "Motion function is '360D * TIME' or '2 * PI * TIME' (or equivalent — 360°/s = 2π rad/s)",
+        "correct_marker_locations": "Marker locations position the joint connections at the correct geometric endpoints (origin, 100mm, 300mm, etc.)",
+        "mass_properties_direct": "mass, ixx, iyy, izz assigned on each part object — not via execute_cmd",
+        "gravity_created": "m.Forces.createGravity() with negative Y gravity",
+        "simulate_called": "m.Simulations.create().simulate() or equivalent is called",
+        "geometry_present": "Geometry (cylinder or block) added to each of the three moving parts",
+        "object_refs_preferred": "Marker references passed as Python objects (variable references), not string dot-paths",
+        "adams_view_no_errors": "Python script runs in Adams View without errors (validated by scripts/run_adams_python.py)"
+      },
+      "adams_view_validation": true
+    },
+    {
+      "id": "design-variable-parameterization",
+      "prompt": "Write an Adams Python script that creates a simple pendulum with a design variable controlling the link length. Use a design variable 'link_length' with a default value of 200 mm. The tip marker position and any relevant mass properties should update when the design variable value changes (use Adams.expression() to link them).",
+      "expected_outputs": [
+        "DesignVariables.create",
+        "Adams.expression",
+        "link_length"
+      ],
+      "rubric": {
+        "dv_created": "m.DesignVariables.create() creates a design variable named 'link_length' (or similar) with value=200.0",
+        "expression_created": "Adams.expression() (or Adams.expression() with dv.full_name) is used to build a parametric expression string",
+        "tip_marker_linked": "Tip marker location Y (or Z) is set using the expression referencing the design variable",
+        "gravity_and_joint": "Model has gravity, at least one part, and a revolute joint to ground",
+        "explains_expression_vs_direct": "Comments or explanation that Adams.expression() wraps the string so the solver evaluates it at runtime — not a Python float",
+        "no_hardcoded_200": "The tip marker position is NOT hardcoded to -200 directly; it references the DV expression"
+      },
+      "adams_view_validation": true
+    },
+    {
+      "id": "oscillating-slider-motion",
+      "prompt": "Write an Adams Python script for a crank-slider (oscillating slider) mechanism. The crank radius is 50 mm, the connecting rod length is 200 mm, and the slider translates along the X axis. Drive the crank at 2 revolutions per second. Simulate 2 seconds.",
+      "expected_outputs": [
+        "Adams.models.create",
+        "createRevolute",
+        "createTranslational",
+        "JointMotions.create",
+        "4.0 * PI * TIME",
+        "createSpherical",
+        "simulate()"
+      ],
+      "rubric": {
+        "model_created": "Adams.models.create() is called",
+        "three_moving_parts": "Three parts: crank, connecting rod, slider",
+        "joints_correct": "Crank-ground = Revolute; crank-rod = Spherical (or Revolute if in-plane only); rod-slider = Spherical/Revolute; slider-ground = Translational",
+        "motion_function": "JointMotion function = '4.0 * PI * TIME' or equivalent (2 rev/s = 4π rad/s)",
+        "geometry_on_parts": "Geometry added to each moving part",
+        "simulation_2s": "Simulated for 2.0 seconds",
+        "correct_marker_position": "Crank big-end marker placed at the crank radius from the pivot",
+        "adams_view_no_errors": "Python script runs in Adams View without errors"
+      },
+      "adams_view_validation": true
+    },
+    {
+      "id": "post-processing-measures",
+      "prompt": "I have an Adams Python script that creates a simple pendulum and runs a simulation. After the simulation, how do I: (1) create an object measure for the angular velocity of the link, and (2) access the simulation results to get the X-position time history of the link's CM marker?",
+      "expected_outputs": [
+        "ObjectMeasure",
+        "analysis.results",
+        "values",
+        "CM Position"
+      ],
+      "rubric": {
+        "object_measure_created": "m.Measures.createObjectMeasure() (or Measures.ObjectMeasure) is used to create an angular velocity measure",
+        "correct_characteristic": "Characteristic name like 'Angular Velocity' and component 'Z' (or equivalent) is used",
+        "analysis_results_accessed": "analysis.results[part_name_or_fullname] is used to access the output channel",
+        "cm_position_x_retrieved": "results[...]['CM Position']['X'].values (or equivalent path) returns the time-history array",
+        "explains_nested_dict": "Explains the results dictionary nesting: [object][characteristic][component].values",
+        "no_execute_cmd_for_postproc": "Post-processing uses the Python API — not execute_cmd('result set_value ...')"
+      }
+    },
+    {
+      "id": "nonlinear-bushing-spline",
+      "prompt": "I need to model a rubber mount with nonlinear X-stiffness in Adams Python. The X force-displacement table is: at −10 mm → −8000 N; −5 mm → −3000 N; 0 mm → 0 N; 5 mm → 3000 N; 10 mm → 8000 N. The Y/Z translational stiffness is linear at 5000 N/mm. Write a Python script that creates the spline and the force element. Use a GeneralForce for the X direction (with AKISPL) and a Bushing for Y/Z.",
+      "expected_outputs": [
+        "DataElements.createSpline",
+        "AKISPL",
+        "Forces.createGeneralForce",
+        "Forces.createBushing",
+        "x_force_function"
+      ],
+      "rubric": {
+        "spline_created": "m.DataElements.createSpline() creates the nonlinear table with correct x/y data",
+        "correct_spline_data": "Spline x=[−10,−5,0,5,10] and y=[−8000,−3000,0,3000,8000] (or numerically equivalent)",
+        "general_force_with_akispl": "m.Forces.createGeneralForce() uses AKISPL() referencing the spline in x_force_function",
+        "bushing_for_yz": "m.Forces.createBushing() provides the Y/Z linear stiffness",
+        "correct_bushing_stiffness": "Bushing translational stiffness list includes 5000 for the Y and Z DOF",
+        "marker_args_present": "Both i_marker and j_marker are provided for all force elements"
+      },
+      "adams_view_validation": true
+    }
+  ]
+}
