@@ -35,8 +35,10 @@ $repo = 'bthornton191/adams_skills'
 
 # --- Resolve destination ---
 if ($Destination) {
-    $dest = (Resolve-Path -Path $Destination -ErrorAction SilentlyContinue)?.Path
-    if (-not $dest) {
+    $resolved = Resolve-Path -Path $Destination -ErrorAction SilentlyContinue
+    if ($resolved) {
+        $dest = $resolved.Path
+    } else {
         $dest = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Destination)
     }
 }
