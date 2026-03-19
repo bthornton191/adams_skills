@@ -92,4 +92,4 @@ foreach ($asset in $zips) {
     Remove-Item $tmp -Force
 }
 
-Write-Host "`nDone. Skills installed to $dest" -ForegroundColor Green
+Write-Host "`nInstalled $($release.tag_name) to $dest" -ForegroundColor Green

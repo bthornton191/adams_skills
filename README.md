@@ -15,10 +15,10 @@ A collection of [GitHub Copilot skills](https://docs.github.com/en/copilot/custo
 Open a **PowerShell** terminal in your project directory and run:
 
 ```powershell
-iwr https://raw.githubusercontent.com/bthornton191/adams_skills/main/install.ps1 -OutFile install.ps1; .\install.ps1
+irm https://raw.githubusercontent.com/bthornton191/adams_skills/main/install.ps1 | iex
 ```
 
-This downloads and installs all available skills into `.agents/skills/`.
+This installs all available skills into your project's skills folder. Run the same command at any time to update to the latest version.
 
 <details>
 <summary>Linux / macOS</summary>

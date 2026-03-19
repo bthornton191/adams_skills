@@ -48,7 +48,7 @@ jobs:
             Open a **PowerShell** terminal in your project directory and run:
 
             ```powershell
-            iwr https://raw.githubusercontent.com/bthornton191/adams_skills/main/install.ps1 -OutFile install.ps1; .\install.ps1
+            irm https://raw.githubusercontent.com/bthornton191/adams_skills/main/install.ps1 | iex
             ```
 
             This installs all skills into your project's skills folder (auto-detected, or `.agents\skills\` if none exists).
