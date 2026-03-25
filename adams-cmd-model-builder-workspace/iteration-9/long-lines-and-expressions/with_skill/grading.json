@@ -1,0 +1,70 @@
+{
+  "summary": {"passed": 13, "failed": 0, "total": 13, "pass_rate": 1.0},
+  "expectations": [
+    {
+      "text": "model_and_parts_created: Script creates a model named 'crane' with three rigid body parts (tower, boom, payload)",
+      "passed": true,
+      "evidence": "'model create model_name = crane' present; parts .crane.tower, .crane.boom, .crane.payload all created with 'part create rigid_body name_and_position'."
+    },
+    {
+      "text": "markers_use_eval_loc: Boom and payload markers use eval() with loc_global() or loc_relative_to() to compute positions",
+      "passed": true,
+      "evidence": "mkr_boom_tip uses 'location = (eval(loc_global({200, 0, 0}, .crane.boom.cm)))'; mkr_payload_hang uses 'location = (eval(loc_relative_to({0, 0, 150}, .crane.boom.mkr_boom_tip)))'."
+    },
+    {
+      "text": "markers_use_ori_along_axis: Both mkr_boom_tip and mkr_payload_hang use eval with ori_along_axis() with full dot-path marker names in the arguments",
+      "passed": true,
+      "evidence": "mkr_boom_tip: '(eval(ori_along_axis(.crane.boom.cm, .crane.payload.cm, \"z\")))'; mkr_payload_hang: '(eval(ori_along_axis(.crane.boom.mkr_boom_tip, .crane.payload.cm, \"z\")))'. Both use full dot-path names."
+    },
+    {
+      "text": "eval_expressions_single_line: Every eval expression stays entirely on one line. If any eval(...) is split across a line continuation (&), this is FALSE.",
+      "passed": true,
+      "evidence": "All four eval calls (loc_global, ori_along_axis x2, loc_relative_to) are each written on a single line with no & continuation inside the eval()."
+    },
+    {
+      "text": "function_string_wrapped: The long FUNCTION= expression is split across multiple lines using comma-separated quoted strings rather than being on one enormous single line",
+      "passed": true,
+      "evidence": "FUNCTION= value is broken into 14 comma-separated quoted string segments across multiple continuation lines (\"STEP5(TIME,...)\", \" + STEP5(...)\", etc.)."
+    },
+    {
+      "text": "joints_correct: Two revolute joints (tower-ground, boom-tower) and one spherical joint (payload-boom) are created",
+      "passed": true,
+      "evidence": "'constraint create joint revolute' for .crane.jnt_tower_ground and .crane.jnt_boom_tower; 'constraint create joint spherical' for .crane.jnt_payload_boom."
+    },
+    {
+      "text": "force_expression_correct: The force function includes STEP5 ramps, a VZ velocity-damping term, and an IMPACT contact term",
+      "passed": true,
+      "evidence": "Function contains 'STEP5(TIME, 0.0, 0.0, 0.5, -500.0)' and 'STEP5(TIME, 1.0, 0.0, 1.5, 500.0)' ramps, '- 2.0 * VZ(...)' damping, and 'IMPACT(DZ(...), VZ(...), 0.0, 1.0E5, 1.5, 50.0, 0.1)' contact."
+    },
+    {
+      "text": "mass_properties_uses_modify: Mass/inertia set with part modify rigid_body mass_properties",
+      "passed": true,
+      "evidence": "All three parts (.crane.tower, .crane.boom, .crane.payload) use 'part modify rigid_body mass_properties' with mass, ixx/iyy/izz, and center_of_mass_marker."
+    },
+    {
+      "text": "dot_path_names: All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "All names consistently use .crane.* prefix throughout the script (e.g., .crane.tower, .crane.boom.mkr_boom_tip, .crane.jnt_tower_ground)."
+    },
+    {
+      "text": "no_adams_id: No adams_id specified anywhere",
+      "passed": true,
+      "evidence": "Grep for 'adams_id' in crane.cmd returned no matches."
+    },
+    {
+      "text": "geometry_present: Cylinder geometry on tower and boom, ellipsoid on payload",
+      "passed": true,
+      "evidence": "'geometry create shape cylinder' for .crane.tower.cyl_body and .crane.boom.cyl_body; 'geometry create shape ellipsoid' for .crane.payload.ellip_body."
+    },
+    {
+      "text": "simulate_transient: Script uses simulation single_run transient for 3 seconds with 3000 steps",
+      "passed": true,
+      "evidence": "'simulation single_run transient' with end_time = 3.0 and number_of_steps = 3000."
+    },
+    {
+      "text": "adams_view_no_errors: CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "No 'ERROR:' lines from Adams in aview.log. Two grep hits ('TypeError:', 'SyntaxError:') are Python exception type names from Adams' internal excepthook (not Adams CMD errors). Log ends with 'batch run is finished'; run_adams_cmd.py exited 0."
+    }
+  ]
+}

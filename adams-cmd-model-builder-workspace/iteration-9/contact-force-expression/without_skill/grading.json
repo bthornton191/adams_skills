@@ -1,0 +1,35 @@
+{
+  "summary": {"passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0},
+  "expectations": [
+    {
+      "text": "uses_impact: Uses the IMPACT() function (not BISTOP or a manual IF expression)",
+      "passed": true,
+      "evidence": "Expression is 'IMPACT(DZ(.model.part.cm), VZ(.model.part.cm), 0.0, 1.0E+05, 1.5, 50.0, 0.1)' — IMPACT used directly."
+    },
+    {
+      "text": "correct_displacement_arg: First arg uses DZ or similar displacement measuring penetration below floor",
+      "passed": true,
+      "evidence": "First argument is DZ(.model.part.cm), measuring Z displacement of the part CM (gap from floor)."
+    },
+    {
+      "text": "correct_velocity_arg: Second arg uses VZ or matching velocity measure",
+      "passed": true,
+      "evidence": "Second argument is VZ(.model.part.cm), the Z velocity of the same CM marker."
+    },
+    {
+      "text": "threshold_at_zero: Threshold value is 0.0 (or equivalent contact point)",
+      "passed": true,
+      "evidence": "Third argument (x1) is 0.0, representing floor level Z = 0."
+    },
+    {
+      "text": "correct_params: Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present",
+      "passed": true,
+      "evidence": "Arguments 4-7 are 1.0E+05, 1.5, 50.0, 0.1 — all four required values present."
+    },
+    {
+      "text": "quoted_expression: Expression wrapped in double quotes as required for FUNCTION= parameter",
+      "passed": true,
+      "evidence": "CMD block shows: function = \"IMPACT(...)\" — expression is double-quoted."
+    }
+  ]
+}

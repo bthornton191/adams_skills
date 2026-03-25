@@ -1,0 +1,6 @@
+{
+  "eval_id": "nonlinear-bushing-spline",
+  "eval_name": "nonlinear-bushing-spline",
+  "prompt": "I need to model a rubber mount between a chassis and a subframe. The X-direction (translational) stiffness is nonlinear and follows this force-displacement table: at \u221210 mm displacement, \u22128000 N; at \u22125 mm, \u22123000 N; at 0 mm, 0 N; at 5 mm, 3000 N; at 10 mm, 8000 N. The Y and Z translational stiffness is linear at 5000 N/mm. Rotational stiffness is 200 N\u00b7mm/deg about all three axes. Write an Adams CMD script that creates both the chassis (fixed to ground) and subframe as rigid parts (10 kg each, Ixx=Iyy=Izz=1000 kg\u00b7mm\u00b2 each), adds appropriate markers, and implements this elastic joint correctly.",
+  "assertions": []
+}

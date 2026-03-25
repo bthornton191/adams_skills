@@ -1,0 +1,75 @@
+{
+  "summary": {"passed": 13, "failed": 1, "total": 14, "pass_rate": 0.9286},
+  "expectations": [
+    {
+      "text": "for_loop_used: A for / end loop drives mass and/or spring-damper creation",
+      "passed": true,
+      "evidence": "Two FOR loops: 'for variable_name = i start_value = 1 end_value = 8' for mass creation and 'for variable_name = j start_value = 1 end_value = 7' for spring-damper creation."
+    },
+    {
+      "text": "eval_function_used: EVAL() used to dereference a variable inside a command string",
+      "passed": true,
+      "evidence": "EVAL() used throughout, e.g., 'point_mass_name = (eval(\".chain.mass_\" // RTOI(i)))' and 'location = (eval((i - 1) * 50.0)), 0.0, 0.0'."
+    },
+    {
+      "text": "rtoi_function_used: RTOI() used to convert the loop counter to a string for name construction",
+      "passed": true,
+      "evidence": "RTOI(i) and RTOI(j) used extensively for name construction, e.g., '\".chain.mass_\" // RTOI(i)' and '\".chain.spr_\" // RTOI(j) // \"_\" // RTOI(j + 1)'."
+    },
+    {
+      "text": "string_concat_operator_used: // string concatenation operator used to build part/marker names",
+      "passed": true,
+      "evidence": "// operator used throughout, e.g., '\".chain.mass_\" // RTOI(i) // \".cm\"' and '\".chain.spr_\" // RTOI(j) // \"_\" // RTOI(j + 1)'."
+    },
+    {
+      "text": "point_mass_type_used: Masses created with part create point_mass (not rigid_body)",
+      "passed": true,
+      "evidence": "'part create point_mass name_and_position' used in the FOR loop for all 8 masses."
+    },
+    {
+      "text": "spring_damper_created: Spring-dampers created with force create element_like translational_spring_damper with stiffness=100, damping=1.0, displacement_at_preload=50",
+      "passed": true,
+      "evidence": "'force create element_like translational_spring_damper' with stiffness=100.0, damping=1.0, displacement_at_preload=50.0. All three values match the rubric."
+    },
+    {
+      "text": "first_mass_fixed_to_ground: First mass (mass_1) is constrained to ground with a SPHERICAL joint (NOT a fixed joint)",
+      "passed": true,
+      "evidence": "'constraint create joint spherical joint_name = .chain.fix_1 i_marker_name = .chain.mass_1.cm j_marker_name = .chain.ground.anchor_mkr' — correctly uses spherical, not fixed."
+    },
+    {
+      "text": "8_masses: Exactly 8 masses are created",
+      "passed": true,
+      "evidence": "FOR loop uses 'start_value = 1 end_value = 8', creating mass_1 through mass_8."
+    },
+    {
+      "text": "50mm_spacing: Masses are spaced 50 mm apart along the X axis",
+      "passed": true,
+      "evidence": "'location = (eval((i - 1) * 50.0)), 0.0, 0.0' places masses at X = 0, 50, 100, 150, 200, 250, 300, 350 mm."
+    },
+    {
+      "text": "simulate_transient: Script uses simulation single_run transient command",
+      "passed": true,
+      "evidence": "'simulation single_run transient type = auto_select end_time = 2.0 number_of_steps = 200 model_name = .chain initial_static = no'."
+    },
+    {
+      "text": "dot_path_names: All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "All names use full dot-path, e.g., .chain.mass_1, .chain.ground.anchor_mkr, .chain.fix_1, .chain.spr_1_2."
+    },
+    {
+      "text": "no_adams_id: No adams_id specified anywhere in the script",
+      "passed": true,
+      "evidence": "No 'adams_id' keyword found anywhere in chain.cmd."
+    },
+    {
+      "text": "geometry_present: At least one geometry shape added to each mass",
+      "passed": false,
+      "evidence": "No 'geometry create shape' commands anywhere in chain.cmd. Point masses have no visual geometry defined."
+    },
+    {
+      "text": "adams_view_no_errors: CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "Run returned exit code 0. The only 'Error' lines in the log are Python excepthook/SyntaxError from VS Code's Python RC file initialization (after 'End of chain.cmd'), unrelated to the script. Model completed with 'batch run is finished'."
+    }
+  ]
+}

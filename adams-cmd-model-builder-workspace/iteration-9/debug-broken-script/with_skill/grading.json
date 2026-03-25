@@ -1,0 +1,50 @@
+{
+  "summary": {"passed": 9, "failed": 0, "total": 9, "pass_rate": 1.0},
+  "expectations": [
+    {
+      "text": "fixes_model_create_abbreviation: 'model cre' expanded to 'model create'",
+      "passed": true,
+      "evidence": "Line 5: 'model create model_name = pendulum' — full keyword used"
+    },
+    {
+      "text": "fixes_part_create_abbreviation: 'part cre rig nam' expanded to 'part create rigid_body name_and_position'",
+      "passed": true,
+      "evidence": "Line 33: 'part create rigid_body name_and_position &' — fully expanded"
+    },
+    {
+      "text": "changes_mass_properties_create_to_modify: 'part create rigid_body mass_properties' changed to 'part modify rigid_body mass_properties'",
+      "passed": true,
+      "evidence": "Line 46: 'part modify rigid_body mass_properties &' — uses modify, not create"
+    },
+    {
+      "text": "removes_adams_id: 'adams_id = 3' removed",
+      "passed": true,
+      "evidence": "No 'adams_id' keyword appears anywhere in the output file"
+    },
+    {
+      "text": "keeps_center_of_mass_marker_cm_created_first: The .pendulum.link.cm marker is explicitly created BEFORE the part modify mass_properties call, and center_of_mass_marker = .pendulum.link.cm is kept in that call.",
+      "passed": true,
+      "evidence": "Lines 40-43: '.pendulum.link.cm' marker created at location 0,-100,0 before mass_properties block at line 46; line 50 includes 'center_of_mass_marker = .pendulum.link.cm'"
+    },
+    {
+      "text": "fixes_missing_dot_paths: 'pendulum.link.pin_mkr' corrected to '.pendulum.link.pin_mkr' in both marker create and i_marker_name",
+      "passed": true,
+      "evidence": "All marker_name and i_marker_name references use leading dot: '.pendulum.link.pin_mkr'"
+    },
+    {
+      "text": "fixes_spring_damper_keyword: 'force create element_like spring_damper' -> 'translational_spring_damper' and 'length = 200.0' -> 'displacement_at_preload = 200.0'",
+      "passed": true,
+      "evidence": "Line 91: 'force create element_like translational_spring_damper &'; line 97: 'displacement_at_preload = 200.0'"
+    },
+    {
+      "text": "fixes_simulation_command: 'sim trans end_time = 2.0 step_size = 0.001' -> 'simulation single_run transient' with proper parameters",
+      "passed": true,
+      "evidence": "Line 100: 'simulation single_run transient &' with type, end_time=2.0, number_of_steps=2000, model_name, initial_static=no"
+    },
+    {
+      "text": "adams_view_no_errors: The corrected CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "No 'ERROR:' lines found in aview.log (only Python exception class names 'TypeError:' and 'SyntaxError:' from an unrelated internal traceback, not Adams ERROR: messages)"
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "summary": {"passed": 13, "failed": 0, "total": 13, "pass_rate": 1.0},
+  "expectations": [
+    {
+      "text": "model_and_parts_created: Script creates a model named 'crane' with three rigid body parts (tower, boom, payload)",
+      "passed": true,
+      "evidence": "'model create model_name = crane' and three 'part create rigid_body name_and_position' commands for .crane.tower, .crane.boom, .crane.payload"
+    },
+    {
+      "text": "markers_use_eval_loc: Boom and payload markers use eval() with loc_global() or loc_relative_to() to compute positions",
+      "passed": true,
+      "evidence": ".crane.boom.mkr_boom_tip uses 'location = (eval(loc_global({200, 0, 0}, .crane.boom.cm)))'; .crane.payload.mkr_payload_hang uses 'location = (eval(loc_relative_to({0, 0, 150}, .crane.boom.mkr_boom_tip)))'"
+    },
+    {
+      "text": "markers_use_ori_along_axis: Both mkr_boom_tip and mkr_payload_hang use eval with ori_along_axis() with full dot-path marker names in the arguments",
+      "passed": true,
+      "evidence": "mkr_boom_tip: 'orientation = (eval(ori_along_axis(.crane.boom.cm, .crane.payload.cm, \"z\")))'; mkr_payload_hang: 'orientation = (eval(ori_along_axis(.crane.boom.mkr_boom_tip, .crane.payload.cm, \"z\")))' — all arguments use full dot-path names"
+    },
+    {
+      "text": "eval_expressions_single_line: Every eval expression — anything inside (eval(...)) — stays entirely on one line. If any eval(...) is split across a line continuation (&), this is FALSE.",
+      "passed": true,
+      "evidence": "All four eval() calls (two location, two orientation) are each on a single line; the '&' continuation character appears only after the closing ')' of eval, never inside it"
+    },
+    {
+      "text": "function_string_wrapped: The long FUNCTION= expression is split across multiple lines using comma-separated quoted strings rather than being on one enormous single line",
+      "passed": true,
+      "evidence": "The force function is split into 15 comma-separated quoted string segments across multiple lines, e.g. '\"STEP5(TIME, 0.0, 0.0, 0.5, -500.0)\", &' followed by '\" + STEP5(...)\", &' etc."
+    },
+    {
+      "text": "joints_correct: Two revolute joints (tower-ground, boom-tower) and one spherical joint (payload-boom) are created",
+      "passed": true,
+      "evidence": "'constraint create joint revolute' for .crane.jnt_tower_ground and .crane.jnt_boom_tower; 'constraint create joint spherical' for .crane.jnt_payload_boom"
+    },
+    {
+      "text": "force_expression_correct: The force function includes STEP5 ramps, a VZ velocity-damping term, and an IMPACT contact term",
+      "passed": true,
+      "evidence": "Contains 'STEP5(TIME, 0.0, 0.0, 0.5, -500.0)' and 'STEP5(TIME, 1.0, 0.0, 1.5, 500.0)' ramps, '2.0 * VZ(.crane.payload.cm,...)' damping, and 'IMPACT(DZ(.crane.payload.cm,...)...)' contact term"
+    },
+    {
+      "text": "mass_properties_uses_modify: Mass/inertia set with part modify rigid_body mass_properties",
+      "passed": true,
+      "evidence": "'part modify rigid_body mass_properties' used for all three parts (.crane.tower, .crane.boom, .crane.payload) with mass, ixx/iyy/izz, and center_of_mass_marker"
+    },
+    {
+      "text": "dot_path_names: All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "All object names use full .crane.* dot-path hierarchy throughout the script (e.g. .crane.tower, .crane.boom.mkr_boom_tip, .crane.jnt_tower_ground)"
+    },
+    {
+      "text": "no_adams_id: No adams_id specified anywhere",
+      "passed": true,
+      "evidence": "No occurrence of 'adams_id' found anywhere in crane.cmd"
+    },
+    {
+      "text": "geometry_present: Cylinder geometry on tower and boom, ellipsoid on payload",
+      "passed": true,
+      "evidence": "'geometry create shape cylinder' for .crane.tower.cyl_body and .crane.boom.cyl_body; 'geometry create shape ellipsoid' for .crane.payload.ellip_body"
+    },
+    {
+      "text": "simulate_transient: Script uses simulation single_run transient for 3 seconds with 3000 steps",
+      "passed": true,
+      "evidence": "'simulation single_run transient ... end_time = 3.0 ... number_of_steps = 3000 ... model_name = .crane'"
+    },
+    {
+      "text": "adams_view_no_errors: CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "No 'ERROR:' lines in aview.log; simulation ran successfully to 3.0s (table shows time steps through 3.00000E+00); log ends with 'batch run is finished' and 'Finished'"
+    }
+  ]
+}

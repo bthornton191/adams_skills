@@ -1,0 +1,6 @@
+{
+  "eval_id": "cam-follower-step5",
+  "eval_name": "cam-follower-step5",
+  "prompt": "Write a complete Adams CMD script for a cam-follower mechanism. Create a cam body (1 kg, Ixx=Iyy=Izz=100 kg\u00b7mm\u00b2) fixed to ground at the origin and a follower (0.5 kg rigid body, Ixx=Iyy=50 kg\u00b7mm\u00b2, Izz=10 kg\u00b7mm\u00b2) that can only translate along the global X axis via a translational joint. Apply a single-component force using STEP5 that pushes the follower in the +X direction: the force should ramp smoothly from 0 N to 500 N as the follower's DX displacement (from .model.follower.tip_mkr relative to .model.cam.ref_mkr) goes from 0 mm to 20 mm, then hold at 500 N beyond 20 mm. Add a velocity-dependent damping of 2.0 \u00d7 VX. Add simple geometry shapes (cylinder or box) to both the cam and follower parts. Simulate for 1 second.",
+  "assertions": []
+}

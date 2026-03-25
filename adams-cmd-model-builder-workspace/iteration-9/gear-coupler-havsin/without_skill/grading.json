@@ -1,0 +1,80 @@
+{
+  "summary": {"passed": 15, "failed": 0, "total": 15, "pass_rate": 1.0},
+  "expectations": [
+    {
+      "text": "model_and_parts_created: Script creates a model with two shaft parts connected to ground via revolute joints",
+      "passed": true,
+      "evidence": "Model .gear_coupler created; input_shaft and output_shaft parts both created and connected to ground via constraint create joint revolute (.gear_coupler.rev_input and .gear_coupler.rev_output)"
+    },
+    {
+      "text": "coupler_constraint_used: constraint create complex_joint coupler is used (must include 'complex_joint' sub-command)",
+      "passed": true,
+      "evidence": "'constraint create complex_joint coupler' with coupler_name = .gear_coupler.coupler_gear is present"
+    },
+    {
+      "text": "motion_multipliers_correct: motion_multipliers = 1.0, -0.333 (or equivalent 3:1 ratio with opposite direction)",
+      "passed": true,
+      "evidence": "motion_multipliers = 1.0, -0.333 — ratio |1.0/0.333| ≈ 3, negative sign gives opposite rotation direction"
+    },
+    {
+      "text": "both_joints_referenced: Coupler references both .model.rev_input and .model.rev_output",
+      "passed": true,
+      "evidence": "joint_name = .gear_coupler.rev_input, .gear_coupler.rev_output in the coupler constraint"
+    },
+    {
+      "text": "motion_generator_created: constraint create motion_generator is used on the input joint",
+      "passed": true,
+      "evidence": "'constraint create motion_generator' with joint_name = .gear_coupler.rev_input is present"
+    },
+    {
+      "text": "type_of_freedom_rotational: Motion generator specifies type_of_freedom = rotational",
+      "passed": true,
+      "evidence": "type_of_freedom = rotational in the motion_generator block"
+    },
+    {
+      "text": "time_derivative_velocity: Motion generator specifies time_derivative = velocity",
+      "passed": true,
+      "evidence": "time_derivative = velocity in the motion_generator block"
+    },
+    {
+      "text": "uses_havsin_not_step: HAVSIN function is used (not STEP or STEP5)",
+      "passed": true,
+      "evidence": "function = \"HAVSIN(TIME, 0.0, 0.5, 0.0, 120D)\" — HAVSIN used, no STEP or STEP5 anywhere"
+    },
+    {
+      "text": "correct_havsin_argument_order: HAVSIN argument order is (TIME, 0.0, 0.5, 0.0, 120D)",
+      "passed": true,
+      "evidence": "HAVSIN(TIME, 0.0, 0.5, 0.0, 120D) exactly matches the required argument order"
+    },
+    {
+      "text": "converts_to_radians_or_uses_D: 120 degrees/s expressed correctly (as 120D or converted to rad/s)",
+      "passed": true,
+      "evidence": "120D used in the HAVSIN expression — D suffix correctly denotes degrees in Adams"
+    },
+    {
+      "text": "geometry_present: At least one geometry shape added to each shaft part",
+      "passed": true,
+      "evidence": "geometry create shape cylinder for .gear_coupler.input_shaft.cyl_shaft and .gear_coupler.output_shaft.cyl_shaft"
+    },
+    {
+      "text": "dot_path_names: All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "All markers, parts, joints, and constraints use full .gear_coupler.* dot-path names throughout"
+    },
+    {
+      "text": "no_adams_id: No adams_id specified anywhere",
+      "passed": true,
+      "evidence": "No adams_id found in the script"
+    },
+    {
+      "text": "simulate_transient: Script uses simulation single_run transient command",
+      "passed": true,
+      "evidence": "'simulation single_run transient' with end_time = 2.0, number_of_steps = 2000 is present"
+    },
+    {
+      "text": "adams_view_no_errors: CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "Adams run exited with code 0; the two 'ERROR:' matches in aview.log are inside Adams comment lines (prefixed with '!') — not actual Adams ERROR: messages"
+    }
+  ]
+}

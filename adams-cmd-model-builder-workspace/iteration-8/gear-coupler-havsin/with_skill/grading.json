@@ -1,0 +1,80 @@
+{
+  "summary": {"passed": 15, "failed": 0, "total": 15, "pass_rate": 1.0},
+  "expectations": [
+    {
+      "text": "model_and_parts_created: Script creates a model with two shaft parts connected to ground via revolute joints",
+      "passed": true,
+      "evidence": "model create .gear_coupler; part create .gear_coupler.input_shaft and .gear_coupler.output_shaft; constraint create joint revolute for rev_input (input_shaft→ground) and rev_output (output_shaft→ground)"
+    },
+    {
+      "text": "coupler_constraint_used: constraint create complex_joint coupler is used (NOT 'constraint create coupler' — must include 'complex_joint' sub-command)",
+      "passed": true,
+      "evidence": "constraint create complex_joint coupler & coupler_name = .gear_coupler.coupler_gear is present"
+    },
+    {
+      "text": "motion_multipliers_correct: motion_multipliers = 1.0, -0.333 (or equivalent 3:1 ratio with opposite direction sign)",
+      "passed": true,
+      "evidence": "motion_multipliers = 1.0, -0.333 exactly as required; encodes 3:1 ratio with opposite rotation"
+    },
+    {
+      "text": "both_joints_referenced: Coupler references both .model.rev_input and .model.rev_output",
+      "passed": true,
+      "evidence": "joint_name = .gear_coupler.rev_input, .gear_coupler.rev_output in the coupler block"
+    },
+    {
+      "text": "motion_generator_created: constraint create motion_generator is used on the input joint",
+      "passed": true,
+      "evidence": "constraint create motion_generator & motion_name = .gear_coupler.motion_drive & joint_name = .gear_coupler.rev_input"
+    },
+    {
+      "text": "type_of_freedom_rotational: Motion generator specifies type_of_freedom = rotational",
+      "passed": true,
+      "evidence": "type_of_freedom = rotational in the motion_generator block"
+    },
+    {
+      "text": "time_derivative_velocity: Motion generator specifies time_derivative = velocity",
+      "passed": true,
+      "evidence": "time_derivative = velocity in the motion_generator block"
+    },
+    {
+      "text": "uses_havsin_not_step: HAVSIN function is used for the ramp (not STEP or STEP5)",
+      "passed": true,
+      "evidence": "function = \"HAVSIN(TIME, 0.0, 0.5, 0.0, 120D)\" — HAVSIN used, no STEP or STEP5 present"
+    },
+    {
+      "text": "correct_havsin_argument_order: HAVSIN argument order is (x, x0, x1, h0, h1) = (TIME, 0.0, 0.5, 0.0, 120D)",
+      "passed": true,
+      "evidence": "HAVSIN(TIME, 0.0, 0.5, 0.0, 120D) exactly matches required argument order (x=TIME, x0=0.0, x1=0.5, h0=0.0, h1=120D)"
+    },
+    {
+      "text": "converts_to_radians_or_uses_D: 120 degrees/s expressed correctly (as 120D or converted to rad/s)",
+      "passed": true,
+      "evidence": "120D used in HAVSIN final value — Adams degree notation suffix D correctly applied"
+    },
+    {
+      "text": "geometry_present: At least one geometry shape (cylinder or similar) added to each shaft part",
+      "passed": true,
+      "evidence": "geometry create shape cylinder cyl_shaft added to both input_shaft and output_shaft using center_marker offsets"
+    },
+    {
+      "text": "dot_path_names: All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "All names use .gear_coupler.<part>.<marker/object> hierarchy throughout; no short names used"
+    },
+    {
+      "text": "no_adams_id: No adams_id specified anywhere",
+      "passed": true,
+      "evidence": "Grep of script finds no adams_id keyword anywhere in the file"
+    },
+    {
+      "text": "simulate_transient: Script uses simulation single_run transient command",
+      "passed": true,
+      "evidence": "simulation single_run transient & type = auto_select & end_time = 2.0 & number_of_steps = 2000 & model_name = .gear_coupler"
+    },
+    {
+      "text": "adams_view_no_errors: CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "run_adams_cmd.py returned exit code 0. Two apparent 'ERROR:' grep hits are Python exception type names (TypeError:, SyntaxError:) in Adams comment lines (! prefix) from VS Code Python extension initialization — not Adams model errors"
+    }
+  ]
+}

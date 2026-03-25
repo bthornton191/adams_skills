@@ -1,0 +1,6 @@
+{
+  "eval_id": "gear-coupler-havsin",
+  "eval_name": "gear-coupler-havsin",
+  "prompt": "Write a complete Adams CMD script for a two-shaft gear system. Create two shaft parts (each 0.5 kg, Ixx=Iyy=1000 kg\u00b7mm\u00b2, Izz=50 kg\u00b7mm\u00b2) connected to ground via revolute joints on the Z axis \u2014 the input shaft joint at the origin, the output shaft joint at 0, 150, 0 mm. Link the two revolute joints (.model.rev_input and .model.rev_output) with a gear coupler at a 3:1 speed ratio where the input rotates 3\u00d7 faster than the output and they rotate in opposite directions. Add a motion generator on the input joint that smoothly ramps the input shaft angular velocity from 0 to 120 degrees per second over the first 0.5 seconds using the haversine step function (HAVSIN), then holds at 120 deg/s afterward. Add cylinder geometry to both shafts. Simulate for 2 seconds.",
+  "assertions": []
+}

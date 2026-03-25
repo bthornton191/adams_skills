@@ -1,0 +1,85 @@
+{
+  "summary": {
+    "passed": 15,
+    "failed": 0,
+    "total": 15,
+    "pass_rate": 1.0
+  },
+  "expectations": [
+    {
+      "text": "Script creates a model with at least two shaft parts connected to ground via revolute joints",
+      "passed": true,
+      "evidence": "gear_coupler.cmd: model create .gear_coupler; part create rigid_body for .gear_coupler.input_shaft and .gear_coupler.output_shaft; constraint create joint revolute for rev_input and rev_output both connecting shaft pin_mkr to ground pivot markers"
+    },
+    {
+      "text": "constraint create complex_joint coupler is used (NOT 'constraint create coupler' — the full sub-command is 'complex_joint')",
+      "passed": true,
+      "evidence": "gear_coupler.cmd: 'constraint create complex_joint coupler' with coupler_name = .gear_coupler.coupler_gear"
+    },
+    {
+      "text": "motion_multipliers = 1.0, -0.333 (or equivalent 3:1 ratio with opposite sign for opposite rotation direction)",
+      "passed": true,
+      "evidence": "gear_coupler.cmd: motion_multipliers = 1.0, -0.333 — ratio |1.0/0.333| ≈ 3:1 with negative sign encoding opposite directions"
+    },
+    {
+      "text": "joint_name lists both .model.rev_input and .model.rev_output in the coupler",
+      "passed": true,
+      "evidence": "gear_coupler.cmd: joint_name = .gear_coupler.rev_input, .gear_coupler.rev_output in the complex_joint coupler command"
+    },
+    {
+      "text": "constraint create motion_generator is used on the input joint",
+      "passed": true,
+      "evidence": "gear_coupler.cmd: 'constraint create motion_generator' with joint_name = .gear_coupler.rev_input"
+    },
+    {
+      "text": "motion generator specifies type_of_freedom = rotational",
+      "passed": true,
+      "evidence": "gear_coupler.cmd: type_of_freedom = rotational in the motion_generator command"
+    },
+    {
+      "text": "motion generator specifies time_derivative = velocity — required so Adams interprets the HAVSIN output as angular velocity, not position",
+      "passed": true,
+      "evidence": "gear_coupler.cmd: time_derivative = velocity in the motion_generator command"
+    },
+    {
+      "text": "HAVSIN function is used for the ramp (not STEP or STEP5)",
+      "passed": true,
+      "evidence": "gear_coupler.cmd: function = \"HAVSIN(TIME, 0.0, 0.5, 0.0, 120D)\" — uses HAVSIN not STEP or STEP5"
+    },
+    {
+      "text": "HAVSIN argument order is (x, x0, x1, h0, h1) = (TIME, 0.0, 0.5, 0.0, 120D)",
+      "passed": true,
+      "evidence": "gear_coupler.cmd: HAVSIN(TIME, 0.0, 0.5, 0.0, 120D) — exact match to required argument order"
+    },
+    {
+      "text": "120 degrees/s expressed correctly — either as 120D for degrees or converted to rad/s",
+      "passed": true,
+      "evidence": "gear_coupler.cmd: 120D used in HAVSIN arguments — the 'D' suffix specifies degrees in Adams"
+    },
+    {
+      "text": "At least one geometry shape (cylinder or similar) is added to each shaft part",
+      "passed": true,
+      "evidence": "gear_coupler.cmd: 'geometry create shape cylinder' for .gear_coupler.input_shaft.cyl_shaft and .gear_coupler.output_shaft.cyl_shaft"
+    },
+    {
+      "text": "All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "gear_coupler.cmd: all names use .gear_coupler.* dot-path format (e.g. .gear_coupler.input_shaft, .gear_coupler.rev_input, .gear_coupler.coupler_gear)"
+    },
+    {
+      "text": "No adams_id specified anywhere",
+      "passed": true,
+      "evidence": "gear_coupler.cmd: no occurrence of 'adams_id' found anywhere in the file"
+    },
+    {
+      "text": "Script uses simulation single_run transient command",
+      "passed": true,
+      "evidence": "gear_coupler.cmd: 'simulation single_run transient' with end_time = 2.0"
+    },
+    {
+      "text": "CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "aview.log: no lines matching 'ERROR:' found; two lines containing 'TypeError:' and 'SyntaxError:' appear inside Adams comment lines (! prefix) from the Python runner script — not Adams View error messages"
+    }
+  ]
+}

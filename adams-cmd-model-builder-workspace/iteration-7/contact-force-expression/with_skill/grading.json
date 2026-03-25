@@ -1,0 +1,40 @@
+{
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "expectations": [
+    {
+      "text": "Uses the IMPACT() function (not BISTOP or a manual IF expression)",
+      "passed": true,
+      "evidence": "response.md: IMPACT(DZ(.model.body.cm, ...), VZ(.model.body.cm, ...), 0.0, 1.0E5, 1.5, 50.0, 0.1)"
+    },
+    {
+      "text": "First arg uses DZ or similar displacement measuring penetration below floor",
+      "passed": true,
+      "evidence": "response.md: DZ(.model.body.cm, .model.ground.floor_ref, .model.ground.floor_ref) — Z-height of the part's CM above the floor marker"
+    },
+    {
+      "text": "Second arg uses VZ or matching velocity measure",
+      "passed": true,
+      "evidence": "response.md: VZ(.model.body.cm, .model.ground.floor_ref, .model.ground.floor_ref, .model.ground.floor_ref) — Z-velocity of the CM"
+    },
+    {
+      "text": "Threshold value is 0.0 (or equivalent contact point)",
+      "passed": true,
+      "evidence": "response.md: third argument is 0.0 — 'Contact activates when ZCM < 0 (i.e., part penetrates the floor)'"
+    },
+    {
+      "text": "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present",
+      "passed": true,
+      "evidence": "response.md: IMPACT(..., 1.0E5, 1.5, 50.0, 0.1) — table confirms K=1.0E5, e=1.5, C=50.0, d=0.1"
+    },
+    {
+      "text": "Expression wrapped in double quotes as required for FUNCTION= parameter",
+      "passed": true,
+      "evidence": "response.md CMD block: function = \"IMPACT(DZ(...),\", \"VZ(...),\", \"0.0, 1.0E5, 1.5, 50.0, 0.1)\" — split across three quoted strings per Adams continuation rules"
+    }
+  ]
+}

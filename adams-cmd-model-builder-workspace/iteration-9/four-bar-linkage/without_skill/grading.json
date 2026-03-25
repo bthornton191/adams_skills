@@ -1,0 +1,70 @@
+{
+  "summary": {"passed": 13, "failed": 0, "total": 13, "pass_rate": 1.0},
+  "expectations": [
+    {
+      "text": "model_created: Script creates a model with model create command",
+      "passed": true,
+      "evidence": "Line: 'model create model_name = four_bar'"
+    },
+    {
+      "text": "three_moving_parts: Three distinct rigid body parts are created (crank, coupler, rocker)",
+      "passed": true,
+      "evidence": "part create rigid_body name_and_position for .four_bar.crank, .four_bar.coupler, .four_bar.rocker"
+    },
+    {
+      "text": "four_revolute_joints: Four revolute joints are created (crank-ground, crank-coupler, coupler-rocker, rocker-ground)",
+      "passed": true,
+      "evidence": "rev_crank_ground, rev_crank_coupler, rev_coupler_rocker, rev_rocker_ground all created with constraint create joint revolute"
+    },
+    {
+      "text": "motion_generator_on_crank: A motion generator drives the crank joint",
+      "passed": true,
+      "evidence": "constraint create motion_generator with joint_name = .four_bar.rev_crank_ground"
+    },
+    {
+      "text": "constant_speed_360: Motion generator function specifies 360 degrees per second",
+      "passed": true,
+      "evidence": "time_derivative = velocity, function = \"360D\" (constant 360 deg/s)"
+    },
+    {
+      "text": "simulate_transient: Script uses simulation single_run transient command",
+      "passed": true,
+      "evidence": "simulation single_run transient ... end_time = 2.0, number_of_steps = 2000"
+    },
+    {
+      "text": "full_keyword_names: All keywords spelled out fully — no abbreviated commands anywhere",
+      "passed": true,
+      "evidence": "All commands fully spelled out: model create, defaults units, force create body gravitational, marker create, part create rigid_body name_and_position, part modify rigid_body mass_properties, geometry create shape link, constraint create joint revolute, constraint create motion_generator, simulation single_run transient"
+    },
+    {
+      "text": "dot_path_names: All object names use full dot-path hierarchy (.model.part.marker)",
+      "passed": true,
+      "evidence": "All names use full dot-path, e.g. .four_bar.crank.cm, .four_bar.ground.crank_pivot_mkr, .four_bar.rev_crank_ground"
+    },
+    {
+      "text": "no_adams_id: No adams_id specified anywhere in the script",
+      "passed": true,
+      "evidence": "No adams_id keyword found anywhere in the file"
+    },
+    {
+      "text": "mass_properties_uses_modify: Mass/inertia set with part modify rigid_body mass_properties, not part create",
+      "passed": true,
+      "evidence": "part modify rigid_body mass_properties used for crank, coupler, and rocker"
+    },
+    {
+      "text": "creates_cm_and_passes_center_of_mass_marker: A .cm marker is explicitly created on each part BEFORE part modify mass_properties is called, and center_of_mass_marker is passed in every part modify rigid_body mass_properties call",
+      "passed": true,
+      "evidence": ".four_bar.crank.cm, .four_bar.coupler.cm, .four_bar.rocker.cm each created before their respective part modify calls; center_of_mass_marker passed in all three modify calls"
+    },
+    {
+      "text": "geometry_present: At least one geometry shape is added to each moving part (crank, coupler, rocker)",
+      "passed": true,
+      "evidence": "geometry create shape link for crank.shape_body, coupler.shape_body, rocker.shape_body"
+    },
+    {
+      "text": "adams_view_no_errors: CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "run_adams_cmd.py returned exit code 0; zero ERROR: lines found in aview.log"
+    }
+  ]
+}

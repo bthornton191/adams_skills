@@ -1,0 +1,6 @@
+{
+  "eval_id": "contact-force-expression",
+  "eval_name": "contact-force-expression",
+  "prompt": "Write a FUNCTION= expression for a one-sided contact force that activates when a part's CM falls below Z = 0 (i.e., hits a floor at Z=0). The contact should have stiffness 1e5, exponent 1.5, damping 50, and penetration depth 0.1 mm.",
+  "assertions": []
+}

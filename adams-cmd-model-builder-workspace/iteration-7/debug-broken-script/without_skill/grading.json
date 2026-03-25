@@ -1,0 +1,55 @@
+{
+  "summary": {
+    "passed": 8,
+    "failed": 1,
+    "total": 9,
+    "pass_rate": 0.89
+  },
+  "expectations": [
+    {
+      "text": "Identifies 'model cre' as an abbreviated keyword (bad practice in scripts, though technically valid in Adams) and expands to 'model create'",
+      "passed": true,
+      "evidence": "pendulum_fixed.cmd: 'model create model_name = pendulum' — abbreviated form fully expanded"
+    },
+    {
+      "text": "Identifies 'part cre rig nam' as abbreviated and expands to 'part create rigid_body name_and_position' (best-practice fix)",
+      "passed": true,
+      "evidence": "pendulum_fixed.cmd: 'part create rigid_body name_and_position &' — all abbreviated tokens expanded"
+    },
+    {
+      "text": "Changes 'part create rigid_body mass_properties' to 'part modify rigid_body mass_properties' — the part already exists from the name_and_position call, so 'create' is a real error here",
+      "passed": true,
+      "evidence": "pendulum_fixed.cmd: 'part modify rigid_body mass_properties &' — correctly changed from create to modify"
+    },
+    {
+      "text": "Removes 'adams_id = 3' — while technically valid in Adams, manually assigning IDs is unnecessary and error-prone",
+      "passed": true,
+      "evidence": "pendulum_fixed.cmd: no 'adams_id' parameter appears anywhere in the file; comment confirms 'adams_id removed from mass_properties modify'"
+    },
+    {
+      "text": "Removes 'center_of_mass_marker = .pendulum.link.cm' from the mass_properties call — the .cm marker does not yet exist at this point and Adams will error on it",
+      "passed": false,
+      "evidence": "pendulum_fixed.cmd: 'center_of_mass_marker = .pendulum.link.cm &' is still present in the 'part modify rigid_body mass_properties' call. The script instead creates the .cm marker explicitly beforehand (a different valid fix), but does not remove the parameter as required by this assertion."
+    },
+    {
+      "text": "Corrects 'pendulum.link.pin_mkr' to '.pendulum.link.pin_mkr' (missing leading dot, appears in both marker create and i_marker_name)",
+      "passed": true,
+      "evidence": "pendulum_fixed.cmd: 'marker_name = .pendulum.link.pin_mkr' and 'i_marker_name = .pendulum.link.pin_mkr' — leading dot present in both occurrences"
+    },
+    {
+      "text": "Changes 'force create element_like spring_damper' to 'force create element_like translational_spring_damper' and 'length = 200.0' to 'displacement_at_preload = 200.0'",
+      "passed": true,
+      "evidence": "pendulum_fixed.cmd: 'force create element_like translational_spring_damper &' with 'displacement_at_preload = 200.0' — both changes correctly applied"
+    },
+    {
+      "text": "Corrects 'sim trans end_time = 2.0 step_size = 0.001' to a proper 'simulation single_run transient' command with end_time and number_of_steps",
+      "passed": true,
+      "evidence": "pendulum_fixed.cmd: 'simulation single_run transient &' with 'end_time = 2.0 &' and 'number_of_steps = 2000 &' — fully corrected with required parameters"
+    },
+    {
+      "text": "The corrected CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "aview.log: no lines matching 'ERROR:' found; two commented-out Python exception messages ('! TypeError:' and '! SyntaxError:') appear in the log preamble but are prefixed with '!' and do not match the 'ERROR:' pattern"
+    }
+  ]
+}

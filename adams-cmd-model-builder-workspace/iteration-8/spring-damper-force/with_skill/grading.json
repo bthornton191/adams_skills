@@ -1,0 +1,35 @@
+{
+  "summary": {"passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0},
+  "expectations": [
+    {
+      "text": "correct_command: Uses force create element_like translational_spring_damper (not single_component_force or bushing)",
+      "passed": true,
+      "evidence": "Response uses 'force create element_like translational_spring_damper' in both the main example and complete example block"
+    },
+    {
+      "text": "stiffness_param: Includes stiffness = 5000",
+      "passed": true,
+      "evidence": "stiffness = 5000.0 present in both code examples and the parameter table"
+    },
+    {
+      "text": "damping_param: Includes damping = 100",
+      "passed": true,
+      "evidence": "damping = 100.0 present in both code examples and the parameter table"
+    },
+    {
+      "text": "length_param: Includes displacement_at_preload = 250 (not 'length = 250')",
+      "passed": true,
+      "evidence": "displacement_at_preload = 250.0 used correctly; response even explicitly states 'Free length is displacement_at_preload, not length'"
+    },
+    {
+      "text": "marker_references: References both i_marker_name and j_marker_name",
+      "passed": true,
+      "evidence": "Both i_marker_name and j_marker_name are present in the spring-damper command"
+    },
+    {
+      "text": "explains_when_to_use: Explains that spring_damper is for 1-DOF along a line of action",
+      "passed": true,
+      "evidence": "Intro states markers 'define the line of action of the spring'; Key Rules section explains 'The I and J markers define the line of action; Adams measures the scalar distance between them'"
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "summary": {
+    "passed": 13,
+    "failed": 0,
+    "total": 13,
+    "pass_rate": 1.0
+  },
+  "expectations": [
+    {
+      "text": "Script creates a model with at least two parts: a cam (fixed to ground) and a follower",
+      "passed": true,
+      "evidence": "cam_follower.cmd: 'part create rigid_body name_and_position part_name = .model.cam' fixed to ground via constraint create joint fixed, and 'part_name = .model.follower' created as a separate rigid body"
+    },
+    {
+      "text": "A translational joint constrains the follower to translate along X",
+      "passed": true,
+      "evidence": "cam_follower.cmd: 'constraint create joint translational joint_name = .model.follower_trans i_marker_name = .model.follower.trans_i_mkr j_marker_name = .model.ground.trans_j_mkr' with both markers oriented (90D,90D,0D) to align local z with global +X"
+    },
+    {
+      "text": "STEP5 is used for the cam force (not plain STEP — STEP5 has continuous 2nd derivative)",
+      "passed": true,
+      "evidence": "cam_follower.cmd: function = \"STEP5(DX(.model.follower.tip_mkr, .model.cam.ref_mkr), 0.0, 0.0, 20.0, 500.0) + 2.0 * VX(...)\""
+    },
+    {
+      "text": "STEP5 x-range spans 0 to 20 (follower displacement from 0 to 20 mm)",
+      "passed": true,
+      "evidence": "cam_follower.cmd: STEP5 arguments are x0=0.0 and x1=20.0 matching the 0–20 mm DX range"
+    },
+    {
+      "text": "STEP5 output range spans 0 to 500 (force from 0 to 500 N)",
+      "passed": true,
+      "evidence": "cam_follower.cmd: STEP5 arguments h0=0.0 and h1=500.0 giving a 0–500 N force range"
+    },
+    {
+      "text": "Force holds at 500 N for DX > 20 mm (STEP5 naturally saturates at h1)",
+      "passed": true,
+      "evidence": "cam_follower.cmd: STEP5 saturates at h1=500.0 for all DX >= 20.0 mm by definition of the STEP5 function"
+    },
+    {
+      "text": "Damping term + 2.0 * VX(...) added to the force expression",
+      "passed": true,
+      "evidence": "cam_follower.cmd: '+ 2.0 * VX(.model.follower.tip_mkr, .model.cam.ref_mkr)' appended to the STEP5 term in the FUNCTION= expression"
+    },
+    {
+      "text": "Full FUNCTION= expression wrapped in double quotes",
+      "passed": true,
+      "evidence": "cam_follower.cmd: function = \"STEP5(...) + 2.0 * VX(...)\" — entire expression enclosed in double quotes"
+    },
+    {
+      "text": "At least one geometry shape is added to each part (cam and follower) for visual inspection",
+      "passed": true,
+      "evidence": "cam_follower.cmd: 'geometry create shape cylinder cylinder_name = .model.cam.cam_cyl' and 'geometry create shape cylinder cylinder_name = .model.follower.follower_cyl'"
+    },
+    {
+      "text": "All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "cam_follower.cmd: all markers, parts, joints, forces, and geometry use full dot-path names such as .model.cam.ref_mkr, .model.follower.trans_i_mkr, .model.cam_ground_fix, .model.cam_push_force"
+    },
+    {
+      "text": "No adams_id specified anywhere",
+      "passed": true,
+      "evidence": "cam_follower.cmd: no 'adams_id' keyword appears anywhere in the script"
+    },
+    {
+      "text": "Script uses simulation single_run transient command",
+      "passed": true,
+      "evidence": "cam_follower.cmd: 'simulation single_run transient type = auto_select end_time = 1.0 number_of_steps = 1000 model_name = .model'"
+    },
+    {
+      "text": "CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "aview.log: searched for lines matching 'ERROR:' — none found. Two comment lines containing 'TypeError:' and 'SyntaxError:' (prefixed with '!') do not match the 'ERROR:' pattern"
+    }
+  ]
+}

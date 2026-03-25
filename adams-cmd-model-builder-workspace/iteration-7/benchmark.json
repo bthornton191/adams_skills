@@ -1,0 +1,1572 @@
+{
+  "metadata": {
+    "skill_name": "adams-cmd-model-builder",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-03-24T22:51:56Z",
+    "evals_run": [
+      "cam-follower-step5",
+      "contact-force-expression",
+      "debug-broken-script",
+      "four-bar-linkage",
+      "gear-coupler-havsin",
+      "long-lines-and-expressions",
+      "nonlinear-bushing-spline",
+      "parametric-loop-chain",
+      "simple-pendulum-script",
+      "spring-damper-force"
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": "cam-follower-step5",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 13,
+        "failed": 0,
+        "total": 13,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Script creates a model with at least two parts: a cam (fixed to ground) and a follower",
+          "passed": true,
+          "evidence": "cam_follower.cmd: 'part create rigid_body name_and_position part_name = .model.cam' fixed to ground via constraint create joint fixed, and 'part_name = .model.follower' created as a separate rigid body"
+        },
+        {
+          "text": "A translational joint constrains the follower to translate along X",
+          "passed": true,
+          "evidence": "cam_follower.cmd: 'constraint create joint translational joint_name = .model.follower_trans i_marker_name = .model.follower.trans_i_mkr j_marker_name = .model.ground.trans_j_mkr' with both markers oriented (90D,90D,0D) to align local z with global +X"
+        },
+        {
+          "text": "STEP5 is used for the cam force (not plain STEP \u00e2\u20ac\u201d STEP5 has continuous 2nd derivative)",
+          "passed": true,
+          "evidence": "cam_follower.cmd: function = \"STEP5(DX(.model.follower.tip_mkr, .model.cam.ref_mkr), 0.0, 0.0, 20.0, 500.0) + 2.0 * VX(...)\""
+        },
+        {
+          "text": "STEP5 x-range spans 0 to 20 (follower displacement from 0 to 20 mm)",
+          "passed": true,
+          "evidence": "cam_follower.cmd: STEP5 arguments are x0=0.0 and x1=20.0 matching the 0\u00e2\u20ac\u201c20 mm DX range"
+        },
+        {
+          "text": "STEP5 output range spans 0 to 500 (force from 0 to 500 N)",
+          "passed": true,
+          "evidence": "cam_follower.cmd: STEP5 arguments h0=0.0 and h1=500.0 giving a 0\u00e2\u20ac\u201c500 N force range"
+        },
+        {
+          "text": "Force holds at 500 N for DX > 20 mm (STEP5 naturally saturates at h1)",
+          "passed": true,
+          "evidence": "cam_follower.cmd: STEP5 saturates at h1=500.0 for all DX >= 20.0 mm by definition of the STEP5 function"
+        },
+        {
+          "text": "Damping term + 2.0 * VX(...) added to the force expression",
+          "passed": true,
+          "evidence": "cam_follower.cmd: '+ 2.0 * VX(.model.follower.tip_mkr, .model.cam.ref_mkr)' appended to the STEP5 term in the FUNCTION= expression"
+        },
+        {
+          "text": "Full FUNCTION= expression wrapped in double quotes",
+          "passed": true,
+          "evidence": "cam_follower.cmd: function = \"STEP5(...) + 2.0 * VX(...)\" \u00e2\u20ac\u201d entire expression enclosed in double quotes"
+        },
+        {
+          "text": "At least one geometry shape is added to each part (cam and follower) for visual inspection",
+          "passed": true,
+          "evidence": "cam_follower.cmd: 'geometry create shape cylinder cylinder_name = .model.cam.cam_cyl' and 'geometry create shape cylinder cylinder_name = .model.follower.follower_cyl'"
+        },
+        {
+          "text": "All object names use full dot-path hierarchy",
+          "passed": true,
+          "evidence": "cam_follower.cmd: all markers, parts, joints, forces, and geometry use full dot-path names such as .model.cam.ref_mkr, .model.follower.trans_i_mkr, .model.cam_ground_fix, .model.cam_push_force"
+        },
+        {
+          "text": "No adams_id specified anywhere",
+          "passed": true,
+          "evidence": "cam_follower.cmd: no 'adams_id' keyword appears anywhere in the script"
+        },
+        {
+          "text": "Script uses simulation single_run transient command",
+          "passed": true,
+          "evidence": "cam_follower.cmd: 'simulation single_run transient type = auto_select end_time = 1.0 number_of_steps = 1000 model_name = .model'"
+        },
+        {
+          "text": "CMD script runs in Adams View without any ERROR: lines in aview.log",
+          "passed": true,
+          "evidence": "aview.log: searched for lines matching 'ERROR:' \u00e2\u20ac\u201d none found. Two comment lines containing 'TypeError:' and 'SyntaxError:' (prefixed with '!') do not match the 'ERROR:' pattern"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "contact-force-expression",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses the IMPACT() function (not BISTOP or a manual IF expression)",
+          "passed": true,
+          "evidence": "response.md: IMPACT(DZ(.model.body.cm, ...), VZ(.model.body.cm, ...), 0.0, 1.0E5, 1.5, 50.0, 0.1)"
+        },
+        {
+          "text": "First arg uses DZ or similar displacement measuring penetration below floor",
+          "passed": true,
+          "evidence": "response.md: DZ(.model.body.cm, .model.ground.floor_ref, .model.ground.floor_ref) \u00e2\u20ac\u201d Z-height of the part's CM above the floor marker"
+        },
+        {
+          "text": "Second arg uses VZ or matching velocity measure",
+          "passed": true,
+          "evidence": "response.md: VZ(.model.body.cm, .model.ground.floor_ref, .model.ground.floor_ref, .model.ground.floor_ref) \u00e2\u20ac\u201d Z-velocity of the CM"
+        },
+        {
+          "text": "Threshold value is 0.0 (or equivalent contact point)",
+          "passed": true,
+          "evidence": "response.md: third argument is 0.0 \u00e2\u20ac\u201d 'Contact activates when ZCM < 0 (i.e., part penetrates the floor)'"
+        },
+        {
+          "text": "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present",
+          "passed": true,
+          "evidence": "response.md: IMPACT(..., 1.0E5, 1.5, 50.0, 0.1) \u00e2\u20ac\u201d table confirms K=1.0E5, e=1.5, C=50.0, d=0.1"
+        },
+        {
+          "text": "Expression wrapped in double quotes as required for FUNCTION= parameter",
+          "passed": true,
+          "evidence": "response.md CMD block: function = \"IMPACT(DZ(...),\", \"VZ(...),\", \"0.0, 1.0E5, 1.5, 50.0, 0.1)\" \u00e2\u20ac\u201d split across three quoted strings per Adams continuation rules"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "debug-broken-script",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.78,
+        "passed": 7,
+        "failed": 2,
+        "total": 9,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Identifies 'model cre' as an abbreviated keyword (bad practice in scripts, though technically valid in Adams) and expands to 'model create'",
+          "passed": true,
+          "evidence": "pendulum_fixed.cmd: 'model create model_name = .pendulum' \u00e2\u20ac\u201d abbreviated form fully expanded"
+        },
+        {
+          "text": "Identifies 'part cre rig nam' as abbreviated and expands to 'part create rigid_body name_and_position' (best-practice fix)",
+          "passed": true,
+          "evidence": "pendulum_fixed.cmd: 'part create rigid_body name_and_position &' \u00e2\u20ac\u201d all abbreviated tokens expanded"
+        },
+        {
+          "text": "Changes 'part create rigid_body mass_properties' to 'part modify rigid_body mass_properties' \u00e2\u20ac\u201d the part already exists from the name_and_position call, so 'create' is a real error here",
+          "passed": true,
+          "evidence": "pendulum_fixed.cmd: 'part modify rigid_body mass_properties &' \u00e2\u20ac\u201d correctly changed from create to modify"
+        },
+        {
+          "text": "Removes 'adams_id = 3' \u00e2\u20ac\u201d while technically valid in Adams, manually assigning IDs is unnecessary and error-prone",
+          "passed": true,
+          "evidence": "pendulum_fixed.cmd: no 'adams_id' parameter appears anywhere in the file; comment confirms '4. Removed adams_id = 3'"
+        },
+        {
+          "text": "Removes 'center_of_mass_marker = .pendulum.link.cm' from the mass_properties call \u00e2\u20ac\u201d the .cm marker does not yet exist at this point and Adams will error on it",
+          "passed": false,
+          "evidence": "pendulum_fixed.cmd: 'center_of_mass_marker = .pendulum.link.cm &' is still present in the 'part modify rigid_body mass_properties' call. The script instead creates the .cm marker explicitly beforehand (a different valid fix), but does not remove the parameter as required by this assertion."
+        },
+        {
+          "text": "Corrects 'pendulum.link.pin_mkr' to '.pendulum.link.pin_mkr' (missing leading dot, appears in both marker create and i_marker_name)",
+          "passed": true,
+          "evidence": "pendulum_fixed.cmd: 'marker_name = .pendulum.link.pin_mkr' and 'i_marker_name = .pendulum.link.pin_mkr' \u00e2\u20ac\u201d leading dot present in both occurrences"
+        },
+        {
+          "text": "Changes 'force create element_like spring_damper' to 'force create element_like translational_spring_damper' and 'length = 200.0' to 'displacement_at_preload = 200.0'",
+          "passed": false,
+          "evidence": "pendulum_fixed.cmd: keyword correctly changed to 'translational_spring_damper', but 'displacement_at_preload = 200.0' is absent \u00e2\u20ac\u201d the comment says 'Removed invalid length = 200.0 parameter (use displacement_at_preload instead)' but the replacement parameter was not added to the force definition"
+        },
+        {
+          "text": "Corrects 'sim trans end_time = 2.0 step_size = 0.001' to a proper 'simulation single_run transient' command with end_time and number_of_steps",
+          "passed": true,
+          "evidence": "pendulum_fixed.cmd: 'simulation single_run transient &' with 'end_time = 2.0 &' and 'number_of_steps = 2000 &' \u00e2\u20ac\u201d fully corrected with required parameters"
+        },
+        {
+          "text": "The corrected CMD script runs in Adams View without any ERROR: lines in aview.log",
+          "passed": true,
+          "evidence": "aview.log: no lines matching 'ERROR:' found; two commented-out Python exception messages ('! TypeError:' and '! SyntaxError:') appear in the log preamble but are prefixed with '!' and do not match the 'ERROR:' pattern"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "four-bar-linkage",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.92,
+        "passed": 12,
+        "failed": 1,
+        "total": 13,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Script creates a model with model create command",
+          "passed": true,
+          "evidence": "Line 24: model create model_name = four_bar"
+        },
+        {
+          "text": "Three distinct rigid body parts are created (crank, coupler, rocker)",
+          "passed": true,
+          "evidence": "part create rigid_body name_and_position for .four_bar.crank, .four_bar.coupler, and .four_bar.rocker"
+        },
+        {
+          "text": "Four revolute joints are created (crank-ground, crank-coupler, coupler-rocker, rocker-ground)",
+          "passed": true,
+          "evidence": "constraint create joint revolute for rev_crank_ground, rev_crank_coupler, rev_coupler_rocker, rev_rocker_ground"
+        },
+        {
+          "text": "A motion generator drives the crank joint",
+          "passed": true,
+          "evidence": "constraint create motion_generator with joint_name = .four_bar.rev_crank_ground and type_of_freedom = rotational"
+        },
+        {
+          "text": "Motion generator function specifies 360 degrees per second (e.g. 360D * TIME or equivalent)",
+          "passed": true,
+          "evidence": "time_derivative = velocity and function = \"360D\" (constant 360 deg/s angular velocity)"
+        },
+        {
+          "text": "Script uses simulation single_run transient command (or notes the command to run)",
+          "passed": true,
+          "evidence": "simulation single_run transient with end_time = 2.0, number_of_steps = 2000, model_name = .four_bar"
+        },
+        {
+          "text": "All keywords spelled out fully \u00e2\u20ac\u201d no abbreviated commands anywhere",
+          "passed": true,
+          "evidence": "All commands use full keywords: model create, part create rigid_body name_and_position, marker create, constraint create joint revolute, simulation single_run transient, etc."
+        },
+        {
+          "text": "All object names use full dot-path hierarchy (.model.part.marker)",
+          "passed": true,
+          "evidence": "All object names use full dot-path: .four_bar.crank.pin_ground_mkr, .four_bar.coupler.cm, .four_bar.ground.rocker_pivot_mkr, etc."
+        },
+        {
+          "text": "No adams_id specified anywhere in the script",
+          "passed": true,
+          "evidence": "No adams_id keyword found anywhere in four_bar.cmd"
+        },
+        {
+          "text": "Mass/inertia set with part modify rigid_body mass_properties, not part create",
+          "passed": true,
+          "evidence": "part modify rigid_body mass_properties used for each part: .four_bar.crank, .four_bar.coupler, .four_bar.rocker"
+        },
+        {
+          "text": "center_of_mass_marker argument is NOT passed in any part modify mass_properties call",
+          "passed": false,
+          "evidence": "center_of_mass_marker = .four_bar.crank.cm, center_of_mass_marker = .four_bar.coupler.cm, and center_of_mass_marker = .four_bar.rocker.cm are all passed in part modify rigid_body mass_properties calls"
+        },
+        {
+          "text": "At least one geometry shape (sphere, cylinder, or box) is added to each moving part (crank, coupler, rocker) for visual inspection",
+          "passed": true,
+          "evidence": "geometry create shape link for crank (shape_body), coupler (shape_body), and rocker (shape_body)"
+        },
+        {
+          "text": "CMD script runs in Adams View (via scripts/run_adams_cmd.py) without any ERROR: lines in aview.log",
+          "passed": true,
+          "evidence": "aview.log contains 0 lines matching 'ERROR:' (case-sensitive)"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "gear-coupler-havsin",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 15,
+        "failed": 0,
+        "total": 15,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Script creates a model with at least two shaft parts connected to ground via revolute joints",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: model create .gear_coupler; part create rigid_body for .gear_coupler.input_shaft and .gear_coupler.output_shaft; constraint create joint revolute for rev_input and rev_output both connecting shaft pin_mkr to ground pivot markers"
+        },
+        {
+          "text": "constraint create complex_joint coupler is used (NOT 'constraint create coupler' \u00e2\u20ac\u201d the full sub-command is 'complex_joint')",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: 'constraint create complex_joint coupler' with coupler_name = .gear_coupler.coupler_gear"
+        },
+        {
+          "text": "motion_multipliers = 1.0, -0.333 (or equivalent 3:1 ratio with opposite sign for opposite rotation direction)",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: motion_multipliers = 1.0, -0.333 \u00e2\u20ac\u201d ratio |1.0/0.333| \u00e2\u2030\u02c6 3:1 with negative sign encoding opposite directions"
+        },
+        {
+          "text": "joint_name lists both .model.rev_input and .model.rev_output in the coupler",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: joint_name = .gear_coupler.rev_input, .gear_coupler.rev_output in the complex_joint coupler command"
+        },
+        {
+          "text": "constraint create motion_generator is used on the input joint",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: 'constraint create motion_generator' with joint_name = .gear_coupler.rev_input"
+        },
+        {
+          "text": "motion generator specifies type_of_freedom = rotational",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: type_of_freedom = rotational in the motion_generator command"
+        },
+        {
+          "text": "motion generator specifies time_derivative = velocity \u00e2\u20ac\u201d required so Adams interprets the HAVSIN output as angular velocity, not position",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: time_derivative = velocity in the motion_generator command"
+        },
+        {
+          "text": "HAVSIN function is used for the ramp (not STEP or STEP5)",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: function = \"HAVSIN(TIME, 0.0, 0.5, 0.0, 120D)\" \u00e2\u20ac\u201d uses HAVSIN not STEP or STEP5"
+        },
+        {
+          "text": "HAVSIN argument order is (x, x0, x1, h0, h1) = (TIME, 0.0, 0.5, 0.0, 120D)",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: HAVSIN(TIME, 0.0, 0.5, 0.0, 120D) \u00e2\u20ac\u201d exact match to required argument order"
+        },
+        {
+          "text": "120 degrees/s expressed correctly \u00e2\u20ac\u201d either as 120D for degrees or converted to rad/s",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: 120D used in HAVSIN arguments \u00e2\u20ac\u201d the 'D' suffix specifies degrees in Adams"
+        },
+        {
+          "text": "At least one geometry shape (cylinder or similar) is added to each shaft part",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: 'geometry create shape cylinder' for .gear_coupler.input_shaft.cyl_shaft and .gear_coupler.output_shaft.cyl_shaft"
+        },
+        {
+          "text": "All object names use full dot-path hierarchy",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: all names use .gear_coupler.* dot-path format (e.g. .gear_coupler.input_shaft, .gear_coupler.rev_input, .gear_coupler.coupler_gear)"
+        },
+        {
+          "text": "No adams_id specified anywhere",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: no occurrence of 'adams_id' found anywhere in the file"
+        },
+        {
+          "text": "Script uses simulation single_run transient command",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: 'simulation single_run transient' with end_time = 2.0"
+        },
+        {
+          "text": "CMD script runs in Adams View without any ERROR: lines in aview.log",
+          "passed": true,
+          "evidence": "aview.log: no lines matching 'ERROR:' found; two lines containing 'TypeError:' and 'SyntaxError:' appear inside Adams comment lines (! prefix) from the Python runner script \u00e2\u20ac\u201d not Adams View error messages"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "long-lines-and-expressions",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 13,
+        "failed": 0,
+        "total": 13,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Script creates a model named 'crane' with three rigid body parts (tower, boom, payload)",
+          "passed": true,
+          "evidence": "crane.cmd: 'model create model_name = crane'; 'part create rigid_body name_and_position' for .crane.tower (0,0,500), .crane.boom (400,0,1000), .crane.payload (800,0,800)"
+        },
+        {
+          "text": "Boom and payload markers use eval() with loc_global() or loc_relative_to() to compute positions",
+          "passed": true,
+          "evidence": "mkr_boom_tip: 'location = (eval(loc_global({200, 0, 0}, .crane.boom.cm)))'; mkr_payload_hang: 'location = (eval(loc_relative_to({0, 0, 150}, .crane.boom.mkr_boom_tip)))'"
+        },
+        {
+          "text": "Both mkr_boom_tip and mkr_payload_hang use eval with ori_along_axis() with full dot-path marker names in the arguments",
+          "passed": true,
+          "evidence": "mkr_boom_tip: 'orientation = (eval(ori_along_axis(.crane.boom.cm, .crane.payload.cm, \"z\")))'; mkr_payload_hang: 'orientation = (eval(ori_along_axis(.crane.boom.mkr_boom_tip, .crane.payload.cm, \"z\")))' \u00e2\u20ac\u201d both use full dot-path names"
+        },
+        {
+          "text": "Every eval expression \u00e2\u20ac\u201d anything inside parentheses like (eval(...)) \u00e2\u20ac\u201d stays entirely on one line, no matter how long it gets. The ori_along_axis calls with full dot-path names like .crane.boom.cm and .crane.payload.cm produce long lines, but they must NOT be split with &. This is the critical check.",
+          "passed": true,
+          "evidence": "All four eval lines are unbroken single lines. The '&' continuation characters appear only after the closing ')' of each eval expression as part of the multi-line marker create command \u00e2\u20ac\u201d not inside the eval parentheses."
+        },
+        {
+          "text": "The long FUNCTION= expression (STEP5 + STEP5 + VZ + IMPACT) is split across multiple lines using comma-separated quoted strings. It should NOT be crammed onto one enormous line \u00e2\u20ac\u201d the syntax allows splitting for function strings.",
+          "passed": true,
+          "evidence": "function = \"STEP5(TIME, 0.0, 0.0, 0.5, -500.0)\", & / \" + STEP5(TIME, 1.0, 0.0, 1.5, 500.0)\", & / ... split across 13 comma-separated double-quoted string segments with & continuation"
+        },
+        {
+          "text": "Two revolute joints (tower-ground, boom-tower) and one spherical joint (payload-boom) are created",
+          "passed": true,
+          "evidence": "constraint create joint revolute: .crane.jnt_tower_ground (tower.mkr_base <-> ground.origin); .crane.jnt_boom_tower (boom.mkr_tower_conn <-> tower.mkr_top); constraint create joint spherical: .crane.jnt_payload_boom (payload.mkr_sph_joint <-> boom.mkr_boom_tip)"
+        },
+        {
+          "text": "The force function includes STEP5 ramps, a VZ velocity-damping term, and an IMPACT contact term",
+          "passed": true,
+          "evidence": "function = \"STEP5(TIME, 0.0, 0.0, 0.5, -500.0)\" + \"STEP5(TIME, 1.0, 0.0, 1.5, 500.0)\" + \"- 2.0 * VZ(.crane.payload.cm, ...)\" + \"IMPACT(DZ(.crane.payload.cm, ...), VZ(...), 0.0, 1.0E5, 1.5, 50.0, 0.1)\" \u00e2\u20ac\u201d all four components present"
+        },
+        {
+          "text": "Mass/inertia set with part modify rigid_body mass_properties",
+          "passed": true,
+          "evidence": "'part modify rigid_body mass_properties' used for all three parts with mass, ixx, iyy, izz, and center_of_mass_marker parameters"
+        },
+        {
+          "text": "All object names use full dot-path hierarchy",
+          "passed": true,
+          "evidence": "All markers, parts, joints, forces use full dot-path names: .crane.tower.cm, .crane.boom.mkr_boom_tip, .crane.payload.mkr_payload_hang, .crane.jnt_tower_ground, etc."
+        },
+        {
+          "text": "No adams_id specified anywhere",
+          "passed": true,
+          "evidence": "Grep for 'adams_id' in crane.cmd returned no matches"
+        },
+        {
+          "text": "Cylinder geometry on tower and boom, ellipsoid on payload",
+          "passed": true,
+          "evidence": "'geometry create shape cylinder' for .crane.tower.cyl_body (center_marker=tower.mkr_base, length=1000, radius=40) and .crane.boom.cyl_body (center_marker=boom.mkr_geom, length=600, radius=25); 'geometry create shape ellipsoid' for .crane.payload.ellip_body (center_marker=payload.cm)"
+        },
+        {
+          "text": "Script uses simulation single_run transient for 3 seconds with 3000 steps",
+          "passed": true,
+          "evidence": "'simulation single_run transient' with end_time = 3.0, number_of_steps = 3000, model_name = .crane"
+        },
+        {
+          "text": "CMD script runs in Adams View without any ERROR: lines in aview.log",
+          "passed": true,
+          "evidence": "aview.log contains no 'ERROR:' lines. Simulation ran to completion (End Simulation at t=3.0s, 3005 steps). The 'TypeError:' and 'SyntaxError:' lines present are Python sys.excepthook cosmetic errors unrelated to Adams execution, and appear in comment lines starting with '!'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "nonlinear-bushing-spline",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.92,
+        "passed": 12,
+        "failed": 1,
+        "total": 13,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A data_element create spline command defines the X stiffness table",
+          "passed": true,
+          "evidence": "bushing.cmd: data_element create spline spline_name = .rubber_mount.x_force_spline"
+        },
+        {
+          "text": "Spline x values include -10, -5, 0, 5, 10 (or equivalent in correct units)",
+          "passed": true,
+          "evidence": "bushing.cmd: x = -10.0, -5.0, 0.0, 5.0, 10.0"
+        },
+        {
+          "text": "Spline y values include -8000, -3000, 0, 3000, 8000",
+          "passed": true,
+          "evidence": "bushing.cmd: y = -8000.0, -3000.0, 0.0, 3000.0, 8000.0"
+        },
+        {
+          "text": "force create direct general_force is used for the X-direction force (required to implement AKISPL nonlinear curve; a simple bushing only accepts constant stiffness per DOF)",
+          "passed": true,
+          "evidence": "bushing.cmd: force create direct general_force general_force_name = .rubber_mount.rubber_mount_gforce"
+        },
+        {
+          "text": "x_force_function uses AKISPL() to look up force from the spline based on DX displacement",
+          "passed": true,
+          "evidence": "bushing.cmd: x_force_function = \"-AKISPL(DX(.rubber_mount.subframe.bush_i, .rubber_mount.chassis.bush_j, .rubber_mount.chassis.bush_j), 0, .rubber_mount.x_force_spline, 0)\""
+        },
+        {
+          "text": "Y and Z translational stiffness of 5000 N/mm implemented \u00e2\u20ac\u201d either as y/z force functions in the GFORCE ('-5000 * DY(...)'), or via a separate bushing element with Ky=Kz=5000 N/mm",
+          "passed": true,
+          "evidence": "bushing.cmd: y_force_function = \"-5000.0 * DY(...)\" and z_force_function = \"-5000.0 * DZ(...)\""
+        },
+        {
+          "text": "Rotational stiffness of 200 N\u00c2\u00b7mm/deg implemented. Preferred approach: a separate bushing element with angular stiffness converted to N\u00c2\u00b7mm/rad (200 \u00c3\u2014 \u00cf\u20ac/180 \u00e2\u2030\u02c6 3.491 N\u00c2\u00b7mm/rad per axis). Do NOT use the invalid 'rotational_stiffness' bushing parameter.",
+          "passed": true,
+          "evidence": "bushing.cmd: x_torque_function = \"(-200.0 / 1D) * AX(...)\" \u00e2\u20ac\u201d uses Adams 1D constant (pi/180) to convert 200 N\u00c2\u00b7mm/deg to N\u00c2\u00b7mm/rad; same for y and z torque functions"
+        },
+        {
+          "text": "Mass/inertia set with part modify rigid_body mass_properties, not part create",
+          "passed": true,
+          "evidence": "bushing.cmd: part modify rigid_body mass_properties part_name = .rubber_mount.chassis ... and part modify rigid_body mass_properties part_name = .rubber_mount.subframe ..."
+        },
+        {
+          "text": "All object names use full dot-path hierarchy",
+          "passed": true,
+          "evidence": "bushing.cmd: all markers, parts, forces use full paths such as .rubber_mount.chassis.bush_j, .rubber_mount.subframe.bush_i, .rubber_mount.rubber_mount_gforce"
+        },
+        {
+          "text": "No adams_id specified anywhere in the script",
+          "passed": true,
+          "evidence": "bushing.cmd: grep for adams_id returns no matches"
+        },
+        {
+          "text": "center_of_mass_marker argument is NOT passed in any part modify mass_properties call",
+          "passed": false,
+          "evidence": "bushing.cmd: center_of_mass_marker = .rubber_mount.chassis.cm passed in chassis mass_properties call; center_of_mass_marker = .rubber_mount.subframe.cm passed in subframe mass_properties call"
+        },
+        {
+          "text": "At least one geometry shape is added to each moving part for visual inspection",
+          "passed": true,
+          "evidence": "bushing.cmd: geometry create shape ellipsoid ellipsoid_name = .rubber_mount.chassis.chassis_geo (chassis) and ellipsoid_name = .rubber_mount.subframe.subframe_geo (subframe)"
+        },
+        {
+          "text": "CMD script runs in Adams View (via scripts/run_adams_cmd.py) without any ERROR: lines in aview.log",
+          "passed": true,
+          "evidence": "aview.log: no lines matching ^ERROR: found; two comment lines contain 'TypeError:' and 'SyntaxError:' as Python exception names in comments but these are not Adams ERROR: lines"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "parametric-loop-chain",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 14,
+        "failed": 0,
+        "total": 14,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A for / end loop drives mass and/or spring-damper creation",
+          "passed": true,
+          "evidence": "chain.cmd: two FOR loops \u00e2\u20ac\u201d 'for variable_name = i  start_value = 1  end_value = (eval(.chain.n_masses))' for masses and 'for variable_name = j  start_value = 1  end_value = (eval(.chain.n_masses - 1))' for spring-dampers"
+        },
+        {
+          "text": "EVAL() used to dereference a variable inside a command string",
+          "passed": true,
+          "evidence": "chain.cmd: e.g. 'point_mass_name = (eval(\".chain.mass_\" // RTOI(i)))' and 'stiffness = (eval(.chain.stiffness))'"
+        },
+        {
+          "text": "RTOI() used to convert the loop counter to a string for name construction",
+          "passed": true,
+          "evidence": "chain.cmd: e.g. 'RTOI(i)' in mass loop and 'RTOI(j)', 'RTOI(j + 1)' in spring-damper loop"
+        },
+        {
+          "text": "// string concatenation operator used to build part/marker names",
+          "passed": true,
+          "evidence": "chain.cmd: e.g. '\".chain.mass_\" // RTOI(i)' and '\".chain.spr_\" // RTOI(j) // \"_\" // RTOI(j + 1)'"
+        },
+        {
+          "text": "Masses created with part create point_mass (not rigid_body)",
+          "passed": true,
+          "evidence": "chain.cmd: 'part create point_mass name_and_position' inside the FOR loop"
+        },
+        {
+          "text": "Spring-dampers created with force create element_like translational_spring_damper with stiffness=100, damping=1.0, displacement_at_preload=50",
+          "passed": true,
+          "evidence": "chain.cmd: 'force create element_like translational_spring_damper' with stiffness=(eval(.chain.stiffness)) [=100], damping=(eval(.chain.damping)) [=1.0], displacement_at_preload=(eval(.chain.free_len)) [=50]"
+        },
+        {
+          "text": "First mass (mass_1) is fixed to ground with a spherical joint or atpoint primitive (NOT fixed joint \u00e2\u20ac\u201d fixed joint is overconstrained for a point mass)",
+          "passed": true,
+          "evidence": "chain.cmd: 'constraint create joint spherical  joint_name = .chain.sph_gnd_1  i_marker_name = .chain.mass_1.cm  j_marker_name = .chain.ground.anchor_mkr'"
+        },
+        {
+          "text": "Exactly 8 masses are created",
+          "passed": true,
+          "evidence": "chain.cmd: variable n_masses = 8, loop end_value = (eval(.chain.n_masses)) creates mass_1 through mass_8"
+        },
+        {
+          "text": "Masses are spaced 50 mm apart along the X axis",
+          "passed": true,
+          "evidence": "chain.cmd: variable spacing = 50.0; location = (eval((i - 1) * .chain.spacing)), 0.0, 0.0"
+        },
+        {
+          "text": "Script uses simulation single_run transient command (or notes the command to run)",
+          "passed": true,
+          "evidence": "chain.cmd: 'simulation single_run transient  type = auto_select  end_time = 2.0  number_of_steps = 2000  model_name = .chain  initial_static = no'"
+        },
+        {
+          "text": "All object names use full dot-path hierarchy",
+          "passed": true,
+          "evidence": "chain.cmd: all names use .chain.mass_N, .chain.spr_N_M, .chain.ground.anchor_mkr, .chain.sph_gnd_1 etc."
+        },
+        {
+          "text": "No adams_id specified anywhere in the script",
+          "passed": true,
+          "evidence": "chain.cmd: no occurrence of 'adams_id' anywhere in the file"
+        },
+        {
+          "text": "At least one geometry shape (sphere or cylinder) is added to each mass for visual inspection",
+          "passed": true,
+          "evidence": "chain.cmd: 'geometry create shape ellipsoid ... center_marker = (eval(\".chain.mass_\" // RTOI(i) // \".cm\"))' created for every mass inside the FOR loop"
+        },
+        {
+          "text": "CMD script runs in Adams View (via scripts/run_adams_cmd.py) without any ERROR: lines in aview.log",
+          "passed": true,
+          "evidence": "aview.log: no lines containing 'ERROR:' found; lines 3190 and 3195 contain TypeError/SyntaxError in Python traceback comments (prefixed with !) but do not match the 'ERROR:' pattern"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "simple-pendulum-script",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 12,
+        "failed": 0,
+        "total": 12,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Script creates a model with model create command",
+          "passed": true,
+          "evidence": "Line 18: model create model_name = pendulum"
+        },
+        {
+          "text": "A rigid body part is created with correct syntax",
+          "passed": true,
+          "evidence": "Line 41: part create rigid_body name_and_position & / part_name = .pendulum.link"
+        },
+        {
+          "text": "At least a pin marker is created on the link and ground",
+          "passed": true,
+          "evidence": "marker create for .pendulum.ground.pivot_mkr (ground), .pendulum.link.pin_mkr (link upper end), and .pendulum.link.tip_mkr (link lower end)"
+        },
+        {
+          "text": "A revolute joint is created connecting the link to ground using i_marker_name and j_marker_name",
+          "passed": true,
+          "evidence": "constraint create joint revolute / joint_name = .pendulum.rev_pivot / i_marker_name = .pendulum.link.pin_mkr / j_marker_name = .pendulum.ground.pivot_mkr"
+        },
+        {
+          "text": "Gravity field is created with -Y component (e.g. -9806.65 or -9.80665)",
+          "passed": true,
+          "evidence": "force create body gravitational / y_component_gravity = -9806.65"
+        },
+        {
+          "text": "Part or marker orientation set to 45 degrees for initial release",
+          "passed": true,
+          "evidence": "part modify rigid_body name_and_position / part_name = .pendulum.link / orientation = 0.0D, 0.0D, 45.0D"
+        },
+        {
+          "text": "All keywords spelled out fully (not abbreviated)",
+          "passed": true,
+          "evidence": "All keywords fully spelled: model_name, gravity_field_name, x_component_gravity, y_component_gravity, z_component_gravity, marker_name, part_name, joint_name, i_marker_name, j_marker_name, link_name, ellipsoid_name, center_marker, x_scale_factor, number_of_steps, initial_static, etc."
+        },
+        {
+          "text": "Object names use dot-path hierarchy `.model.part.marker`",
+          "passed": true,
+          "evidence": "All names use dot-path notation: .pendulum.ground.pivot_mkr, .pendulum.link, .pendulum.link.cm, .pendulum.link.pin_mkr, .pendulum.link.tip_mkr, .pendulum.rev_pivot, .pendulum.gravity, .pendulum.link.shape_rod, .pendulum.link.ellips_tip"
+        },
+        {
+          "text": "No adams_id specified anywhere in the script",
+          "passed": true,
+          "evidence": "No instance of 'adams_id' found anywhere in the script"
+        },
+        {
+          "text": "Mass properties set with part modify (not part create) since the part already exists",
+          "passed": true,
+          "evidence": "part modify rigid_body mass_properties / part_name = .pendulum.link / mass = 1.0 / ..."
+        },
+        {
+          "text": "At least one geometry shape (sphere, cylinder, or box) is added to each moving part for visual inspection in Adams View",
+          "passed": true,
+          "evidence": "geometry create shape link (.pendulum.link.shape_rod) and geometry create shape ellipsoid (.pendulum.link.ellips_tip) both added to .pendulum.link"
+        },
+        {
+          "text": "CMD script runs in Adams View without any ERROR: lines in aview.log",
+          "passed": true,
+          "evidence": "No ERROR: lines found in aview.log. Simulation ran to completion: 'End Simulation' / 'Finished -----' / Elapsed time = 4.16s. Note: echoed Python sys.excepthook traceback (TypeError:/SyntaxError: in comment lines starting with '!') is unrelated to the CMD script."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "spring-damper-force",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses force create element_like translational_spring_damper (not single_component_force or bushing)",
+          "passed": true,
+          "evidence": "response.md line 5: Use `force create element_like translational_spring_damper` to create a 1-DOF spring-damper; also line 82 in code block"
+        },
+        {
+          "text": "Includes stiffness = 5000",
+          "passed": true,
+          "evidence": "response.md line 86:     stiffness               = 5000.0"
+        },
+        {
+          "text": "Includes damping = 100",
+          "passed": true,
+          "evidence": "response.md line 87:     damping                 = 100.0"
+        },
+        {
+          "text": "Includes length = 250 (free length) or displacement_at_preload = 250",
+          "passed": true,
+          "evidence": "response.md line 89:     displacement_at_preload = 250.0"
+        },
+        {
+          "text": "References both i_marker_name and j_marker_name",
+          "passed": true,
+          "evidence": "response.md line 84:     i_marker_name           = .spring_demo.mass_block.spring_bot; line 85:     j_marker_name           = .spring_demo.ground.spring_top"
+        },
+        {
+          "text": "Explains that spring_damper is for 1-DOF along a line of action",
+          "passed": true,
+          "evidence": "response.md line 5: to create a 1-DOF spring-damper that acts along the line of sight between two markers"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "cam-follower-step5",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 13,
+        "failed": 0,
+        "total": 13,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Script creates a model with at least two parts: a cam (fixed to ground) and a follower",
+          "passed": true,
+          "evidence": "cam_follower.cmd: 'part create rigid_body name_and_position part_name = .model.cam' fixed to ground via constraint create joint fixed, and 'part_name = .model.follower' created as a separate rigid body"
+        },
+        {
+          "text": "A translational joint constrains the follower to translate along X",
+          "passed": true,
+          "evidence": "cam_follower.cmd: 'constraint create joint translational joint_name = .model.follower_trans i_marker_name = .model.follower.trans_i_mkr j_marker_name = .model.ground.trans_j_mkr' with both markers oriented (90D,90D,0D) to align local z with global +X"
+        },
+        {
+          "text": "STEP5 is used for the cam force (not plain STEP \u00e2\u20ac\u201d STEP5 has continuous 2nd derivative)",
+          "passed": true,
+          "evidence": "cam_follower.cmd: function = \"STEP5(DX(.model.follower.tip_mkr, .model.cam.ref_mkr), 0.0, 0.0, 20.0, 500.0) + 2.0 * VX(...)\""
+        },
+        {
+          "text": "STEP5 x-range spans 0 to 20 (follower displacement from 0 to 20 mm)",
+          "passed": true,
+          "evidence": "cam_follower.cmd: STEP5 arguments are x0=0.0 and x1=20.0 matching the 0\u00e2\u20ac\u201c20 mm DX range"
+        },
+        {
+          "text": "STEP5 output range spans 0 to 500 (force from 0 to 500 N)",
+          "passed": true,
+          "evidence": "cam_follower.cmd: STEP5 arguments h0=0.0 and h1=500.0 giving a 0\u00e2\u20ac\u201c500 N force range"
+        },
+        {
+          "text": "Force holds at 500 N for DX > 20 mm (STEP5 naturally saturates at h1)",
+          "passed": true,
+          "evidence": "cam_follower.cmd: STEP5 saturates at h1=500.0 for all DX >= 20.0 mm by definition of the STEP5 function"
+        },
+        {
+          "text": "Damping term + 2.0 * VX(...) added to the force expression",
+          "passed": true,
+          "evidence": "cam_follower.cmd: '+ 2.0 * VX(.model.follower.tip_mkr, .model.cam.ref_mkr)' appended to the STEP5 term in the FUNCTION= expression"
+        },
+        {
+          "text": "Full FUNCTION= expression wrapped in double quotes",
+          "passed": true,
+          "evidence": "cam_follower.cmd: function = \"STEP5(...) + 2.0 * VX(...)\" \u00e2\u20ac\u201d entire expression enclosed in double quotes"
+        },
+        {
+          "text": "At least one geometry shape is added to each part (cam and follower) for visual inspection",
+          "passed": true,
+          "evidence": "cam_follower.cmd: 'geometry create shape cylinder cylinder_name = .model.cam.cam_cyl' and 'geometry create shape cylinder cylinder_name = .model.follower.follower_cyl'"
+        },
+        {
+          "text": "All object names use full dot-path hierarchy",
+          "passed": true,
+          "evidence": "cam_follower.cmd: all markers, parts, joints, forces, and geometry use full dot-path names such as .model.cam.ref_mkr, .model.follower.trans_i_mkr, .model.cam_ground_fix, .model.cam_push_force"
+        },
+        {
+          "text": "No adams_id specified anywhere",
+          "passed": true,
+          "evidence": "cam_follower.cmd: no 'adams_id' keyword appears anywhere in the script"
+        },
+        {
+          "text": "Script uses simulation single_run transient command",
+          "passed": true,
+          "evidence": "cam_follower.cmd: 'simulation single_run transient type = auto_select end_time = 1.0 number_of_steps = 1000 model_name = .model'"
+        },
+        {
+          "text": "CMD script runs in Adams View without any ERROR: lines in aview.log",
+          "passed": true,
+          "evidence": "aview.log: searched for lines matching 'ERROR:' \u00e2\u20ac\u201d none found. Two comment lines containing 'TypeError:' and 'SyntaxError:' (prefixed with '!') do not match the 'ERROR:' pattern"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "contact-force-expression",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.83,
+        "passed": 5,
+        "failed": 1,
+        "total": 6,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses the IMPACT() function (not BISTOP or a manual IF expression)",
+          "passed": true,
+          "evidence": "response.md: FUNCTION=IMPACT(DZ(cm_marker_id, ground_marker_id), VZ(cm_marker_id, ground_marker_id), 0.0, 1.0E+5, 1.5, 50.0, 0.1)"
+        },
+        {
+          "text": "First arg uses DZ or similar displacement measuring penetration below floor",
+          "passed": true,
+          "evidence": "response.md: DZ(cm_marker_id, ground_marker_id) \u00e2\u20ac\u201d 'Current Z-position of the part's CM'"
+        },
+        {
+          "text": "Second arg uses VZ or matching velocity measure",
+          "passed": true,
+          "evidence": "response.md: VZ(cm_marker_id, ground_marker_id) \u00e2\u20ac\u201d 'Current Z-velocity of the part's CM'"
+        },
+        {
+          "text": "Threshold value is 0.0 (or equivalent contact point)",
+          "passed": true,
+          "evidence": "response.md: x1 = 0.0 \u00e2\u20ac\u201d 'Contact boundary \u00e2\u20ac\u201d floor at Z = 0'"
+        },
+        {
+          "text": "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present",
+          "passed": true,
+          "evidence": "response.md: IMPACT(..., 1.0E+5, 1.5, 50.0, 0.1) \u00e2\u20ac\u201d table confirms k=1.0E+5, e=1.5, cmax=50.0, d=0.1"
+        },
+        {
+          "text": "Expression wrapped in double quotes as required for FUNCTION= parameter",
+          "passed": false,
+          "evidence": "response.md shows FUNCTION=IMPACT(...) with no surrounding double quotes \u00e2\u20ac\u201d uses numeric SFORCE/1 dataset format where quotes are absent, rather than the quoted CMD command language format"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "debug-broken-script",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.89,
+        "passed": 8,
+        "failed": 1,
+        "total": 9,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Identifies 'model cre' as an abbreviated keyword (bad practice in scripts, though technically valid in Adams) and expands to 'model create'",
+          "passed": true,
+          "evidence": "pendulum_fixed.cmd: 'model create model_name = pendulum' \u00e2\u20ac\u201d abbreviated form fully expanded"
+        },
+        {
+          "text": "Identifies 'part cre rig nam' as abbreviated and expands to 'part create rigid_body name_and_position' (best-practice fix)",
+          "passed": true,
+          "evidence": "pendulum_fixed.cmd: 'part create rigid_body name_and_position &' \u00e2\u20ac\u201d all abbreviated tokens expanded"
+        },
+        {
+          "text": "Changes 'part create rigid_body mass_properties' to 'part modify rigid_body mass_properties' \u00e2\u20ac\u201d the part already exists from the name_and_position call, so 'create' is a real error here",
+          "passed": true,
+          "evidence": "pendulum_fixed.cmd: 'part modify rigid_body mass_properties &' \u00e2\u20ac\u201d correctly changed from create to modify"
+        },
+        {
+          "text": "Removes 'adams_id = 3' \u00e2\u20ac\u201d while technically valid in Adams, manually assigning IDs is unnecessary and error-prone",
+          "passed": true,
+          "evidence": "pendulum_fixed.cmd: no 'adams_id' parameter appears anywhere in the file; comment confirms 'adams_id removed from mass_properties modify'"
+        },
+        {
+          "text": "Removes 'center_of_mass_marker = .pendulum.link.cm' from the mass_properties call \u00e2\u20ac\u201d the .cm marker does not yet exist at this point and Adams will error on it",
+          "passed": false,
+          "evidence": "pendulum_fixed.cmd: 'center_of_mass_marker = .pendulum.link.cm &' is still present in the 'part modify rigid_body mass_properties' call. The script instead creates the .cm marker explicitly beforehand (a different valid fix), but does not remove the parameter as required by this assertion."
+        },
+        {
+          "text": "Corrects 'pendulum.link.pin_mkr' to '.pendulum.link.pin_mkr' (missing leading dot, appears in both marker create and i_marker_name)",
+          "passed": true,
+          "evidence": "pendulum_fixed.cmd: 'marker_name = .pendulum.link.pin_mkr' and 'i_marker_name = .pendulum.link.pin_mkr' \u00e2\u20ac\u201d leading dot present in both occurrences"
+        },
+        {
+          "text": "Changes 'force create element_like spring_damper' to 'force create element_like translational_spring_damper' and 'length = 200.0' to 'displacement_at_preload = 200.0'",
+          "passed": true,
+          "evidence": "pendulum_fixed.cmd: 'force create element_like translational_spring_damper &' with 'displacement_at_preload = 200.0' \u00e2\u20ac\u201d both changes correctly applied"
+        },
+        {
+          "text": "Corrects 'sim trans end_time = 2.0 step_size = 0.001' to a proper 'simulation single_run transient' command with end_time and number_of_steps",
+          "passed": true,
+          "evidence": "pendulum_fixed.cmd: 'simulation single_run transient &' with 'end_time = 2.0 &' and 'number_of_steps = 2000 &' \u00e2\u20ac\u201d fully corrected with required parameters"
+        },
+        {
+          "text": "The corrected CMD script runs in Adams View without any ERROR: lines in aview.log",
+          "passed": true,
+          "evidence": "aview.log: no lines matching 'ERROR:' found; two commented-out Python exception messages ('! TypeError:' and '! SyntaxError:') appear in the log preamble but are prefixed with '!' and do not match the 'ERROR:' pattern"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "four-bar-linkage",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.92,
+        "passed": 12,
+        "failed": 1,
+        "total": 13,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Script creates a model with model create command",
+          "passed": true,
+          "evidence": "Line 28: model create model_name = four_bar"
+        },
+        {
+          "text": "Three distinct rigid body parts are created (crank, coupler, rocker)",
+          "passed": true,
+          "evidence": "part create rigid_body name_and_position for .four_bar.crank, .four_bar.coupler, and .four_bar.rocker"
+        },
+        {
+          "text": "Four revolute joints are created (crank-ground, crank-coupler, coupler-rocker, rocker-ground)",
+          "passed": true,
+          "evidence": "constraint create joint revolute for rev_crank_ground, rev_crank_coupler, rev_coupler_rocker, rev_rocker_ground"
+        },
+        {
+          "text": "A motion generator drives the crank joint",
+          "passed": true,
+          "evidence": "constraint create motion_generator with joint_name = .four_bar.rev_crank_ground and type_of_freedom = rotational"
+        },
+        {
+          "text": "Motion generator function specifies 360 degrees per second (e.g. 360D * TIME or equivalent)",
+          "passed": true,
+          "evidence": "time_derivative = velocity and function = \"360D\" (constant 360 deg/s angular velocity)"
+        },
+        {
+          "text": "Script uses simulation single_run transient command (or notes the command to run)",
+          "passed": true,
+          "evidence": "simulation single_run transient with end_time = 2.0, number_of_steps = 2000, model_name = .four_bar"
+        },
+        {
+          "text": "All keywords spelled out fully \u00e2\u20ac\u201d no abbreviated commands anywhere",
+          "passed": true,
+          "evidence": "All commands use full keywords: model create, part create rigid_body name_and_position, marker create, constraint create joint revolute, simulation single_run transient, etc."
+        },
+        {
+          "text": "All object names use full dot-path hierarchy (.model.part.marker)",
+          "passed": true,
+          "evidence": "All object names use full dot-path: .four_bar.crank.pin_ground_mkr, .four_bar.coupler.cm, .four_bar.ground.rocker_pivot_mkr, etc."
+        },
+        {
+          "text": "No adams_id specified anywhere in the script",
+          "passed": true,
+          "evidence": "No adams_id keyword found anywhere in four_bar.cmd"
+        },
+        {
+          "text": "Mass/inertia set with part modify rigid_body mass_properties, not part create",
+          "passed": true,
+          "evidence": "part modify rigid_body mass_properties used for each part: .four_bar.crank, .four_bar.coupler, .four_bar.rocker"
+        },
+        {
+          "text": "center_of_mass_marker argument is NOT passed in any part modify mass_properties call",
+          "passed": false,
+          "evidence": "center_of_mass_marker = .four_bar.crank.cm, center_of_mass_marker = .four_bar.coupler.cm, and center_of_mass_marker = .four_bar.rocker.cm are all passed in part modify rigid_body mass_properties calls"
+        },
+        {
+          "text": "At least one geometry shape (sphere, cylinder, or box) is added to each moving part (crank, coupler, rocker) for visual inspection",
+          "passed": true,
+          "evidence": "geometry create shape link for crank (shape_body), coupler (shape_body), and rocker (shape_body)"
+        },
+        {
+          "text": "CMD script runs in Adams View (via scripts/run_adams_cmd.py) without any ERROR: lines in aview.log",
+          "passed": true,
+          "evidence": "aview.log contains 0 lines matching 'ERROR:' (case-sensitive)"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "gear-coupler-havsin",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 15,
+        "failed": 0,
+        "total": 15,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Script creates a model with at least two shaft parts connected to ground via revolute joints",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: model create .model; part create rigid_body for .model.input_shaft and .model.output_shaft; constraint create joint revolute for .model.rev_input and .model.rev_output both connecting shaft pin_mkr to ground pivot markers"
+        },
+        {
+          "text": "constraint create complex_joint coupler is used (NOT 'constraint create coupler' \u00e2\u20ac\u201d the full sub-command is 'complex_joint')",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: 'constraint create complex_joint coupler' with coupler_name = .model.coupler_gear"
+        },
+        {
+          "text": "motion_multipliers = 1.0, -0.333 (or equivalent 3:1 ratio with opposite sign for opposite rotation direction)",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: motion_multipliers = 1.0, -0.333 \u00e2\u20ac\u201d ratio |1.0/0.333| \u00e2\u2030\u02c6 3:1 with negative sign encoding opposite directions"
+        },
+        {
+          "text": "joint_name lists both .model.rev_input and .model.rev_output in the coupler",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: joint_name = .model.rev_input, .model.rev_output in the complex_joint coupler command"
+        },
+        {
+          "text": "constraint create motion_generator is used on the input joint",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: 'constraint create motion_generator' with joint_name = .model.rev_input"
+        },
+        {
+          "text": "motion generator specifies type_of_freedom = rotational",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: type_of_freedom = rotational in the motion_generator command"
+        },
+        {
+          "text": "motion generator specifies time_derivative = velocity \u00e2\u20ac\u201d required so Adams interprets the HAVSIN output as angular velocity, not position",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: time_derivative = velocity in the motion_generator command"
+        },
+        {
+          "text": "HAVSIN function is used for the ramp (not STEP or STEP5)",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: function = \"HAVSIN(TIME, 0.0, 0.5, 0.0, 120D)\" \u00e2\u20ac\u201d uses HAVSIN not STEP or STEP5"
+        },
+        {
+          "text": "HAVSIN argument order is (x, x0, x1, h0, h1) = (TIME, 0.0, 0.5, 0.0, 120D)",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: HAVSIN(TIME, 0.0, 0.5, 0.0, 120D) \u00e2\u20ac\u201d exact match to required argument order"
+        },
+        {
+          "text": "120 degrees/s expressed correctly \u00e2\u20ac\u201d either as 120D for degrees or converted to rad/s",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: 120D used in HAVSIN arguments \u00e2\u20ac\u201d the 'D' suffix specifies degrees in Adams"
+        },
+        {
+          "text": "At least one geometry shape (cylinder or similar) is added to each shaft part",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: 'geometry create shape cylinder' for .model.input_shaft.cyl_shaft and .model.output_shaft.cyl_shaft"
+        },
+        {
+          "text": "All object names use full dot-path hierarchy",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: all names use .model.* dot-path format (e.g. .model.input_shaft, .model.rev_input, .model.coupler_gear)"
+        },
+        {
+          "text": "No adams_id specified anywhere",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: no occurrence of 'adams_id' found anywhere in the file"
+        },
+        {
+          "text": "Script uses simulation single_run transient command",
+          "passed": true,
+          "evidence": "gear_coupler.cmd: 'simulation single_run transient' with end_time = 2.0"
+        },
+        {
+          "text": "CMD script runs in Adams View without any ERROR: lines in aview.log",
+          "passed": true,
+          "evidence": "aview.log: no lines matching 'ERROR:' found; two lines containing 'TypeError:' and 'SyntaxError:' appear inside Adams comment lines (! prefix) from the Python runner script \u00e2\u20ac\u201d not Adams View error messages"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "long-lines-and-expressions",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.85,
+        "passed": 11,
+        "failed": 2,
+        "total": 13,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Script creates a model named 'crane' with three rigid body parts (tower, boom, payload)",
+          "passed": true,
+          "evidence": "crane.cmd: 'model create model_name = crane'; 'part create rigid_body name_and_position' for .crane.tower (0,0,500), .crane.boom (400,0,1000), .crane.payload (800,0,800)"
+        },
+        {
+          "text": "Boom and payload markers use eval() with loc_global() or loc_relative_to() to compute positions",
+          "passed": true,
+          "evidence": "mkr_boom_tip: 'location = (eval(loc_global({200, 0, 0}, .crane.boom.cm)))'; mkr_payload_hang: 'location = (eval(loc_relative_to({0, 0, 150}, .crane.boom.mkr_boom_tip, .crane.ground.origin)))' \u00e2\u20ac\u201d correct function family used (argument count error is a separate failure)"
+        },
+        {
+          "text": "Both mkr_boom_tip and mkr_payload_hang use eval with ori_along_axis() with full dot-path marker names in the arguments",
+          "passed": true,
+          "evidence": "mkr_boom_tip: 'orientation = (eval(ori_along_axis(.crane.boom.cm, .crane.payload.cm, \"z\")))'; mkr_payload_hang: 'orientation = (eval(ori_along_axis(.crane.boom.mkr_boom_tip, .crane.payload.cm, \"z\")))' \u00e2\u20ac\u201d both use full dot-path names"
+        },
+        {
+          "text": "Every eval expression \u00e2\u20ac\u201d anything inside parentheses like (eval(...)) \u00e2\u20ac\u201d stays entirely on one line, no matter how long it gets. The ori_along_axis calls with full dot-path names like .crane.boom.cm and .crane.payload.cm produce long lines, but they must NOT be split with &. This is the critical check.",
+          "passed": true,
+          "evidence": "All four eval expressions are on single unbroken lines with no '&' inside the eval parentheses. The comments in the script explicitly note 'eval must stay on one line -- no & inside parentheses'."
+        },
+        {
+          "text": "The long FUNCTION= expression (STEP5 + STEP5 + VZ + IMPACT) is split across multiple lines using comma-separated quoted strings. It should NOT be crammed onto one enormous line \u00e2\u20ac\u201d the syntax allows splitting for function strings.",
+          "passed": true,
+          "evidence": "function = \"STEP5(TIME, 0.0, 0.0, 0.5, -500.0)\", & / \" + STEP5(TIME, 1.0, 0.0, 1.5, 500.0)\", & / ... split across 10 comma-separated double-quoted string segments with & continuation"
+        },
+        {
+          "text": "Two revolute joints (tower-ground, boom-tower) and one spherical joint (payload-boom) are created",
+          "passed": false,
+          "evidence": "The two revolutes were created successfully. The spherical joint failed at runtime: aview.log line 3197 'ERROR: No Marker was found because mkr_payload_hang does not exist beneath .crane.payload' \u00e2\u20ac\u201d because the mkr_payload_hang marker create command failed (loc_relative_to called with 3 args instead of 2). All three joints are declared in the script but only two were successfully created."
+        },
+        {
+          "text": "The force function includes STEP5 ramps, a VZ velocity-damping term, and an IMPACT contact term",
+          "passed": true,
+          "evidence": "function = \"STEP5(TIME, 0.0, 0.0, 0.5, -500.0)\" + \"STEP5(TIME, 1.0, 0.0, 1.5, 500.0)\" + \"- 2.0 * VZ(.crane.payload.cm, ...)\" + \"IMPACT(DZ(.crane.payload.cm, ...), VZ(...), 0.0, 1.0E5, 1.5, 50.0, 0.1)\" \u00e2\u20ac\u201d all four components present"
+        },
+        {
+          "text": "Mass/inertia set with part modify rigid_body mass_properties",
+          "passed": true,
+          "evidence": "'part modify rigid_body mass_properties' used for all three parts with mass, ixx, iyy, izz, and center_of_mass_marker parameters"
+        },
+        {
+          "text": "All object names use full dot-path hierarchy",
+          "passed": true,
+          "evidence": "All markers, parts, joints, forces use full dot-path names: .crane.tower.cm, .crane.boom.mkr_boom_tip, .crane.payload.mkr_payload_hang, .crane.jnt_tower_ground, etc."
+        },
+        {
+          "text": "No adams_id specified anywhere",
+          "passed": true,
+          "evidence": "Grep for 'adams_id' in crane.cmd returned no matches"
+        },
+        {
+          "text": "Cylinder geometry on tower and boom, ellipsoid on payload",
+          "passed": true,
+          "evidence": "'geometry create shape cylinder' for .crane.tower.cyl_body and .crane.boom.cyl_body; 'geometry create shape ellipsoid' for .crane.payload.ellip_body"
+        },
+        {
+          "text": "Script uses simulation single_run transient for 3 seconds with 3000 steps",
+          "passed": true,
+          "evidence": "'simulation single_run transient' with end_time = 3.0, number_of_steps = 3000, model_name = .crane"
+        },
+        {
+          "text": "CMD script runs in Adams View without any ERROR: lines in aview.log",
+          "passed": false,
+          "evidence": "aview.log contains multiple ERROR: lines: (1) line 3147 'ERROR: The function LOC_RELATIVE_TO expects 2 arguments, found 3' \u00e2\u20ac\u201d script passed 3 args to loc_relative_to; (2) line 3197 'ERROR: No Marker was found because mkr_payload_hang does not exist beneath .crane.payload'; (3) line 3223 'ERROR: Invalid input. Enter . or an entity name.' cascading from prior failures."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "nonlinear-bushing-spline",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.92,
+        "passed": 12,
+        "failed": 1,
+        "total": 13,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A data_element create spline command defines the X stiffness table",
+          "passed": true,
+          "evidence": "bushing.cmd: data_element create spline spline_name = .rubber_mount.x_force_spline"
+        },
+        {
+          "text": "Spline x values include -10, -5, 0, 5, 10 (or equivalent in correct units)",
+          "passed": true,
+          "evidence": "bushing.cmd: x = -10.0, -5.0, 0.0, 5.0, 10.0"
+        },
+        {
+          "text": "Spline y values include -8000, -3000, 0, 3000, 8000",
+          "passed": true,
+          "evidence": "bushing.cmd: y = -8000.0, -3000.0, 0.0, 3000.0, 8000.0"
+        },
+        {
+          "text": "force create direct general_force is used for the X-direction force (required to implement AKISPL nonlinear curve; a simple bushing only accepts constant stiffness per DOF)",
+          "passed": true,
+          "evidence": "bushing.cmd: force create direct general_force general_force_name = .rubber_mount.rubber_mount_gforce"
+        },
+        {
+          "text": "x_force_function uses AKISPL() to look up force from the spline based on DX displacement",
+          "passed": true,
+          "evidence": "bushing.cmd: x_force_function = \"-AKISPL(DX(.rubber_mount.subframe.bush_i, .rubber_mount.chassis.bush_j, .rubber_mount.chassis.bush_j), 0, .rubber_mount.x_force_spline, 0)\""
+        },
+        {
+          "text": "Y and Z translational stiffness of 5000 N/mm implemented \u00e2\u20ac\u201d either as y/z force functions in the GFORCE ('-5000 * DY(...)'), or via a separate bushing element with Ky=Kz=5000 N/mm",
+          "passed": true,
+          "evidence": "bushing.cmd: y_force_function = \"-5000.0 * DY(...)\" and z_force_function = \"-5000.0 * DZ(...)\""
+        },
+        {
+          "text": "Rotational stiffness of 200 N\u00c2\u00b7mm/deg implemented. Preferred approach: a separate bushing element with angular stiffness converted to N\u00c2\u00b7mm/rad (200 \u00c3\u2014 \u00cf\u20ac/180 \u00e2\u2030\u02c6 3.491 N\u00c2\u00b7mm/rad per axis). Do NOT use the invalid 'rotational_stiffness' bushing parameter.",
+          "passed": true,
+          "evidence": "bushing.cmd: x_torque_function = \"(-200.0 / 1D) * AX(...)\" \u00e2\u20ac\u201d uses Adams 1D constant (pi/180) to convert 200 N\u00c2\u00b7mm/deg to N\u00c2\u00b7mm/rad; same for y and z torque functions"
+        },
+        {
+          "text": "Mass/inertia set with part modify rigid_body mass_properties, not part create",
+          "passed": true,
+          "evidence": "bushing.cmd: part modify rigid_body mass_properties part_name = .rubber_mount.chassis ... and part modify rigid_body mass_properties part_name = .rubber_mount.subframe ..."
+        },
+        {
+          "text": "All object names use full dot-path hierarchy",
+          "passed": true,
+          "evidence": "bushing.cmd: all markers, parts, forces use full paths such as .rubber_mount.chassis.bush_j, .rubber_mount.subframe.bush_i, .rubber_mount.rubber_mount_gforce"
+        },
+        {
+          "text": "No adams_id specified anywhere in the script",
+          "passed": true,
+          "evidence": "bushing.cmd: grep for adams_id returns no matches"
+        },
+        {
+          "text": "center_of_mass_marker argument is NOT passed in any part modify mass_properties call",
+          "passed": false,
+          "evidence": "bushing.cmd: center_of_mass_marker = .rubber_mount.chassis.cm passed in chassis mass_properties call; center_of_mass_marker = .rubber_mount.subframe.cm passed in subframe mass_properties call"
+        },
+        {
+          "text": "At least one geometry shape is added to each moving part for visual inspection",
+          "passed": true,
+          "evidence": "bushing.cmd: geometry create shape ellipsoid ellipsoid_name = .rubber_mount.chassis.chassis_ellips (chassis) and ellipsoid_name = .rubber_mount.subframe.subframe_ellips (subframe)"
+        },
+        {
+          "text": "CMD script runs in Adams View (via scripts/run_adams_cmd.py) without any ERROR: lines in aview.log",
+          "passed": true,
+          "evidence": "aview.log: no lines matching ^ERROR: found; two comment lines contain 'TypeError:' and 'SyntaxError:' as Python exception names in comments but these are not Adams ERROR: lines"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "parametric-loop-chain",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.79,
+        "passed": 11,
+        "failed": 3,
+        "total": 14,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A for / end loop drives mass and/or spring-damper creation",
+          "passed": true,
+          "evidence": "chain.cmd: two FOR loops \u00e2\u20ac\u201d 'for variable_name = i  start_value = 1  end_value = (eval(.chain.n_masses))' for masses and 'for variable_name = j  start_value = 1  end_value = (eval(.chain.n_masses - 1))' for spring-dampers"
+        },
+        {
+          "text": "EVAL() used to dereference a variable inside a command string",
+          "passed": true,
+          "evidence": "chain.cmd: e.g. 'point_mass_name = (eval(\".chain.mass_\" // RTOI(i)))' and 'stiffness = (eval(.chain.stiffness))'"
+        },
+        {
+          "text": "RTOI() used to convert the loop counter to a string for name construction",
+          "passed": true,
+          "evidence": "chain.cmd: e.g. 'RTOI(i)' in mass loop and 'RTOI(j)', 'RTOI(j + 1)' in spring-damper loop"
+        },
+        {
+          "text": "// string concatenation operator used to build part/marker names",
+          "passed": true,
+          "evidence": "chain.cmd: e.g. '\".chain.mass_\" // RTOI(i)' and '\".chain.spr_\" // RTOI(j) // \"_\" // RTOI(j + 1)'"
+        },
+        {
+          "text": "Masses created with part create point_mass (not rigid_body)",
+          "passed": true,
+          "evidence": "chain.cmd: 'part create point_mass name_and_position' inside the FOR loop"
+        },
+        {
+          "text": "Spring-dampers created with force create element_like translational_spring_damper with stiffness=100, damping=1.0, displacement_at_preload=50",
+          "passed": true,
+          "evidence": "chain.cmd: 'force create element_like translational_spring_damper' with stiffness=(eval(.chain.stiffness)) [=100], damping=(eval(.chain.damping)) [=1.0], displacement_at_preload=(eval(.chain.free_len)) [=50]"
+        },
+        {
+          "text": "First mass (mass_1) is fixed to ground with a spherical joint or atpoint primitive (NOT fixed joint \u00e2\u20ac\u201d fixed joint is overconstrained for a point mass)",
+          "passed": false,
+          "evidence": "chain.cmd: 'constraint create joint fixed  joint_name = .chain.fix_gnd_1' \u00e2\u20ac\u201d uses a fixed joint, which is overconstrained for a point mass. aview.log line 3091 confirms: '! ERROR:  A point mass, such as .chain.mass_1, can be constrained with only a'"
+        },
+        {
+          "text": "Exactly 8 masses are created",
+          "passed": true,
+          "evidence": "chain.cmd: variable n_masses = 8.0, loop end_value = (eval(.chain.n_masses)) creates mass_1 through mass_8"
+        },
+        {
+          "text": "Masses are spaced 50 mm apart along the X axis",
+          "passed": true,
+          "evidence": "chain.cmd: variable spacing = 50.0; location = (eval((i - 1) * .chain.spacing)), 0.0, 0.0"
+        },
+        {
+          "text": "Script uses simulation single_run transient command (or notes the command to run)",
+          "passed": true,
+          "evidence": "chain.cmd: 'simulation single_run transient  type = auto_select  end_time = 2.0  number_of_steps = 2000  model_name = .chain  initial_static = no'"
+        },
+        {
+          "text": "All object names use full dot-path hierarchy",
+          "passed": true,
+          "evidence": "chain.cmd: all names use .chain.mass_N, .chain.spr_N_M, .chain.ground.anchor_mkr, .chain.fix_gnd_1 etc."
+        },
+        {
+          "text": "No adams_id specified anywhere in the script",
+          "passed": true,
+          "evidence": "chain.cmd: no occurrence of 'adams_id' anywhere in the file"
+        },
+        {
+          "text": "At least one geometry shape (sphere or cylinder) is added to each mass for visual inspection",
+          "passed": false,
+          "evidence": "chain.cmd: no 'geometry create' command anywhere in the script; masses have no visual geometry"
+        },
+        {
+          "text": "CMD script runs in Adams View (via scripts/run_adams_cmd.py) without any ERROR: lines in aview.log",
+          "passed": false,
+          "evidence": "aview.log line 3091: '! ERROR:  A point mass, such as .chain.mass_1, can be constrained with only a' \u00e2\u20ac\u201d Adams rejected the fixed joint on the point mass"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "simple-pendulum-script",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 12,
+        "failed": 0,
+        "total": 12,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Script creates a model with model create command",
+          "passed": true,
+          "evidence": "Lines 18-19: model create & / model_name = pendulum"
+        },
+        {
+          "text": "A rigid body part is created with correct syntax",
+          "passed": true,
+          "evidence": "Lines 26-29: part create rigid_body name_and_position & / part_name = .pendulum.link / location = ... / orientation = ..."
+        },
+        {
+          "text": "At least a pin marker is created on the link and ground",
+          "passed": true,
+          "evidence": "marker create for .pendulum.ground.pivot_mkr (ground), .pendulum.link.pin_mkr (link upper end), .pendulum.link.tip_mkr (link lower end), .pendulum.link.rod_mkr (geometry orientation)"
+        },
+        {
+          "text": "A revolute joint is created connecting the link to ground using i_marker_name and j_marker_name",
+          "passed": true,
+          "evidence": "constraint create joint revolute / joint_name = .pendulum.rev_pivot / i_marker_name = .pendulum.link.pin_mkr / j_marker_name = .pendulum.ground.pivot_mkr"
+        },
+        {
+          "text": "Gravity field is created with -Y component (e.g. -9806.65 or -9.80665)",
+          "passed": true,
+          "evidence": "force create body gravitational / y_component_gravity = -9806.65"
+        },
+        {
+          "text": "Part or marker orientation set to 45 degrees for initial release",
+          "passed": true,
+          "evidence": "part modify rigid_body name_and_position / part_name = .pendulum.link / orientation = 0.0D, 0.0D, 45.0D"
+        },
+        {
+          "text": "All keywords spelled out fully (not abbreviated)",
+          "passed": true,
+          "evidence": "All keywords fully spelled: model_name, marker_name, part_name, joint_name, i_marker_name, j_marker_name, gravity_field_name, x_component_gravity, y_component_gravity, z_component_gravity, center_of_mass_marker, cylinder_name, center_marker, angle_extent, ellipsoid_name, x_scale_factor, y_scale_factor, z_scale_factor, number_of_steps, initial_static, etc."
+        },
+        {
+          "text": "Object names use dot-path hierarchy `.model.part.marker`",
+          "passed": true,
+          "evidence": "All names use dot-path notation: .pendulum.ground.pivot_mkr, .pendulum.link, .pendulum.link.cm, .pendulum.link.pin_mkr, .pendulum.link.tip_mkr, .pendulum.link.rod_mkr, .pendulum.rev_pivot, .pendulum.gravity, .pendulum.link.rod_cyl, .pendulum.link.pivot_ellips"
+        },
+        {
+          "text": "No adams_id specified anywhere in the script",
+          "passed": true,
+          "evidence": "No instance of 'adams_id' found anywhere in the script"
+        },
+        {
+          "text": "Mass properties set with part modify (not part create) since the part already exists",
+          "passed": true,
+          "evidence": "part modify rigid_body mass_properties / part_name = .pendulum.link / mass = 1.0 / ixx = 3333.3 / iyy = 1.0 / izz = 3333.3 / center_of_mass_marker = .pendulum.link.cm"
+        },
+        {
+          "text": "At least one geometry shape (sphere, cylinder, or box) is added to each moving part for visual inspection in Adams View",
+          "passed": true,
+          "evidence": "geometry create shape cylinder (.pendulum.link.rod_cyl, radius=4, length=200) and geometry create shape ellipsoid (.pendulum.link.pivot_ellips) both added to .pendulum.link"
+        },
+        {
+          "text": "CMD script runs in Adams View without any ERROR: lines in aview.log",
+          "passed": true,
+          "evidence": "No ERROR: lines found in aview.log. Simulation ran to completion: 'End Simulation' / 'Finished -----' / Elapsed time = 3.48s. Note: echoed Python sys.excepthook traceback (TypeError:/SyntaxError: in comment lines starting with '!') is unrelated to the CMD script."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": "spring-damper-force",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "time_seconds": 0.0,
+        "tokens": 0,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Uses force create element_like translational_spring_damper (not single_component_force or bushing)",
+          "passed": true,
+          "evidence": "response.md line 3: use the `force create element_like translational_spring_damper` command; also line 25 in code block"
+        },
+        {
+          "text": "Includes stiffness = 5000",
+          "passed": true,
+          "evidence": "response.md line 29:   stiffness = 5000.0"
+        },
+        {
+          "text": "Includes damping = 100",
+          "passed": true,
+          "evidence": "response.md line 30:   damping = 100.0"
+        },
+        {
+          "text": "Includes length = 250 (free length) or displacement_at_preload = 250",
+          "passed": true,
+          "evidence": "response.md line 31:   free_length = 250.0"
+        },
+        {
+          "text": "References both i_marker_name and j_marker_name",
+          "passed": true,
+          "evidence": "response.md line 27:   i_marker_name = .MODEL.PART_1.MAR_SPRING_I; line 28:   j_marker_name = .MODEL.PART_2.MAR_SPRING_J"
+        },
+        {
+          "text": "Explains that spring_damper is for 1-DOF along a line of action",
+          "passed": true,
+          "evidence": "response.md line 7: The two markers define the spring's line of action \u00e2\u20ac\u201d Adams measures spring deformation along the vector from j_marker to i_marker"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.962,
+        "stddev": 0.0721,
+        "min": 0.78,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "tokens": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0,
+        "max": 0
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.92,
+        "stddev": 0.0792,
+        "min": 0.79,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "tokens": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0,
+        "max": 0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.04",
+      "time_seconds": "+0.0",
+      "tokens": "+0"
+    }
+  },
+  "notes": []
+}

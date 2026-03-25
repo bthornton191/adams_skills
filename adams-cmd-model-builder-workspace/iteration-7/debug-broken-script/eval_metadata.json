@@ -1,0 +1,6 @@
+{
+  "eval_id": "debug-broken-script",
+  "eval_name": "debug-broken-script",
+  "prompt": "This Adams CMD script has several bugs. Find and fix all of them. Your output should be a complete, corrected script that runs without errors in Adams View.",
+  "assertions": []
+}

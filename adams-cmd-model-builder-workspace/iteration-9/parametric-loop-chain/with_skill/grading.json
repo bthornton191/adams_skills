@@ -1,0 +1,75 @@
+{
+  "summary": {"passed": 14, "failed": 0, "total": 14, "pass_rate": 1.0},
+  "expectations": [
+    {
+      "text": "for_loop_used: A for / end loop drives mass and/or spring-damper creation",
+      "passed": true,
+      "evidence": "Two for/end loops: one iterating i=1..8 to create point masses, one iterating j=1..7 to create spring-dampers."
+    },
+    {
+      "text": "eval_function_used: EVAL() used to dereference a variable inside a command string",
+      "passed": true,
+      "evidence": "EVAL() used extensively, e.g. (eval(\".chain_masses.mass_\" // RTOI(i))), (eval((i - 1) * .chain_masses.spacing)), (eval(.chain_masses.stiffness)), etc."
+    },
+    {
+      "text": "rtoi_function_used: RTOI() used to convert the loop counter to a string for name construction",
+      "passed": true,
+      "evidence": "RTOI(i) and RTOI(j) used throughout both loops for name construction, e.g. RTOI(i), RTOI(j), RTOI(j + 1)."
+    },
+    {
+      "text": "string_concat_operator_used: // string concatenation operator used to build part/marker names",
+      "passed": true,
+      "evidence": "// used in all name-building expressions, e.g. \".chain_masses.mass_\" // RTOI(i) // \".cm\", \"sd_\" // RTOI(j) // \"_\" // RTOI(j + 1)."
+    },
+    {
+      "text": "point_mass_type_used: Masses created with part create point_mass (not rigid_body)",
+      "passed": true,
+      "evidence": "Loop body uses 'part create point_mass name_and_position' for each mass."
+    },
+    {
+      "text": "spring_damper_created: Spring-dampers created with force create element_like translational_spring_damper with stiffness=100, damping=1.0, displacement_at_preload=50",
+      "passed": true,
+      "evidence": "force create element_like translational_spring_damper used with stiffness=(eval(.chain_masses.stiffness)) [=100.0], damping=(eval(.chain_masses.damping)) [=1.0], displacement_at_preload=(eval(.chain_masses.free_len)) [=50.0]."
+    },
+    {
+      "text": "first_mass_fixed_to_ground: First mass (mass_1) is constrained to ground with a SPHERICAL joint (NOT a fixed joint)",
+      "passed": true,
+      "evidence": "constraint create joint spherical with joint_name=.chain_masses.sph_fix, i_marker=.chain_masses.mass_1.cm, j_marker=.chain_masses.ground.anchor_mkr."
+    },
+    {
+      "text": "8_masses: Exactly 8 masses are created",
+      "passed": true,
+      "evidence": "Loop runs from start_value=1 to end_value=(eval(.chain_masses.n_mass)) where n_mass=8.0, creating exactly 8 point masses."
+    },
+    {
+      "text": "50mm_spacing: Masses are spaced 50 mm apart along the X axis",
+      "passed": true,
+      "evidence": "spacing=50.0; location=(eval((i - 1) * .chain_masses.spacing)), 0.0, 0.0 places mass_1 at x=0, mass_2 at x=50, ..., mass_8 at x=350."
+    },
+    {
+      "text": "simulate_transient: Script uses simulation single_run transient command",
+      "passed": true,
+      "evidence": "simulation single_run transient with type=auto_select, end_time=2.0, number_of_steps=2000."
+    },
+    {
+      "text": "dot_path_names: All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "All names use full dot-path: .chain_masses.ground.anchor_mkr, .chain_masses.mass_1.cm, .chain_masses.sph_fix, .chain_masses.sd_1_2, etc."
+    },
+    {
+      "text": "no_adams_id: No adams_id specified anywhere in the script",
+      "passed": true,
+      "evidence": "No occurrence of 'adams_id' found anywhere in chain.cmd."
+    },
+    {
+      "text": "geometry_present: At least one geometry shape added to each mass",
+      "passed": true,
+      "evidence": "Inside the mass-creation loop, an ellipsoid (geometry create shape ellipsoid) is created for every mass using its .cm marker as center_marker."
+    },
+    {
+      "text": "adams_view_no_errors: CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "run_adams_cmd.py exited 0. Simulation reached 'End Simulation' and 'batch run is finished' at t=2.0s. Two grep matches for 'Error:' are Python sys.excepthook traceback from Adams startup pythonrc.py (TypeError:/SyntaxError: in ! comment lines), not Adams ERROR: simulation errors."
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "summary": {
+    "passed": 13,
+    "failed": 0,
+    "total": 13,
+    "pass_rate": 1.0
+  },
+  "expectations": [
+    {
+      "text": "Script creates a model named 'crane' with three rigid body parts (tower, boom, payload)",
+      "passed": true,
+      "evidence": "crane.cmd: 'model create model_name = crane'; 'part create rigid_body name_and_position' for .crane.tower (0,0,500), .crane.boom (400,0,1000), .crane.payload (800,0,800)"
+    },
+    {
+      "text": "Boom and payload markers use eval() with loc_global() or loc_relative_to() to compute positions",
+      "passed": true,
+      "evidence": "mkr_boom_tip: 'location = (eval(loc_global({200, 0, 0}, .crane.boom.cm)))'; mkr_payload_hang: 'location = (eval(loc_relative_to({0, 0, 150}, .crane.boom.mkr_boom_tip)))'"
+    },
+    {
+      "text": "Both mkr_boom_tip and mkr_payload_hang use eval with ori_along_axis() with full dot-path marker names in the arguments",
+      "passed": true,
+      "evidence": "mkr_boom_tip: 'orientation = (eval(ori_along_axis(.crane.boom.cm, .crane.payload.cm, \"z\")))'; mkr_payload_hang: 'orientation = (eval(ori_along_axis(.crane.boom.mkr_boom_tip, .crane.payload.cm, \"z\")))' — both use full dot-path names"
+    },
+    {
+      "text": "Every eval expression — anything inside parentheses like (eval(...)) — stays entirely on one line, no matter how long it gets. The ori_along_axis calls with full dot-path names like .crane.boom.cm and .crane.payload.cm produce long lines, but they must NOT be split with &. This is the critical check.",
+      "passed": true,
+      "evidence": "All four eval lines are unbroken single lines. The '&' continuation characters appear only after the closing ')' of each eval expression as part of the multi-line marker create command — not inside the eval parentheses."
+    },
+    {
+      "text": "The long FUNCTION= expression (STEP5 + STEP5 + VZ + IMPACT) is split across multiple lines using comma-separated quoted strings. It should NOT be crammed onto one enormous line — the syntax allows splitting for function strings.",
+      "passed": true,
+      "evidence": "function = \"STEP5(TIME, 0.0, 0.0, 0.5, -500.0)\", & / \" + STEP5(TIME, 1.0, 0.0, 1.5, 500.0)\", & / ... split across 13 comma-separated double-quoted string segments with & continuation"
+    },
+    {
+      "text": "Two revolute joints (tower-ground, boom-tower) and one spherical joint (payload-boom) are created",
+      "passed": true,
+      "evidence": "constraint create joint revolute: .crane.jnt_tower_ground (tower.mkr_base <-> ground.origin); .crane.jnt_boom_tower (boom.mkr_tower_conn <-> tower.mkr_top); constraint create joint spherical: .crane.jnt_payload_boom (payload.mkr_sph_joint <-> boom.mkr_boom_tip)"
+    },
+    {
+      "text": "The force function includes STEP5 ramps, a VZ velocity-damping term, and an IMPACT contact term",
+      "passed": true,
+      "evidence": "function = \"STEP5(TIME, 0.0, 0.0, 0.5, -500.0)\" + \"STEP5(TIME, 1.0, 0.0, 1.5, 500.0)\" + \"- 2.0 * VZ(.crane.payload.cm, ...)\" + \"IMPACT(DZ(.crane.payload.cm, ...), VZ(...), 0.0, 1.0E5, 1.5, 50.0, 0.1)\" — all four components present"
+    },
+    {
+      "text": "Mass/inertia set with part modify rigid_body mass_properties",
+      "passed": true,
+      "evidence": "'part modify rigid_body mass_properties' used for all three parts with mass, ixx, iyy, izz, and center_of_mass_marker parameters"
+    },
+    {
+      "text": "All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "All markers, parts, joints, forces use full dot-path names: .crane.tower.cm, .crane.boom.mkr_boom_tip, .crane.payload.mkr_payload_hang, .crane.jnt_tower_ground, etc."
+    },
+    {
+      "text": "No adams_id specified anywhere",
+      "passed": true,
+      "evidence": "Grep for 'adams_id' in crane.cmd returned no matches"
+    },
+    {
+      "text": "Cylinder geometry on tower and boom, ellipsoid on payload",
+      "passed": true,
+      "evidence": "'geometry create shape cylinder' for .crane.tower.cyl_body (center_marker=tower.mkr_base, length=1000, radius=40) and .crane.boom.cyl_body (center_marker=boom.mkr_geom, length=600, radius=25); 'geometry create shape ellipsoid' for .crane.payload.ellip_body (center_marker=payload.cm)"
+    },
+    {
+      "text": "Script uses simulation single_run transient for 3 seconds with 3000 steps",
+      "passed": true,
+      "evidence": "'simulation single_run transient' with end_time = 3.0, number_of_steps = 3000, model_name = .crane"
+    },
+    {
+      "text": "CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "aview.log contains no 'ERROR:' lines. Simulation ran to completion (End Simulation at t=3.0s, 3005 steps). The 'TypeError:' and 'SyntaxError:' lines present are Python sys.excepthook cosmetic errors unrelated to Adams execution, and appear in comment lines starting with '!'."
+    }
+  ]
+}

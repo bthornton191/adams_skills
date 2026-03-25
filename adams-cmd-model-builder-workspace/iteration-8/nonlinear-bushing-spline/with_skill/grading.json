@@ -1,0 +1,70 @@
+{
+  "summary": {"passed": 13, "failed": 0, "total": 13, "pass_rate": 1.0},
+  "expectations": [
+    {
+      "text": "spline_data_element_created: A data_element create spline command defines the X stiffness table",
+      "passed": true,
+      "evidence": "data_element create spline with spline_name = .rubber_mount.x_force_spline is present"
+    },
+    {
+      "text": "correct_spline_x_points: Spline x values include -10, -5, 0, 5, 10",
+      "passed": true,
+      "evidence": "x = -10.0, -5.0, 0.0, 5.0, 10.0 matches exactly"
+    },
+    {
+      "text": "correct_spline_y_points: Spline y values include -8000, -3000, 0, 3000, 8000",
+      "passed": true,
+      "evidence": "y = -8000.0, -3000.0, 0.0, 3000.0, 8000.0 matches exactly"
+    },
+    {
+      "text": "general_force_used: force create direct general_force is used for the X-direction force",
+      "passed": true,
+      "evidence": "force create direct general_force with general_force_name = .rubber_mount.rubber_mount_gforce"
+    },
+    {
+      "text": "akispl_in_x_force_function: x_force_function uses AKISPL() to look up force from spline based on DX displacement",
+      "passed": true,
+      "evidence": "x_force_function = \"-AKISPL(DX(.rubber_mount.subframe.bush_i, .rubber_mount.chassis.bush_j, .rubber_mount.chassis.bush_j), 0, .rubber_mount.x_force_spline, 0)\""
+    },
+    {
+      "text": "yz_force_functions_linear: Y and Z translational stiffness of 5000 N/mm implemented",
+      "passed": true,
+      "evidence": "y_force_function = \"-5000.0 * DY(...)\" and z_force_function = \"-5000.0 * DZ(...)\" both present"
+    },
+    {
+      "text": "rotational_functions_200: Rotational stiffness of 200 N·mm/deg implemented",
+      "passed": true,
+      "evidence": "x/y/z_torque_function all use \"(-200.0 / 1D) * AX/AY/AZ(...)\" pattern"
+    },
+    {
+      "text": "mass_properties_uses_modify: Mass/inertia set with part modify rigid_body mass_properties, not part create",
+      "passed": true,
+      "evidence": "Both chassis and subframe use part modify rigid_body mass_properties"
+    },
+    {
+      "text": "dot_path_names: All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "All markers, parts, constraints use .rubber_mount.xxx.yyy full dot-path notation throughout"
+    },
+    {
+      "text": "no_adams_id: No adams_id specified anywhere in the script",
+      "passed": true,
+      "evidence": "No occurrence of adams_id found in bushing.cmd"
+    },
+    {
+      "text": "no_center_of_mass_marker: center_of_mass_marker argument is NOT passed in any part modify mass_properties call",
+      "passed": true,
+      "evidence": "center_of_mass_marker appears only in comments (lines prefixed with !), never as an argument"
+    },
+    {
+      "text": "geometry_present: At least one geometry shape is added to each moving part",
+      "passed": true,
+      "evidence": "chassis has chassis_geo ellipsoid; subframe has subframe_geo ellipsoid"
+    },
+    {
+      "text": "adams_view_no_errors: CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "No ERROR: lines found in aview.log; log ends with 'batch run is finished'"
+    }
+  ]
+}

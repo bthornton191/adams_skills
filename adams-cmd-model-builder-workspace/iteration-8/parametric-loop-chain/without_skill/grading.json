@@ -1,0 +1,75 @@
+{
+  "summary": {"passed": 11, "failed": 3, "total": 14, "pass_rate": 0.786},
+  "expectations": [
+    {
+      "text": "for_loop_used: A for / end loop drives mass and/or spring-damper creation",
+      "passed": true,
+      "evidence": "Two 'for ... end' loops present: one creates 8 point masses (i=1..8), one creates 7 spring-dampers (j=1..7)"
+    },
+    {
+      "text": "eval_function_used: EVAL() used to dereference a variable inside a command string",
+      "passed": true,
+      "evidence": "EVAL() used extensively, e.g. 'location = (eval((i - 1) * .chain.spacing))' and in name construction"
+    },
+    {
+      "text": "rtoi_function_used: RTOI() used to convert the loop counter to a string for name construction",
+      "passed": true,
+      "evidence": "RTOI(i) and RTOI(j) used in name expressions, e.g. '\".chain.mass_\" // RTOI(i)'"
+    },
+    {
+      "text": "string_concat_operator_used: // string concatenation operator used to build part/marker names",
+      "passed": true,
+      "evidence": "// used throughout, e.g. '\".chain.mass_\" // RTOI(i) // \".cm\"'"
+    },
+    {
+      "text": "point_mass_type_used: Masses created with part create point_mass (not rigid_body)",
+      "passed": true,
+      "evidence": "'part create point_mass name_and_position' used in the mass creation loop"
+    },
+    {
+      "text": "spring_damper_created: Spring-dampers created with force create element_like translational_spring_damper with stiffness=100, damping=1.0, displacement_at_preload=50",
+      "passed": true,
+      "evidence": "'force create element_like translational_spring_damper' used; stiffness variable=100, damping=1.0, free_len=50.0 used as displacement_at_preload"
+    },
+    {
+      "text": "first_mass_fixed_to_ground: First mass (mass_1) is constrained to ground with a spherical joint (NOT a fixed joint)",
+      "passed": false,
+      "evidence": "'constraint create joint fixed' used for mass_1. Adams log confirms error: 'A point mass, such as .chain.mass_1, can be constrained with only a [spherical joint]'"
+    },
+    {
+      "text": "8_masses: Exactly 8 masses are created",
+      "passed": true,
+      "evidence": "Loop runs end_value = (eval(.chain.n_masses)) where n_masses = 8.0, creating mass_1 through mass_8"
+    },
+    {
+      "text": "50mm_spacing: Masses are spaced 50 mm apart along the X axis",
+      "passed": true,
+      "evidence": "location = (eval((i-1) * .chain.spacing)) where spacing variable = 50.0"
+    },
+    {
+      "text": "simulate_transient: Script uses simulation single_run transient command",
+      "passed": true,
+      "evidence": "'simulation single_run transient' present with end_time=2.0 and number_of_steps=2000"
+    },
+    {
+      "text": "dot_path_names: All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "All names use full paths, e.g. '.chain.mass_1', '.chain.ground.anchor_mkr', '.chain.spr_1_2'"
+    },
+    {
+      "text": "no_adams_id: No adams_id specified anywhere in the script",
+      "passed": true,
+      "evidence": "No 'adams_id' keyword found anywhere in chain.cmd"
+    },
+    {
+      "text": "geometry_present: At least one geometry shape (sphere or cylinder) added to each mass",
+      "passed": false,
+      "evidence": "No 'geometry create' commands found in the script; masses have no visual geometry"
+    },
+    {
+      "text": "adams_view_no_errors: CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": false,
+      "evidence": "aview.log line 3091: 'ERROR: A point mass, such as .chain.mass_1, can be constrained with only a [spherical joint]' — fixed joint on point mass is invalid"
+    }
+  ]
+}

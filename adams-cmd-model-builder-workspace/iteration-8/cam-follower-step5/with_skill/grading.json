@@ -1,0 +1,70 @@
+{
+  "summary": {"passed": 13, "failed": 0, "total": 13, "pass_rate": 1.0},
+  "expectations": [
+    {
+      "text": "model_and_parts_created: Script creates a model with at least two parts: a cam (fixed to ground) and a follower",
+      "passed": true,
+      "evidence": "part create rigid_body for .model.cam and .model.follower both present; cam fixed to ground via fixed joint"
+    },
+    {
+      "text": "translational_joint: A translational joint constrains the follower to translate along X",
+      "passed": true,
+      "evidence": "constraint create joint translational for .model.follower_trans using markers oriented with z→global +X (orientation = 90D, 90D, 0D)"
+    },
+    {
+      "text": "uses_step5_not_step: STEP5 is used for the cam force (not plain STEP)",
+      "passed": true,
+      "evidence": "force function uses STEP5(DX(...),0.0,0.0,20.0,500.0) — no plain STEP(...) anywhere"
+    },
+    {
+      "text": "correct_dx_range_0_to_20: STEP5 x-range spans 0 to 20 (follower displacement 0 to 20 mm)",
+      "passed": true,
+      "evidence": "STEP5(DX(.model.follower.tip_mkr,.model.cam.ref_mkr),0.0,0.0,20.0,500.0) — x0=0.0, x1=20.0"
+    },
+    {
+      "text": "correct_force_range_0_to_500: STEP5 output range spans 0 to 500 (force 0 to 500 N)",
+      "passed": true,
+      "evidence": "STEP5(...,0.0,0.0,20.0,500.0) — h0=0.0, h1=500.0"
+    },
+    {
+      "text": "hold_beyond_20mm: Force holds at 500 N for DX > 20 mm (STEP5 naturally saturates at h1)",
+      "passed": true,
+      "evidence": "STEP5 saturates at h1=500.0 for DX > 20.0 mm by definition; no clamp needed"
+    },
+    {
+      "text": "velocity_damping_2_vx: Damping term 2.0 * VX(...) added to force expression",
+      "passed": true,
+      "evidence": "Second part of function expression: \" - 2.0*VX(.model.follower.tip_mkr,.model.cam.ref_mkr)\""
+    },
+    {
+      "text": "quoted_expression: Full FUNCTION= expression wrapped in double quotes",
+      "passed": true,
+      "evidence": "Both parts of the expression are in double quotes using Adams line continuation: \"STEP5(...)\" , & \" - 2.0*VX(...)\"; Adams ran it successfully"
+    },
+    {
+      "text": "geometry_present: At least one geometry shape added to each part (cam and follower)",
+      "passed": true,
+      "evidence": "geometry create shape cylinder for .model.cam.cam_cyl (r=40, l=30) and .model.follower.follower_cyl (r=10, l=60)"
+    },
+    {
+      "text": "dot_path_names: All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "All markers, parts, joints and forces use fully qualified names e.g. .model.cam.ref_mkr, .model.follower_trans"
+    },
+    {
+      "text": "no_adams_id: No adams_id specified anywhere",
+      "passed": true,
+      "evidence": "Grep for 'adams_id' in cam_follower.cmd returned no matches"
+    },
+    {
+      "text": "simulate_transient: Script uses simulation single_run transient command",
+      "passed": true,
+      "evidence": "simulation single_run transient with end_time=1.0, number_of_steps=1000, model_name=.model"
+    },
+    {
+      "text": "adams_view_no_errors: CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "run_adams_cmd.py exited with code 0; the two grep hits for 'ERROR:' in aview.log are inside '!' comment lines (TypeError and SyntaxError from Python traceback text), not Adams ERROR: lines"
+    }
+  ]
+}

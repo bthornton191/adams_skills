@@ -1,0 +1,70 @@
+{
+  "summary": {
+    "passed": 12,
+    "failed": 0,
+    "total": 12,
+    "pass_rate": 1.0
+  },
+  "expectations": [
+    {
+      "text": "Script creates a model with model create command",
+      "passed": true,
+      "evidence": "Line 18: model create model_name = pendulum"
+    },
+    {
+      "text": "A rigid body part is created with correct syntax",
+      "passed": true,
+      "evidence": "Line 41: part create rigid_body name_and_position & / part_name = .pendulum.link"
+    },
+    {
+      "text": "At least a pin marker is created on the link and ground",
+      "passed": true,
+      "evidence": "marker create for .pendulum.ground.pivot_mkr (ground), .pendulum.link.pin_mkr (link upper end), and .pendulum.link.tip_mkr (link lower end)"
+    },
+    {
+      "text": "A revolute joint is created connecting the link to ground using i_marker_name and j_marker_name",
+      "passed": true,
+      "evidence": "constraint create joint revolute / joint_name = .pendulum.rev_pivot / i_marker_name = .pendulum.link.pin_mkr / j_marker_name = .pendulum.ground.pivot_mkr"
+    },
+    {
+      "text": "Gravity field is created with -Y component (e.g. -9806.65 or -9.80665)",
+      "passed": true,
+      "evidence": "force create body gravitational / y_component_gravity = -9806.65"
+    },
+    {
+      "text": "Part or marker orientation set to 45 degrees for initial release",
+      "passed": true,
+      "evidence": "part modify rigid_body name_and_position / part_name = .pendulum.link / orientation = 0.0D, 0.0D, 45.0D"
+    },
+    {
+      "text": "All keywords spelled out fully (not abbreviated)",
+      "passed": true,
+      "evidence": "All keywords fully spelled: model_name, gravity_field_name, x_component_gravity, y_component_gravity, z_component_gravity, marker_name, part_name, joint_name, i_marker_name, j_marker_name, link_name, ellipsoid_name, center_marker, x_scale_factor, number_of_steps, initial_static, etc."
+    },
+    {
+      "text": "Object names use dot-path hierarchy `.model.part.marker`",
+      "passed": true,
+      "evidence": "All names use dot-path notation: .pendulum.ground.pivot_mkr, .pendulum.link, .pendulum.link.cm, .pendulum.link.pin_mkr, .pendulum.link.tip_mkr, .pendulum.rev_pivot, .pendulum.gravity, .pendulum.link.shape_rod, .pendulum.link.ellips_tip"
+    },
+    {
+      "text": "No adams_id specified anywhere in the script",
+      "passed": true,
+      "evidence": "No instance of 'adams_id' found anywhere in the script"
+    },
+    {
+      "text": "Mass properties set with part modify (not part create) since the part already exists",
+      "passed": true,
+      "evidence": "part modify rigid_body mass_properties / part_name = .pendulum.link / mass = 1.0 / ..."
+    },
+    {
+      "text": "At least one geometry shape (sphere, cylinder, or box) is added to each moving part for visual inspection in Adams View",
+      "passed": true,
+      "evidence": "geometry create shape link (.pendulum.link.shape_rod) and geometry create shape ellipsoid (.pendulum.link.ellips_tip) both added to .pendulum.link"
+    },
+    {
+      "text": "CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "No ERROR: lines found in aview.log. Simulation ran to completion: 'End Simulation' / 'Finished -----' / Elapsed time = 4.16s. Note: echoed Python sys.excepthook traceback (TypeError:/SyntaxError: in comment lines starting with '!') is unrelated to the CMD script."
+    }
+  ]
+}

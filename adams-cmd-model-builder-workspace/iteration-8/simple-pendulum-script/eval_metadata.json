@@ -1,0 +1,6 @@
+{
+  "eval_id": "simple-pendulum-script",
+  "eval_name": "simple-pendulum-script",
+  "prompt": "Write an Adams CMD script to create a simple pendulum. It should have a single rigid link of length 200 mm and mass 1 kg, pinned to the ground at its top end by a revolute joint, with gravity acting in the -Y direction. Release it from 45 degrees.",
+  "assertions": []
+}

@@ -1,0 +1,70 @@
+{
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 12,
+    "failed": 0,
+    "total": 12
+  },
+  "expectations": [
+    {
+      "text": "Script creates a model named 'crane' with three rigid body parts (tower, boom, payload)",
+      "passed": true,
+      "evidence": "model create model_name = crane, followed by part create rigid_body name_and_position for .crane.tower, .crane.boom, and .crane.payload"
+    },
+    {
+      "text": "Boom markers use eval() with loc_global() to compute positions relative to the boom's CM",
+      "passed": true,
+      "evidence": "mkr_boom_base: location = (eval(loc_global({-200, 0, 0}, .crane.boom.cm))) and mkr_boom_tip: location = (eval(loc_global({200, 0, 0}, .crane.boom.cm)))"
+    },
+    {
+      "text": "mkr_boom_tip uses ori_along_axis() for orientation toward the payload",
+      "passed": true,
+      "evidence": "orientation = (eval(ori_along_axis(.crane.boom.cm, .crane.payload.cm, 'z')))"
+    },
+    {
+      "text": "Every eval expression (eval(...)) stays entirely on one line - no & inside parentheses",
+      "passed": true,
+      "evidence": "All three eval expressions (two loc_global, one ori_along_axis) are each on a single line with no & continuation inside the parentheses. A comment in the script even cites Rule 16."
+    },
+    {
+      "text": "The long FUNCTION= expression is split across multiple lines (comma-separated quoted strings), not on one enormous line",
+      "passed": true,
+      "evidence": "function = 'STEP5(TIME, 0.0, 0.0, 0.5, -500.0)', & ' + STEP5(TIME, 1.0, 0.0, 1.5, 500.0)', & ' - 2.0 * VZ(...)' - correctly split as comma-separated quoted strings"
+    },
+    {
+      "text": "Two revolute joints (tower-ground, boom-tower) and one spherical joint (payload-boom)",
+      "passed": true,
+      "evidence": "constraint create joint revolute for jnt_tower_ground and jnt_boom_tower; constraint create joint spherical for jnt_payload_boom"
+    },
+    {
+      "text": "Force function includes STEP5 ramps and a VZ velocity-damping term",
+      "passed": true,
+      "evidence": "STEP5(TIME, 0.0, 0.0, 0.5, -500.0) + STEP5(TIME, 1.0, 0.0, 1.5, 500.0) - 2.0 * VZ(...)"
+    },
+    {
+      "text": "Mass/inertia set with part modify rigid_body mass_properties",
+      "passed": true,
+      "evidence": "All three parts use part modify rigid_body mass_properties with center_of_mass_marker referencing pre-created .cm markers"
+    },
+    {
+      "text": "All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "All names use full .crane.* paths throughout the script"
+    },
+    {
+      "text": "No adams_id specified anywhere",
+      "passed": true,
+      "evidence": "No adams_id keyword appears anywhere in the script"
+    },
+    {
+      "text": "Cylinder geometry on tower and boom, ellipsoid on payload",
+      "passed": true,
+      "evidence": "geometry create shape cylinder for .crane.tower.cyl_body and .crane.boom.cyl_body; geometry create shape ellipsoid for .crane.payload.ellip_body"
+    },
+    {
+      "text": "Uses simulation single_run transient for 3 seconds with 3000 steps",
+      "passed": true,
+      "evidence": "simulation single_run transient & type = auto_select & end_time = 3.0 & number_of_steps = 3000 & model_name = .crane & initial_static = no"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "summary": {"passed": 5, "failed": 1, "total": 6, "pass_rate": 0.8333333333333334},
+  "expectations": [
+    {
+      "text": "uses_impact: Uses the IMPACT() function (not BISTOP or a manual IF expression)",
+      "passed": true,
+      "evidence": "Response explicitly uses IMPACT(DZ(PART_CM,0,0), VZ(PART_CM,0,0), 0.0, 1E5, 1.5, 50.0, 0.1)"
+    },
+    {
+      "text": "correct_displacement_arg: First arg uses DZ or similar displacement measuring penetration below floor",
+      "passed": true,
+      "evidence": "First argument is DZ(PART_CM,0,0), measuring Z displacement of the part CM relative to the global frame"
+    },
+    {
+      "text": "correct_velocity_arg: Second arg uses VZ or matching velocity measure",
+      "passed": true,
+      "evidence": "Second argument is VZ(PART_CM,0,0), the Z velocity matching the displacement measure"
+    },
+    {
+      "text": "threshold_at_zero: Threshold value is 0.0 (or equivalent contact point)",
+      "passed": true,
+      "evidence": "x1 argument is 0.0, described as 'floor at Z = 0'"
+    },
+    {
+      "text": "correct_params: Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present",
+      "passed": true,
+      "evidence": "All four parameters present: k=1E5, e=1.5, cmax=50.0, d=0.1"
+    },
+    {
+      "text": "quoted_expression: Expression wrapped in double quotes as required for FUNCTION= parameter",
+      "passed": false,
+      "evidence": "FUNCTION = IMPACT(...) is written without surrounding double quotes in the SFORCE definition"
+    }
+  ]
+}

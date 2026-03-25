@@ -1,0 +1,6 @@
+{
+  "eval_id": "spring-damper-force",
+  "eval_name": "spring-damper-force",
+  "prompt": "How do I create a spring-damper force between two parts in Adams CMD? The spring should have stiffness 5000 N/mm and damping 100 N\u00b7s/mm, with a free length of 250 mm.",
+  "assertions": []
+}

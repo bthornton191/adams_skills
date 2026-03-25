@@ -103,7 +103,7 @@
         "dot_path_names": "All object names use full dot-path hierarchy (.model.part.marker)",
         "no_adams_id": "No adams_id specified anywhere in the script",
         "mass_properties_uses_modify": "Mass/inertia set with part modify rigid_body mass_properties, not part create",
-        "no_center_of_mass_marker": "center_of_mass_marker argument is NOT passed in any part modify mass_properties call",
+        "creates_cm_and_passes_center_of_mass_marker": "A .cm marker is explicitly created on each part BEFORE part modify mass_properties is called, and center_of_mass_marker is passed in every part modify rigid_body mass_properties call",
         "geometry_present": "At least one geometry shape (sphere, cylinder, or box) is added to each moving part (crank, coupler, rocker) for visual inspection",
         "adams_view_no_errors": "CMD script runs in Adams View (via scripts/run_adams_cmd.py) without any ERROR: lines in aview.log"
       },
@@ -132,7 +132,7 @@
         "mass_properties_uses_modify": "Mass/inertia set with part modify rigid_body mass_properties, not part create",
         "dot_path_names": "All object names use full dot-path hierarchy",
         "no_adams_id": "No adams_id specified anywhere in the script",
-        "no_center_of_mass_marker": "center_of_mass_marker argument is NOT passed in any part modify mass_properties call",
+        "creates_cm_and_passes_center_of_mass_marker": "A .cm marker is explicitly created on each rigid part BEFORE part modify mass_properties is called, and center_of_mass_marker is passed in every part modify rigid_body mass_properties call",
         "geometry_present": "At least one geometry shape is added to each moving part for visual inspection",
         "adams_view_no_errors": "CMD script runs in Adams View (via scripts/run_adams_cmd.py) without any ERROR: lines in aview.log"
       },
@@ -164,7 +164,7 @@
         "correct_force_range_0_to_500": "STEP5 output range spans 0 to 500 (force from 0 to 500 N)",
         "hold_beyond_20mm": "Force holds at 500 N for DX > 20 mm (STEP5 naturally saturates at h1)",
         "velocity_damping_2_vx": "Damping term + 2.0 * VX(...) added to the force expression",
-        "quoted_expression": "Full FUNCTION= expression wrapped in double quotes",
+        "quoted_expression": "The FUNCTION= value is expressed as one or more double-quoted strings (comma-separated quoted strings are valid Adams CMD syntax for splitting long expressions and should be marked TRUE)",
         "geometry_present": "At least one geometry shape is added to each part (cam and follower) for visual inspection",
         "dot_path_names": "All object names use full dot-path hierarchy",
         "no_adams_id": "No adams_id specified anywhere",
@@ -261,11 +261,47 @@
         "fixes_part_create_abbreviation": "Identifies 'part cre rig nam' as abbreviated and expands to 'part create rigid_body name_and_position' (best-practice fix)",
         "changes_mass_properties_create_to_modify": "Changes 'part create rigid_body mass_properties' to 'part modify rigid_body mass_properties' — the part already exists from the name_and_position call, so 'create' is a real error here",
         "removes_adams_id": "Removes 'adams_id = 3' — while technically valid in Adams, manually assigning IDs is unnecessary and error-prone",
-        "removes_center_of_mass_marker": "Removes 'center_of_mass_marker = .pendulum.link.cm' from the mass_properties call — the .cm marker does not yet exist at this point and Adams will error on it",
+        "keeps_center_of_mass_marker_cm_created_first": "The .pendulum.link.cm marker is explicitly created BEFORE the part modify mass_properties call, and center_of_mass_marker = .pendulum.link.cm is kept in that call. The bug in the original script is that .cm was referenced before it existed \u2014 the fix is to create it first, not remove it.",
         "fixes_missing_dot_paths": "Corrects 'pendulum.link.pin_mkr' to '.pendulum.link.pin_mkr' (missing leading dot, appears in both marker create and i_marker_name)",
         "fixes_spring_damper_keyword": "Changes 'force create element_like spring_damper' to 'force create element_like translational_spring_damper' and 'length = 200.0' to 'displacement_at_preload = 200.0'",
         "fixes_simulation_command": "Corrects 'sim trans end_time = 2.0 step_size = 0.001' to 'simulation single_run transient & type = auto_select & end_time = 2.0 & number_of_steps = 2000 & model_name = .pendulum & initial_static = no'",
         "adams_view_no_errors": "The corrected CMD script runs in Adams View without any ERROR: lines in aview.log"
+      },
+      "adams_view_validation": true
+    },
+    {
+      "id": "long-lines-and-expressions",
+      "prompt": "Write an Adams CMD script for a model called 'crane'. It has three rigid parts:\n\n1. A tower (5 kg, Ixx=Iyy=10000 kg·mm², Izz=500 kg·mm²) at 0, 0, 500 mm\n2. A boom (3 kg, Ixx=Iyy=8000 kg·mm², Izz=300 kg·mm²) at 400, 0, 1000 mm\n3. A payload (10 kg, Ixx=Iyy=Izz=100 kg·mm²) at 800, 0, 800 mm\n\nOn the boom, create a marker called mkr_boom_tip using eval with loc_global at local offset {200, 0, 0} from the boom's CM. Orient it using eval with ori_along_axis so its z-axis points from the boom's CM marker (.crane.boom.cm) toward the payload's CM marker (.crane.payload.cm) — use the full dot-path names in the ori_along_axis call.\n\nOn the payload, create a marker called mkr_payload_hang. Place it using eval with loc_relative_to that computes a position offset {0, 0, 150} relative to the boom's tip marker (.crane.boom.mkr_boom_tip) expressed in the ground frame (.crane.ground.origin). Orient it using eval with ori_along_axis so its z-axis points from .crane.boom.mkr_boom_tip toward .crane.payload.cm — again use full dot-path names.\n\nConnect tower to ground with a revolute joint at the tower base, boom to tower top with a revolute joint, and payload to boom tip with a spherical joint.\n\nApply a single-component force on the payload with this FUNCTION= expression: STEP5(TIME, 0.0, 0.0, 0.5, -500.0) + STEP5(TIME, 1.0, 0.0, 1.5, 500.0) - 2.0 * VZ(.crane.payload.cm, .crane.ground.origin, .crane.ground.origin, .crane.ground.origin) + IMPACT(DZ(.crane.payload.cm, .crane.ground.origin, .crane.ground.origin), VZ(.crane.payload.cm, .crane.ground.origin, .crane.ground.origin, .crane.ground.origin), 0.0, 1.0E5, 1.5, 50.0, 0.1)\n\nAdd cylinder geometry to the tower and boom, and an ellipsoid to the payload. Simulate for 3 seconds with 3000 steps.\n\nTry to keep lines under 80 characters where the CMD syntax allows it.",
+      "expected_outputs": [
+        "model create",
+        "part create rigid_body name_and_position",
+        "marker create",
+        "eval",
+        "loc_global",
+        "ori_along_axis",
+        "constraint create joint revolute",
+        "constraint create joint spherical",
+        "force create direct single_component_force",
+        "STEP5",
+        "VZ",
+        "IMPACT",
+        "geometry create shape",
+        "simulation single_run transient"
+      ],
+      "rubric": {
+        "model_and_parts_created": "Script creates a model named 'crane' with three rigid body parts (tower, boom, payload)",
+        "markers_use_eval_loc": "Boom and payload markers use eval() with loc_global() or loc_relative_to() to compute positions",
+        "markers_use_ori_along_axis": "Both mkr_boom_tip and mkr_payload_hang use eval with ori_along_axis() with full dot-path marker names in the arguments",
+        "eval_expressions_single_line": "Every eval expression — anything inside parentheses like (eval(...)) — stays entirely on one line, no matter how long it gets. The ori_along_axis calls with full dot-path names like .crane.boom.cm and .crane.payload.cm produce long lines, but they must NOT be split with &. This is the critical check.",
+        "function_string_wrapped": "The long FUNCTION= expression (STEP5 + STEP5 + VZ + IMPACT) is split across multiple lines using comma-separated quoted strings. It should NOT be crammed onto one enormous line — the syntax allows splitting for function strings.",
+        "joints_correct": "Two revolute joints (tower-ground, boom-tower) and one spherical joint (payload-boom) are created",
+        "force_expression_correct": "The force function includes STEP5 ramps, a VZ velocity-damping term, and an IMPACT contact term",
+        "mass_properties_uses_modify": "Mass/inertia set with part modify rigid_body mass_properties",
+        "dot_path_names": "All object names use full dot-path hierarchy",
+        "no_adams_id": "No adams_id specified anywhere",
+        "geometry_present": "Cylinder geometry on tower and boom, ellipsoid on payload",
+        "simulate_transient": "Script uses simulation single_run transient for 3 seconds with 3000 steps",
+        "adams_view_no_errors": "CMD script runs in Adams View without any ERROR: lines in aview.log"
       },
       "adams_view_validation": true
     }

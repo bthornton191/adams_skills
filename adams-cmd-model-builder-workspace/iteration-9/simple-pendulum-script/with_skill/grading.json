@@ -1,0 +1,70 @@
+{
+  "summary": {"passed": 13, "failed": 0, "total": 13, "pass_rate": 1.0},
+  "expectations": [
+    {
+      "text": "model_created: Script creates a model with model create command",
+      "passed": true,
+      "evidence": "'model create model_name = pendulum' present on line 10"
+    },
+    {
+      "text": "part_created: A rigid body part is created with correct syntax (part create rigid_body name_and_position)",
+      "passed": true,
+      "evidence": "'part create rigid_body name_and_position' with part_name = .pendulum.link present"
+    },
+    {
+      "text": "markers_created: At least a pin marker is created on the link and ground",
+      "passed": true,
+      "evidence": ".pendulum.link.pin_mkr created on link and .pendulum.ground.pivot_mkr created on ground"
+    },
+    {
+      "text": "revolute_joint: A revolute joint is created connecting the link to ground using i_marker_name and j_marker_name",
+      "passed": true,
+      "evidence": "'constraint create joint revolute' with i_marker_name = .pendulum.link.pin_mkr and j_marker_name = .pendulum.ground.pivot_mkr"
+    },
+    {
+      "text": "gravity: Gravity field is created with -Y component (e.g. -9806.65 or -9.80665)",
+      "passed": true,
+      "evidence": "'y_component_gravity = -9806.65' in force create body gravitational block"
+    },
+    {
+      "text": "initial_angle: Part or marker orientation set to 45 degrees for initial release",
+      "passed": true,
+      "evidence": "'part modify rigid_body name_and_position' sets orientation = 0.0D, 0.0D, 45.0D"
+    },
+    {
+      "text": "full_keyword_names: All keywords spelled out fully (not abbreviated)",
+      "passed": true,
+      "evidence": "All keywords fully spelled: marker_name, gravity_field_name, x_component_gravity, i_marker_name, j_marker_name, center_of_mass_marker, number_of_steps, etc."
+    },
+    {
+      "text": "dot_path_names: Object names use dot-path hierarchy .model.part.marker",
+      "passed": true,
+      "evidence": "All names use dot-path: .pendulum.link, .pendulum.link.pin_mkr, .pendulum.ground.pivot_mkr, .pendulum.rev_pivot, etc."
+    },
+    {
+      "text": "no_adams_id: No adams_id specified anywhere in the script",
+      "passed": true,
+      "evidence": "No occurrence of 'adams_id' found in the script"
+    },
+    {
+      "text": "mass_properties_uses_modify: Mass properties set with part modify (not part create) since the part already exists",
+      "passed": true,
+      "evidence": "'part modify rigid_body mass_properties' used after the part is created with 'part create'"
+    },
+    {
+      "text": "creates_cm_and_passes_center_of_mass_marker: A .cm marker is explicitly created on each part BEFORE part modify mass_properties is called, and center_of_mass_marker is passed in every part modify rigid_body mass_properties call",
+      "passed": true,
+      "evidence": ".pendulum.link.cm marker created at location 0, -100, 0 before the mass_properties modify; center_of_mass_marker = .pendulum.link.cm passed in modify call"
+    },
+    {
+      "text": "geometry_present: At least one geometry shape (sphere, cylinder, or box) is added to each moving part",
+      "passed": true,
+      "evidence": "'geometry create shape link' (rod bar) and 'geometry create shape ellipsoid' (bob) both created on .pendulum.link"
+    },
+    {
+      "text": "adams_view_no_errors: CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "run_adams_cmd.py exited with code 0; no lines starting with 'ERROR:' found in aview.log (2 comment lines starting with '!' containing Python traceback text are not Adams errors)"
+    }
+  ]
+}

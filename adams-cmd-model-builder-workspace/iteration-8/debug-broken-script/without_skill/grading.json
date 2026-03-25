@@ -1,0 +1,50 @@
+{
+  "summary": {"passed": 7, "failed": 2, "total": 9, "pass_rate": 0.778},
+  "expectations": [
+    {
+      "text": "fixes_model_create_abbreviation: 'model cre' expanded to 'model create'",
+      "passed": true,
+      "evidence": "File begins with 'model create model_name = pendulum'"
+    },
+    {
+      "text": "fixes_part_create_abbreviation: 'part cre rig nam' expanded to 'part create rigid_body name_and_position'",
+      "passed": true,
+      "evidence": "File contains 'part create rigid_body name_and_position' for the link part"
+    },
+    {
+      "text": "changes_mass_properties_create_to_modify: 'part create rigid_body mass_properties' changed to 'part modify rigid_body mass_properties'",
+      "passed": false,
+      "evidence": "File still uses 'part create rigid_body mass_properties' instead of 'part modify rigid_body mass_properties'"
+    },
+    {
+      "text": "removes_adams_id: 'adams_id = 3' removed",
+      "passed": true,
+      "evidence": "No 'adams_id' keyword present anywhere in the fixed script"
+    },
+    {
+      "text": "removes_center_of_mass_marker: 'center_of_mass_marker = .pendulum.link.cm' is NOT present in the final script",
+      "passed": false,
+      "evidence": "File explicitly creates .pendulum.link.cm marker and passes 'center_of_mass_marker = .pendulum.link.cm' in the mass_properties block"
+    },
+    {
+      "text": "fixes_missing_dot_paths: 'pendulum.link.pin_mkr' corrected to '.pendulum.link.pin_mkr' (missing leading dot fixed in both marker create and i_marker_name)",
+      "passed": true,
+      "evidence": "Both 'marker_name = .pendulum.link.pin_mkr' and 'i_marker_name = .pendulum.link.pin_mkr' have the required leading dot"
+    },
+    {
+      "text": "fixes_spring_damper_keyword: 'force create element_like spring_damper' changed to 'force create element_like translational_spring_damper' and 'length = 200.0' changed to 'displacement_at_preload = 200.0'",
+      "passed": true,
+      "evidence": "File uses 'force create element_like translational_spring_damper' with 'displacement_at_preload = 200.0'"
+    },
+    {
+      "text": "fixes_simulation_command: 'sim trans end_time = 2.0 step_size = 0.001' changed to 'simulation single_run transient' with proper parameters",
+      "passed": true,
+      "evidence": "File uses 'simulation single_run transient' with type, end_time, and number_of_steps parameters"
+    },
+    {
+      "text": "adams_view_no_errors: The corrected CMD script runs in Adams View without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "No 'ERROR:' lines found in aview.log; simulation completed successfully with 'batch run is finished' and 'Finished -----'; run_adams_cmd.py exited with code 0"
+    }
+  ]
+}

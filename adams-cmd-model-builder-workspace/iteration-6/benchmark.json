@@ -1,0 +1,89 @@
+{
+  "metadata": {
+    "skill_name": "adams-cmd-model-builder",
+    "skill_path": "skills/adams-cmd-model-builder",
+    "timestamp": "2026-03-23T00:00:00Z",
+    "evals_run": [
+      "long-lines-and-expressions"
+    ],
+    "runs_per_configuration": 1,
+    "notes": [
+      "New eval: long-lines-and-expressions — tests that the agent keeps (eval(...)) expressions on single lines while actively splitting long function strings using comma-separated quoted strings.",
+      "with_skill: 12/12 pass. Correctly splits function string as comma-separated quoted strings. All eval expressions on single lines. No adams_id. Full simulation command.",
+      "without_skill: 7/12 pass. Critical failure: breaks FUNCTION= string with & inside double-quoted expression (the exact incident bug). Also adds adams_id everywhere, uses wrong force command (missing 'direct'), and omits simulation parameters."
+    ]
+  },
+  "runs": [
+    {
+      "eval_id": "long-lines-and-expressions",
+      "eval_name": "Long Lines and Expressions",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 12,
+        "failed": 0,
+        "total": 12
+      },
+      "expectations": [
+        {"text": "Script creates a model named 'crane' with three rigid body parts (tower, boom, payload)", "passed": true, "evidence": "model create model_name = crane, then part create for .crane.tower, .crane.boom, .crane.payload"},
+        {"text": "Boom markers use eval() with loc_global() to compute positions relative to the boom's CM", "passed": true, "evidence": "mkr_boom_base and mkr_boom_tip both use (eval(loc_global(...)))"},
+        {"text": "mkr_boom_tip uses ori_along_axis() for orientation toward the payload", "passed": true, "evidence": "orientation = (eval(ori_along_axis(.crane.boom.cm, .crane.payload.cm, 'z')))"},
+        {"text": "Every eval expression (eval(...)) stays entirely on one line - no & inside parentheses", "passed": true, "evidence": "All three eval expressions are on single lines with no & continuation inside. Script even cites Rule 16."},
+        {"text": "The long FUNCTION= expression is split across multiple lines (comma-separated quoted strings), not on one enormous line", "passed": true, "evidence": "function = 'STEP5(...)' , & ' + STEP5(...)' , & ' - 2.0 * VZ(...)' — correctly split as comma-separated quoted strings"},
+        {"text": "Two revolute joints (tower-ground, boom-tower) and one spherical joint (payload-boom)", "passed": true, "evidence": "Two constraint create joint revolute and one constraint create joint spherical"},
+        {"text": "Force function includes STEP5 ramps and a VZ velocity-damping term", "passed": true, "evidence": "STEP5 ramps and - 2.0 * VZ(...) present"},
+        {"text": "Mass/inertia set with part modify rigid_body mass_properties", "passed": true, "evidence": "All three parts use part modify rigid_body mass_properties"},
+        {"text": "All object names use full dot-path hierarchy", "passed": true, "evidence": "All names use .crane.* paths"},
+        {"text": "No adams_id specified anywhere", "passed": true, "evidence": "No adams_id keyword in the script"},
+        {"text": "Cylinder geometry on tower and boom, ellipsoid on payload", "passed": true, "evidence": "geometry create shape cylinder for tower and boom; ellipsoid for payload"},
+        {"text": "Uses simulation single_run transient for 3 seconds with 3000 steps", "passed": true, "evidence": "simulation single_run transient with all required parameters"}
+      ]
+    },
+    {
+      "eval_id": "long-lines-and-expressions",
+      "eval_name": "Long Lines and Expressions",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.583,
+        "passed": 7,
+        "failed": 5,
+        "total": 12
+      },
+      "expectations": [
+        {"text": "Script creates a model named 'crane' with three rigid body parts (tower, boom, payload)", "passed": true, "evidence": "model create and three part create present"},
+        {"text": "Boom markers use eval() with loc_global() to compute positions relative to the boom's CM", "passed": true, "evidence": "mkr_boom_base and mkr_boom_tip use loc_global"},
+        {"text": "mkr_boom_tip uses ori_along_axis() for orientation toward the payload", "passed": true, "evidence": "marker modify with ori_along_axis"},
+        {"text": "Every eval expression (eval(...)) stays entirely on one line - no & inside parentheses", "passed": false, "evidence": "orientation = & (newline) (eval(...)) — fragile & between = and the expression"},
+        {"text": "The long FUNCTION= expression is split across multiple lines (comma-separated quoted strings), not on one enormous line", "passed": false, "evidence": "& continuation placed INSIDE the double-quoted string — the exact incident bug"},
+        {"text": "Two revolute joints (tower-ground, boom-tower) and one spherical joint (payload-boom)", "passed": true, "evidence": "All three joints present"},
+        {"text": "Force function includes STEP5 ramps and a VZ velocity-damping term", "passed": false, "evidence": "Uses 'force create single_component_force' (missing 'direct') — will error in Adams"},
+        {"text": "Mass/inertia set with part modify rigid_body mass_properties", "passed": true, "evidence": "All three parts use part modify"},
+        {"text": "All object names use full dot-path hierarchy", "passed": true, "evidence": "All .crane.* paths"},
+        {"text": "No adams_id specified anywhere", "passed": false, "evidence": "adams_id on every part, joint, geometry, and force"},
+        {"text": "Cylinder geometry on tower and boom, ellipsoid on payload", "passed": true, "evidence": "Cylinders and ellipsoid present"},
+        {"text": "Uses simulation single_run transient for 3 seconds with 3000 steps", "passed": false, "evidence": "Missing type, model_name, initial_static parameters"}
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": { "mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0 },
+      "evals": {
+        "long-lines-and-expressions": { "pass_rate": 1.0 }
+      }
+    },
+    "without_skill": {
+      "pass_rate": { "mean": 0.583, "stddev": 0.0, "min": 0.583, "max": 0.583 },
+      "evals": {
+        "long-lines-and-expressions": { "pass_rate": 0.583 }
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.42",
+      "time_seconds": "N/A",
+      "tokens": "N/A"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "eval_id": "long-lines-and-expressions",
+  "eval_name": "long-lines-and-expressions",
+  "prompt": "Write an Adams CMD script for a model called 'crane'. It has three rigid parts:\n\n1. A tower (5 kg, Ixx=Iyy=10000 kg\u00b7mm\u00b2, Izz=500 kg\u00b7mm\u00b2) at 0, 0, 500 mm\n2. A boom (3 kg, Ixx=Iyy=8000 kg\u00b7mm\u00b2, Izz=300 kg\u00b7mm\u00b2) at 400, 0, 1000 mm\n3. A payload (10 kg, Ixx=Iyy=Izz=100 kg\u00b7mm\u00b2) at 800, 0, 800 mm\n\nOn the boom, create two markers using eval and loc_global:\n- mkr_boom_base at local offset {-200, 0, 0} from the boom's CM\n- mkr_boom_tip at local offset {200, 0, 0} from the boom's CM\nUse ori_along_axis to orient mkr_boom_tip so its z-axis points from the boom's CM toward the payload's CM.\n\nConnect tower to ground with a revolute joint at the tower base, boom to tower top with a revolute joint, and payload to boom tip with a spherical joint.\n\nApply a single-component force on the payload using a complex FUNCTION= expression: STEP5(TIME, 0.0, 0.0, 0.5, -500.0) + STEP5(TIME, 1.0, 0.0, 1.5, 500.0) - 2.0 * VZ(.crane.payload.cm, .crane.ground.origin, .crane.ground.origin, .crane.ground.origin) (the expression should be readable \u2014 split it across lines if the syntax allows).\n\nAdd cylinder geometry to the tower and boom, and an ellipsoid to the payload. Simulate for 3 seconds with 3000 steps.",
+  "assertions": [
+    "model_and_parts_created: Script creates a model named 'crane' with three rigid body parts (tower, boom, payload)",
+    "markers_use_eval_loc_global: Boom markers use eval() with loc_global() to compute positions relative to the boom's CM",
+    "markers_use_ori_along_axis: mkr_boom_tip uses ori_along_axis() for orientation toward the payload",
+    "eval_expressions_single_line: Every eval expression (eval(...)) stays entirely on one line \u2014 no & inside parentheses",
+    "function_string_split_across_lines: The long FUNCTION= expression is split across multiple lines (comma-separated quoted strings or & between args), not on one enormous line",
+    "joints_correct: Two revolute joints (tower-ground, boom-tower) and one spherical joint (payload-boom)",
+    "force_expression_correct: Force function includes STEP5 ramps and a VZ velocity-damping term",
+    "mass_properties_uses_modify: Mass/inertia set with part modify rigid_body mass_properties",
+    "dot_path_names: All object names use full dot-path hierarchy",
+    "no_adams_id: No adams_id specified anywhere",
+    "geometry_present: Cylinder geometry on tower and boom, ellipsoid on payload",
+    "simulate_transient: Uses simulation single_run transient for 3 seconds with 3000 steps"
+  ]
+}

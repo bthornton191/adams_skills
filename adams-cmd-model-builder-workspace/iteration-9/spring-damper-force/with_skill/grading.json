@@ -1,0 +1,35 @@
+{
+  "summary": {"passed": 6, "failed": 0, "total": 6, "pass_rate": 1.0},
+  "expectations": [
+    {
+      "text": "correct_command: Uses force create element_like translational_spring_damper (not single_component_force or bushing)",
+      "passed": true,
+      "evidence": "Response uses 'force create element_like translational_spring_damper' in both the syntax block and the complete example."
+    },
+    {
+      "text": "stiffness_param: Includes stiffness = 5000",
+      "passed": true,
+      "evidence": "stiffness = 5000.0 is present in both the syntax block and the complete example."
+    },
+    {
+      "text": "damping_param: Includes damping = 100",
+      "passed": true,
+      "evidence": "damping = 100.0 is present in both the syntax block and the complete example."
+    },
+    {
+      "text": "length_param: Includes displacement_at_preload = 250 (NOT 'length = 250' or 'free_length = 250')",
+      "passed": true,
+      "evidence": "displacement_at_preload = 250.0 is used throughout. The response explicitly warns 'Using length = 250.0 will error' and labels displacement_at_preload as 'Free length in mm'."
+    },
+    {
+      "text": "marker_references: References both i_marker_name and j_marker_name",
+      "passed": true,
+      "evidence": "Both i_marker_name and j_marker_name are present in the syntax block and complete example (spring_i_mkr and spring_j_mkr)."
+    },
+    {
+      "text": "explains_when_to_use: Explains that spring_damper is for 1-DOF along a line of action",
+      "passed": true,
+      "evidence": "Key Rules states 'The I and J markers define the line of action'; the force equation F = -K*(d-d0) - C*d_dot and use of a translational joint in the example make the 1-DOF along-a-line-of-action nature explicit."
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "summary": {
+    "passed": 14,
+    "failed": 0,
+    "total": 14,
+    "pass_rate": 1.0
+  },
+  "expectations": [
+    {
+      "text": "A for / end loop drives mass and/or spring-damper creation",
+      "passed": true,
+      "evidence": "chain.cmd: two FOR loops — 'for variable_name = i  start_value = 1  end_value = (eval(.chain.n_masses))' for masses and 'for variable_name = j  start_value = 1  end_value = (eval(.chain.n_masses - 1))' for spring-dampers"
+    },
+    {
+      "text": "EVAL() used to dereference a variable inside a command string",
+      "passed": true,
+      "evidence": "chain.cmd: e.g. 'point_mass_name = (eval(\".chain.mass_\" // RTOI(i)))' and 'stiffness = (eval(.chain.stiffness))'"
+    },
+    {
+      "text": "RTOI() used to convert the loop counter to a string for name construction",
+      "passed": true,
+      "evidence": "chain.cmd: e.g. 'RTOI(i)' in mass loop and 'RTOI(j)', 'RTOI(j + 1)' in spring-damper loop"
+    },
+    {
+      "text": "// string concatenation operator used to build part/marker names",
+      "passed": true,
+      "evidence": "chain.cmd: e.g. '\".chain.mass_\" // RTOI(i)' and '\".chain.spr_\" // RTOI(j) // \"_\" // RTOI(j + 1)'"
+    },
+    {
+      "text": "Masses created with part create point_mass (not rigid_body)",
+      "passed": true,
+      "evidence": "chain.cmd: 'part create point_mass name_and_position' inside the FOR loop"
+    },
+    {
+      "text": "Spring-dampers created with force create element_like translational_spring_damper with stiffness=100, damping=1.0, displacement_at_preload=50",
+      "passed": true,
+      "evidence": "chain.cmd: 'force create element_like translational_spring_damper' with stiffness=(eval(.chain.stiffness)) [=100], damping=(eval(.chain.damping)) [=1.0], displacement_at_preload=(eval(.chain.free_len)) [=50]"
+    },
+    {
+      "text": "First mass (mass_1) is fixed to ground with a spherical joint or atpoint primitive (NOT fixed joint — fixed joint is overconstrained for a point mass)",
+      "passed": true,
+      "evidence": "chain.cmd: 'constraint create joint spherical  joint_name = .chain.sph_gnd_1  i_marker_name = .chain.mass_1.cm  j_marker_name = .chain.ground.anchor_mkr'"
+    },
+    {
+      "text": "Exactly 8 masses are created",
+      "passed": true,
+      "evidence": "chain.cmd: variable n_masses = 8, loop end_value = (eval(.chain.n_masses)) creates mass_1 through mass_8"
+    },
+    {
+      "text": "Masses are spaced 50 mm apart along the X axis",
+      "passed": true,
+      "evidence": "chain.cmd: variable spacing = 50.0; location = (eval((i - 1) * .chain.spacing)), 0.0, 0.0"
+    },
+    {
+      "text": "Script uses simulation single_run transient command (or notes the command to run)",
+      "passed": true,
+      "evidence": "chain.cmd: 'simulation single_run transient  type = auto_select  end_time = 2.0  number_of_steps = 2000  model_name = .chain  initial_static = no'"
+    },
+    {
+      "text": "All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "chain.cmd: all names use .chain.mass_N, .chain.spr_N_M, .chain.ground.anchor_mkr, .chain.sph_gnd_1 etc."
+    },
+    {
+      "text": "No adams_id specified anywhere in the script",
+      "passed": true,
+      "evidence": "chain.cmd: no occurrence of 'adams_id' anywhere in the file"
+    },
+    {
+      "text": "At least one geometry shape (sphere or cylinder) is added to each mass for visual inspection",
+      "passed": true,
+      "evidence": "chain.cmd: 'geometry create shape ellipsoid ... center_marker = (eval(\".chain.mass_\" // RTOI(i) // \".cm\"))' created for every mass inside the FOR loop"
+    },
+    {
+      "text": "CMD script runs in Adams View (via scripts/run_adams_cmd.py) without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "aview.log: no lines containing 'ERROR:' found; lines 3190 and 3195 contain TypeError/SyntaxError in Python traceback comments (prefixed with !) but do not match the 'ERROR:' pattern"
+    }
+  ]
+}

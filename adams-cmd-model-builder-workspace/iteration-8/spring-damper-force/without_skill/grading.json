@@ -1,0 +1,35 @@
+{
+  "summary": {"passed": 5, "failed": 1, "total": 6, "pass_rate": 0.8333},
+  "expectations": [
+    {
+      "text": "correct_command: Uses force create element_like translational_spring_damper (not single_component_force or bushing)",
+      "passed": true,
+      "evidence": "Response explicitly uses 'force create element_like translational_spring_damper' in both the example and modify sections."
+    },
+    {
+      "text": "stiffness_param: Includes stiffness = 5000",
+      "passed": true,
+      "evidence": "Uses 'stiffness_coefficient = 5000.0' — value 5000 is present and clearly stiffness-related. Parameter name differs from canonical 'stiffness' but value is correct."
+    },
+    {
+      "text": "damping_param: Includes damping = 100",
+      "passed": true,
+      "evidence": "Uses 'damping_coefficient = 100.0' — value 100 is present and clearly damping-related. Parameter name differs from canonical 'damping' but value is correct."
+    },
+    {
+      "text": "length_param: Includes displacement_at_preload = 250 (free length — parameter name must be displacement_at_preload, NOT 'length')",
+      "passed": false,
+      "evidence": "Response uses 'free_length = 250.0' instead of the required 'displacement_at_preload = 250'. The rubric explicitly flags any non-displacement_at_preload name as wrong."
+    },
+    {
+      "text": "marker_references: References both i_marker_name and j_marker_name",
+      "passed": true,
+      "evidence": "Both 'i_marker_name = .MODEL_1.PART_1.MAR_SPRING_I' and 'j_marker_name = .MODEL_1.PART_2.MAR_SPRING_J' are present."
+    },
+    {
+      "text": "explains_when_to_use: Explains that spring_damper is for 1-DOF along a line of action",
+      "passed": true,
+      "evidence": "Overview states 'The force acts along the line joining two markers' and How It Works describes the scalar 1-DOF force law F = k*(L-L0) + c*dL/dt along the line between markers."
+    }
+  ]
+}

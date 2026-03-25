@@ -1,0 +1,25 @@
+﻿Using mdi.bat: C:\Program Files\MSC.Software\Adams\2023_2\common\mdi.bat
+Running: gear_coupler.cmd
+Working dir: C:\Users\ben.thornton\code\adams_skills\adams-cmd-model-builder-workspace\iteration-7\gear-coupler-havsin\without_skill\outputs
+Adams View launched, waiting up to 120s for completion...
+Adams View finished.
+python : Traceback (most recent call last):
+At line:1 char:1
++ python "c:\Users\ben.thornton\code\adams_skills\skills\adams-cmd-mode ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last) 
+   ::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "c:\Users\ben.thornton\code\adams_skills\skills\adams-cmd-model-builder\
+scripts\run_adams_cmd.py", line 210, in <module>
+    main()
+  File "c:\Users\ben.thornton\code\adams_skills\skills\adams-cmd-model-builder\
+scripts\run_adams_cmd.py", line 194, in main
+    shutil.copy2(log_path, out_path)
+  File 
+"C:\Users\ben.thornton\AppData\Local\Programs\Python\Python312\Lib\shutil.py", 
+line 460, in copy2
+    _winapi.CopyFile2(src_, dst_, flags)
+PermissionError: [WinError 32] The process cannot access the file because it 
+is being used by another process

@@ -1,0 +1,6 @@
+{
+  "eval_id": "long-lines-and-expressions",
+  "eval_name": "long-lines-and-expressions",
+  "prompt": "Write an Adams CMD script for a model called 'crane' with a 80-character line length guideline.",
+  "assertions": []
+}

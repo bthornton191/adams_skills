@@ -1,0 +1,70 @@
+{
+  "summary": {
+    "pass_rate": 0.583,
+    "passed": 7,
+    "failed": 5,
+    "total": 12
+  },
+  "expectations": [
+    {
+      "text": "Script creates a model named 'crane' with three rigid body parts (tower, boom, payload)",
+      "passed": true,
+      "evidence": "model create model_name = .crane, then part create rigid_body name_and_position for .crane.tower, .crane.boom, .crane.payload"
+    },
+    {
+      "text": "Boom markers use eval() with loc_global() to compute positions relative to the boom's CM",
+      "passed": true,
+      "evidence": "mkr_boom_base: location = (eval(loc_global({-200, 0, 0}, .crane.boom.cm))); mkr_boom_tip also uses loc_global"
+    },
+    {
+      "text": "mkr_boom_tip uses ori_along_axis() for orientation toward the payload",
+      "passed": true,
+      "evidence": "A marker modify is issued with orientation = (eval(ori_along_axis(.crane.payload.cm, .crane.boom.mkr_boom_tip, 'z')))"
+    },
+    {
+      "text": "Every eval expression (eval(...)) stays entirely on one line - no & inside parentheses",
+      "passed": false,
+      "evidence": "The marker modify for mkr_boom_tip orientation uses 'orientation = & (newline) (eval(...))' - a & continuation between the = and the opening parenthesis. While the expression itself is not internally broken, this pattern is fragile and non-standard."
+    },
+    {
+      "text": "The long FUNCTION= expression is split across multiple lines (comma-separated quoted strings), not on one enormous line",
+      "passed": false,
+      "evidence": "The FUNCTION= value places & continuation characters INSIDE the double-quoted string: 'STEP5(TIME,0,0,0.5,-500) + & (newline) STEP5(TIME,1,0,1.5,500) - & (newline) 2.0*VZ(...)'. This is the exact incident bug - Adams cannot parse expressions that span multiple lines inside quotes."
+    },
+    {
+      "text": "Two revolute joints (tower-ground, boom-tower) and one spherical joint (payload-boom)",
+      "passed": true,
+      "evidence": "constraint create joint revolute for jnt_tower_ground and jnt_boom_tower; constraint create joint spherical for jnt_payload_boom"
+    },
+    {
+      "text": "Force function includes STEP5 ramps and a VZ velocity-damping term",
+      "passed": false,
+      "evidence": "The function components are present (STEP5 and VZ) but the command uses 'force create single_component_force' instead of 'force create direct single_component_force' - missing the 'direct' sub-command which will cause an error in Adams View."
+    },
+    {
+      "text": "Mass/inertia set with part modify rigid_body mass_properties",
+      "passed": true,
+      "evidence": "All three parts use part modify rigid_body mass_properties"
+    },
+    {
+      "text": "All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "All names use full .crane.* paths"
+    },
+    {
+      "text": "No adams_id specified anywhere",
+      "passed": false,
+      "evidence": "adams_id is specified on every part (adams_id = 2, 3, 4), every joint (adams_id = 1, 2, 3), every geometry entity, and the force"
+    },
+    {
+      "text": "Cylinder geometry on tower and boom, ellipsoid on payload",
+      "passed": true,
+      "evidence": "geometry create shape cylinder for tower and boom; geometry create shape ellipsoid for payload"
+    },
+    {
+      "text": "Uses simulation single_run transient for 3 seconds with 3000 steps",
+      "passed": false,
+      "evidence": "Uses simulation single_run transient with end_time = 3.0 and number_of_steps = 3000, but is missing type = auto_select, model_name = .crane, and initial_static = no"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "expectations": [
+    {
+      "text": "Uses force create element_like translational_spring_damper (not single_component_force or bushing)",
+      "passed": true,
+      "evidence": "response.md line 5: Use `force create element_like translational_spring_damper` to create a 1-DOF spring-damper; also line 82 in code block"
+    },
+    {
+      "text": "Includes stiffness = 5000",
+      "passed": true,
+      "evidence": "response.md line 86:     stiffness               = 5000.0"
+    },
+    {
+      "text": "Includes damping = 100",
+      "passed": true,
+      "evidence": "response.md line 87:     damping                 = 100.0"
+    },
+    {
+      "text": "Includes length = 250 (free length) or displacement_at_preload = 250",
+      "passed": true,
+      "evidence": "response.md line 89:     displacement_at_preload = 250.0"
+    },
+    {
+      "text": "References both i_marker_name and j_marker_name",
+      "passed": true,
+      "evidence": "response.md line 84:     i_marker_name           = .spring_demo.mass_block.spring_bot; line 85:     j_marker_name           = .spring_demo.ground.spring_top"
+    },
+    {
+      "text": "Explains that spring_damper is for 1-DOF along a line of action",
+      "passed": true,
+      "evidence": "response.md line 5: to create a 1-DOF spring-damper that acts along the line of sight between two markers"
+    }
+  ]
+}

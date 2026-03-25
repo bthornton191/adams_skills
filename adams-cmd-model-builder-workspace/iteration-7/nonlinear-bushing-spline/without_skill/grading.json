@@ -1,0 +1,75 @@
+{
+  "summary": {
+    "passed": 12,
+    "failed": 1,
+    "total": 13,
+    "pass_rate": 0.92
+  },
+  "expectations": [
+    {
+      "text": "A data_element create spline command defines the X stiffness table",
+      "passed": true,
+      "evidence": "bushing.cmd: data_element create spline spline_name = .rubber_mount.x_force_spline"
+    },
+    {
+      "text": "Spline x values include -10, -5, 0, 5, 10 (or equivalent in correct units)",
+      "passed": true,
+      "evidence": "bushing.cmd: x = -10.0, -5.0, 0.0, 5.0, 10.0"
+    },
+    {
+      "text": "Spline y values include -8000, -3000, 0, 3000, 8000",
+      "passed": true,
+      "evidence": "bushing.cmd: y = -8000.0, -3000.0, 0.0, 3000.0, 8000.0"
+    },
+    {
+      "text": "force create direct general_force is used for the X-direction force (required to implement AKISPL nonlinear curve; a simple bushing only accepts constant stiffness per DOF)",
+      "passed": true,
+      "evidence": "bushing.cmd: force create direct general_force general_force_name = .rubber_mount.rubber_mount_gforce"
+    },
+    {
+      "text": "x_force_function uses AKISPL() to look up force from the spline based on DX displacement",
+      "passed": true,
+      "evidence": "bushing.cmd: x_force_function = \"-AKISPL(DX(.rubber_mount.subframe.bush_i, .rubber_mount.chassis.bush_j, .rubber_mount.chassis.bush_j), 0, .rubber_mount.x_force_spline, 0)\""
+    },
+    {
+      "text": "Y and Z translational stiffness of 5000 N/mm implemented — either as y/z force functions in the GFORCE ('-5000 * DY(...)'), or via a separate bushing element with Ky=Kz=5000 N/mm",
+      "passed": true,
+      "evidence": "bushing.cmd: y_force_function = \"-5000.0 * DY(...)\" and z_force_function = \"-5000.0 * DZ(...)\""
+    },
+    {
+      "text": "Rotational stiffness of 200 N·mm/deg implemented. Preferred approach: a separate bushing element with angular stiffness converted to N·mm/rad (200 × π/180 ≈ 3.491 N·mm/rad per axis). Do NOT use the invalid 'rotational_stiffness' bushing parameter.",
+      "passed": true,
+      "evidence": "bushing.cmd: x_torque_function = \"(-200.0 / 1D) * AX(...)\" — uses Adams 1D constant (pi/180) to convert 200 N·mm/deg to N·mm/rad; same for y and z torque functions"
+    },
+    {
+      "text": "Mass/inertia set with part modify rigid_body mass_properties, not part create",
+      "passed": true,
+      "evidence": "bushing.cmd: part modify rigid_body mass_properties part_name = .rubber_mount.chassis ... and part modify rigid_body mass_properties part_name = .rubber_mount.subframe ..."
+    },
+    {
+      "text": "All object names use full dot-path hierarchy",
+      "passed": true,
+      "evidence": "bushing.cmd: all markers, parts, forces use full paths such as .rubber_mount.chassis.bush_j, .rubber_mount.subframe.bush_i, .rubber_mount.rubber_mount_gforce"
+    },
+    {
+      "text": "No adams_id specified anywhere in the script",
+      "passed": true,
+      "evidence": "bushing.cmd: grep for adams_id returns no matches"
+    },
+    {
+      "text": "center_of_mass_marker argument is NOT passed in any part modify mass_properties call",
+      "passed": false,
+      "evidence": "bushing.cmd: center_of_mass_marker = .rubber_mount.chassis.cm passed in chassis mass_properties call; center_of_mass_marker = .rubber_mount.subframe.cm passed in subframe mass_properties call"
+    },
+    {
+      "text": "At least one geometry shape is added to each moving part for visual inspection",
+      "passed": true,
+      "evidence": "bushing.cmd: geometry create shape ellipsoid ellipsoid_name = .rubber_mount.chassis.chassis_ellips (chassis) and ellipsoid_name = .rubber_mount.subframe.subframe_ellips (subframe)"
+    },
+    {
+      "text": "CMD script runs in Adams View (via scripts/run_adams_cmd.py) without any ERROR: lines in aview.log",
+      "passed": true,
+      "evidence": "aview.log: no lines matching ^ERROR: found; two comment lines contain 'TypeError:' and 'SyntaxError:' as Python exception names in comments but these are not Adams ERROR: lines"
+    }
+  ]
+}

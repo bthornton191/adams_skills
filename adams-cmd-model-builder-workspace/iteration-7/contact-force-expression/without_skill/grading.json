@@ -1,0 +1,40 @@
+{
+  "summary": {
+    "passed": 5,
+    "failed": 1,
+    "total": 6,
+    "pass_rate": 0.83
+  },
+  "expectations": [
+    {
+      "text": "Uses the IMPACT() function (not BISTOP or a manual IF expression)",
+      "passed": true,
+      "evidence": "response.md: FUNCTION=IMPACT(DZ(cm_marker_id, ground_marker_id), VZ(cm_marker_id, ground_marker_id), 0.0, 1.0E+5, 1.5, 50.0, 0.1)"
+    },
+    {
+      "text": "First arg uses DZ or similar displacement measuring penetration below floor",
+      "passed": true,
+      "evidence": "response.md: DZ(cm_marker_id, ground_marker_id) — 'Current Z-position of the part's CM'"
+    },
+    {
+      "text": "Second arg uses VZ or matching velocity measure",
+      "passed": true,
+      "evidence": "response.md: VZ(cm_marker_id, ground_marker_id) — 'Current Z-velocity of the part's CM'"
+    },
+    {
+      "text": "Threshold value is 0.0 (or equivalent contact point)",
+      "passed": true,
+      "evidence": "response.md: x1 = 0.0 — 'Contact boundary — floor at Z = 0'"
+    },
+    {
+      "text": "Stiffness 1e5, exponent 1.5, damping 50, penetration 0.1 all present",
+      "passed": true,
+      "evidence": "response.md: IMPACT(..., 1.0E+5, 1.5, 50.0, 0.1) — table confirms k=1.0E+5, e=1.5, cmax=50.0, d=0.1"
+    },
+    {
+      "text": "Expression wrapped in double quotes as required for FUNCTION= parameter",
+      "passed": false,
+      "evidence": "response.md shows FUNCTION=IMPACT(...) with no surrounding double quotes — uses numeric SFORCE/1 dataset format where quotes are absent, rather than the quoted CMD command language format"
+    }
+  ]
+}

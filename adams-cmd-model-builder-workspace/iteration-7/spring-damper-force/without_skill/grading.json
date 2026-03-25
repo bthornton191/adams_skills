@@ -1,0 +1,40 @@
+{
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "expectations": [
+    {
+      "text": "Uses force create element_like translational_spring_damper (not single_component_force or bushing)",
+      "passed": true,
+      "evidence": "response.md line 3: use the `force create element_like translational_spring_damper` command; also line 25 in code block"
+    },
+    {
+      "text": "Includes stiffness = 5000",
+      "passed": true,
+      "evidence": "response.md line 29:   stiffness = 5000.0"
+    },
+    {
+      "text": "Includes damping = 100",
+      "passed": true,
+      "evidence": "response.md line 30:   damping = 100.0"
+    },
+    {
+      "text": "Includes length = 250 (free length) or displacement_at_preload = 250",
+      "passed": true,
+      "evidence": "response.md line 31:   free_length = 250.0"
+    },
+    {
+      "text": "References both i_marker_name and j_marker_name",
+      "passed": true,
+      "evidence": "response.md line 27:   i_marker_name = .MODEL.PART_1.MAR_SPRING_I; line 28:   j_marker_name = .MODEL.PART_2.MAR_SPRING_J"
+    },
+    {
+      "text": "Explains that spring_damper is for 1-DOF along a line of action",
+      "passed": true,
+      "evidence": "response.md line 7: The two markers define the spring's line of action — Adams measures spring deformation along the vector from j_marker to i_marker"
+    }
+  ]
+}

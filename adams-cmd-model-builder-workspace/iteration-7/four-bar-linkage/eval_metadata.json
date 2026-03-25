@@ -1,0 +1,6 @@
+{
+  "eval_id": "four-bar-linkage",
+  "eval_name": "four-bar-linkage",
+  "prompt": "Write an Adams CMD script to build a four-bar linkage mechanism. It has three moving rigid links: a crank (100 mm long, 0.5 kg), a coupler (250 mm long, 0.5 kg), and a rocker (200 mm long, 0.5 kg). The crank is pinned to the ground at the origin; the rocker is pinned to the ground 300 mm to the right. Connect the free ends of the crank and rocker with the coupler via revolute joints. Drive the crank at a constant 360 degrees per second. Simulate for 2 seconds at 0.001 s steps.",
+  "assertions": []
+}
