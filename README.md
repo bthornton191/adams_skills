@@ -40,6 +40,17 @@ curl -fsSL https://raw.githubusercontent.com/bthornton191/adams_skills/main/inst
 
 Compatible with GitHub Copilot (VS Code), Claude Code, Cursor, and Windsurf.
 
+## Development
+
+### Making a release
+
+Create and push a version tag — the CI workflow will package all skills and publish a GitHub release automatically:
+
+```powershell
+git tag v1.2.3
+git push origin v1.2.3
+```
+
 ## License
 
 [MIT](LICENSE)

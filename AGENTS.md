@@ -44,6 +44,19 @@ python -m scripts.run_eval ..\..\..\skills\<skill-name>
 
 Eval prompts are in `skills/<skill-name>/evals/evals.json`. Results and grading go in `evals/results/`.
 
+## Making a release
+
+Create and push a `v*.*.*` tag. The `release.yml` workflow will:
+
+1. Stamp the version from the tag into each `SKILL.md` frontmatter
+2. Package all skills into `dist/*.zip`
+3. Publish a GitHub Release with the zip files attached
+
+```powershell
+git tag v1.2.3
+git push origin v1.2.3
+```
+
 ## Key conventions
 
 - `compatibility` in SKILL.md frontmatter must be a **comma-separated string**, not a YAML list
